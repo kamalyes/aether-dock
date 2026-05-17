@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Star, Download, Trash2, BellDot, GitCommit } from 'lucide-react'
+import { Star, Download, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { Skill } from '@/types'
 import { SkillIcon } from '@/components/ui/SkillIcon'
@@ -52,11 +52,13 @@ export function SkillCard({
   const versionDiffs = useSkillStore((s) => s.versionDiffs)
   const visibleTags = skill.tags?.slice(0, 3) || []
   const diffInfo = versionDiffs[skill.id]
+  const showUpdate = hasUpdate || diffInfo?.hasUpdate
 
   return (
     <StaggerItem>
       <motion.div
-        className="glass-card-hover group relative p-5 cursor-pointer"
+        className="glass-card-hover group relative cursor-pointer overflow-hidden"
+        style={{ padding: 20, height: 180 }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => onClick(skill)}
@@ -64,14 +66,25 @@ export function SkillCard({
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
       >
-        {hasUpdate && (
-          <div
-            className="absolute left-4 top-4 z-10 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
-            style={{ background: 'var(--c-amber-soft)', color: 'var(--c-amber)' }}
+        {showUpdate && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setDiffOpen(true)
+            }}
+            className="absolute top-0 right-0 z-10"
+            style={{ width: 0, height: 0, borderStyle: 'solid', borderWidth: '0 32px 32px 0', borderColor: 'transparent var(--c-amber) transparent transparent', cursor: 'pointer' }}
+            title={t('skills.viewDiff', 'View version diff')}
           >
-            <BellDot style={{ width: 12, height: 12 }} className="animate-pulse" />
-            {t('skills.updateAvailable', 'Update')}
-          </div>
+            <span
+              className="absolute flex items-center justify-center"
+              style={{ top: 2, right: -28, width: 20, height: 20 }}
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="18 15 12 9 6 15" />
+              </svg>
+            </span>
+          </button>
         )}
 
         <div className="flex items-start justify-between mb-3">
@@ -101,21 +114,6 @@ export function SkillCard({
                 title={t('skills.quickInstall', 'Quick Install')}
               >
                 <Download style={{ width: 14, height: 14 }} />
-              </button>
-            )}
-            {(hasUpdate || diffInfo?.hasUpdate) && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setDiffOpen(true)
-                }}
-                className="p-1.5 rounded-lg transition-colors"
-                style={{ color: 'var(--c-amber)' }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--c-amber-soft)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-                title={t('skills.viewDiff', 'View version diff')}
-              >
-                <GitCommit style={{ width: 14, height: 14 }} />
               </button>
             )}
             {onToggleFavorite && (
@@ -158,33 +156,33 @@ export function SkillCard({
           <StatusBadge status={skill.status} size="sm" />
         </div>
 
-        {skill.description && (
-          <p style={{ fontSize: 11, color: 'var(--c-text-muted)', lineHeight: 1.5 }} className="line-clamp-2 mb-3">
-            {skill.description}
-          </p>
-        )}
+        <p style={{ fontSize: 11, color: 'var(--c-text-muted)', lineHeight: 1.5 }} className="line-clamp-2 mb-3">
+          {skill.description || ' '}
+        </p>
 
-        {visibleTags.length > 0 && (
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {visibleTags.map((tag) => {
-              const color = getTagColor(tag)
-              return (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium"
-                  style={{ background: color.bg, color: color.text }}
-                >
-                  {tag}
+        <div className="absolute bottom-5 left-5 right-5">
+          {visibleTags.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {visibleTags.map((tag) => {
+                const color = getTagColor(tag)
+                return (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium"
+                    style={{ background: color.bg, color: color.text }}
+                  >
+                    {tag}
+                  </span>
+                )
+              })}
+              {skill.tags && skill.tags.length > 3 && (
+                <span style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>
+                  +{skill.tags.length - 3}
                 </span>
-              )
-            })}
-            {skill.tags && skill.tags.length > 3 && (
-              <span style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>
-                +{skill.tags.length - 3}
-              </span>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
+        </div>
       </motion.div>
       <SkillDiffModal
         skillId={skill.id}
