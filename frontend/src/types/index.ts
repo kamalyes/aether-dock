@@ -11,6 +11,7 @@ export interface Skill {
   description: string
   version: string
   sourceId: string
+  sourceName?: string
   installPath: string
   gitUrl: string
   gitBranch: string
@@ -69,7 +70,7 @@ export interface ToolConfig {
   displayName: string
   configPath: string
   skillDir: string
-  mcpConfigPath: string
+  mcpDir: string
   isDetected: boolean
   isEnabled: boolean
   createdAt: string

@@ -36,7 +36,7 @@ func (s *SettingsService) InitDefaults() error {
 		"app.defaultEditor":        "",
 		"app.checkUpdates":         "true",
 		"install.autoSync":         "true",
-		"install.defaultGitBranch": "master",
+		"install.defaultGitBranch": "main",
 	}
 	for k, v := range defaults {
 		existing, err := s.repo.Setting.Get(k)
@@ -55,7 +55,7 @@ func (s *SettingsService) ResetAll() error {
 		"app.defaultEditor":        "",
 		"app.checkUpdates":         "true",
 		"install.autoSync":         "true",
-		"install.defaultGitBranch": "master",
+		"install.defaultGitBranch": "main",
 	}
 	for k, v := range defaults {
 		if err := s.repo.Setting.Set(k, v); err != nil {

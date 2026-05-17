@@ -1,5 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useEffect } from 'react'
+import { APP_VERSION } from '@/constants/app'
 import {
   LayoutDashboard,
   Zap,
@@ -9,11 +11,19 @@ import {
   Settings,
   Hexagon,
   Layers,
+  Command,
 } from 'lucide-react'
 import ToastContainer from '@/components/ui/ToastContainer'
+import CommandPalette from '@/components/ui/CommandPalette'
+import { useThemeStore } from '@/stores/themeStore'
 
 export default function AppLayout() {
   const { t } = useTranslation()
+  const initTheme = useThemeStore((s) => s.init)
+
+  useEffect(() => {
+    initTheme()
+  }, [initTheme])
 
   const mainNav = [
     { to: '/', icon: LayoutDashboard, label: t('nav.dashboard', 'Dashboard'), end: true },
@@ -105,9 +115,18 @@ export default function AppLayout() {
         </nav>
 
         <div className="px-4 py-2.5" style={{ borderTop: '1px solid var(--c-border)' }}>
-          <div className="flex items-center gap-2">
-            <Layers style={{ width: 12, height: 12, color: 'var(--c-text-faint)' }} />
-            <span style={{ fontSize: 10, color: 'var(--c-text-faint)', fontFamily: 'var(--font-mono, monospace)' }}>v0.2.0</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Layers style={{ width: 12, height: 12, color: 'var(--c-text-faint)' }} />
+              <span style={{ fontSize: 10, color: 'var(--c-text-faint)', fontFamily: 'var(--font-mono, monospace)' }}>v{APP_VERSION}</span>
+            </div>
+            <div
+              className="flex items-center gap-1 px-1.5 py-0.5 rounded"
+              style={{ background: 'var(--c-bg-input)', border: '1px solid var(--c-border)' }}
+            >
+              <Command style={{ width: 9, height: 9, color: 'var(--c-text-faint)' }} />
+              <span style={{ fontSize: 9, color: 'var(--c-text-faint)' }}>⇧P</span>
+            </div>
           </div>
         </div>
       </aside>
@@ -116,6 +135,7 @@ export default function AppLayout() {
         <Outlet />
       </main>
       <ToastContainer />
+      <CommandPalette />
     </div>
   )
 }

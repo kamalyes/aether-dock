@@ -9,7 +9,6 @@ import {
   Package,
   RefreshCw,
   Plus,
-  Search,
   CheckSquare,
   Square,
 } from 'lucide-react'
@@ -21,6 +20,7 @@ import SkillDetailPage from '@/components/skills/SkillDetailPage'
 import { BatchActionBar } from '@/components/skills/BatchActionBar'
 import { ViewToggle } from '@/components/ui/ViewToggle'
 import { SortDropdown } from '@/components/ui/SortDropdown'
+import { SearchInput } from '@/components/ui/Form'
 import { motion, AnimatePresence } from 'framer-motion'
 import { StaggerContainer } from '@/components/ui/motion'
 import { FadeIn } from '@/components/ui/motion'
@@ -168,30 +168,11 @@ export default function SkillsPage() {
         }}
       >
         <div className="px-3 py-3" style={{ borderBottom: '1px solid var(--c-border)' }}>
-          <div className="relative">
-            <Search style={{ width: 14, height: 14, position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--c-text-faint)' }} />
-            <input
-              type="text"
-              placeholder={t('skills.search')}
-              style={{
-                width: '100%',
-                paddingLeft: 32,
-                paddingRight: 8,
-                paddingTop: 6,
-                paddingBottom: 6,
-                background: 'var(--c-bg-input)',
-                border: '1px solid var(--c-border)',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: 11,
-                color: 'var(--c-text)',
-                outline: 'none',
-              }}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={(e) => { e.target.style.borderColor = 'var(--c-border-accent)' }}
-              onBlur={(e) => { e.target.style.borderColor = 'var(--c-border)' }}
-            />
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder={t('skills.search')}
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto py-1.5 px-2">

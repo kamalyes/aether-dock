@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { wailsApi } from '@/services/wailsBridge'
-import { RotateCcw, FolderOpen, Pencil, Globe, Shield, Bell, Monitor } from 'lucide-react'
+import { useThemeStore, type ThemeMode } from '@/stores/themeStore'
+import { APP_VERSION } from '@/constants/app'
+import { RotateCcw, FolderOpen, Pencil, Globe, Shield, Bell, Monitor, Sun, Moon, MonitorSmartphone } from 'lucide-react'
 import { TOOL_ICONS } from '@/constants/tools'
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation()
+  const { mode: themeMode, setMode: setThemeMode } = useThemeStore()
   const [settings, setSettings] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
 
@@ -22,6 +25,10 @@ export default function SettingsPage() {
       if (lang && lang !== 'auto') {
         i18n.changeLanguage(lang)
       }
+      const savedTheme = resp.data['app.theme'] as ThemeMode | undefined
+      if (savedTheme && savedTheme !== themeMode) {
+        setThemeMode(savedTheme)
+      }
     }
     setLoading(false)
   }
@@ -35,6 +42,9 @@ export default function SettingsPage() {
       } else {
         i18n.changeLanguage(value)
       }
+    }
+    if (key === 'app.theme') {
+      setThemeMode(value as ThemeMode)
     }
   }
 
@@ -56,16 +66,6 @@ export default function SettingsPage() {
             { value: 'auto', label: t('settings.langAuto', 'Auto (System)') },
             { value: 'en', label: 'English' },
             { value: 'zh', label: '简体中文' },
-          ],
-        },
-        {
-          key: 'app.theme',
-          label: t('settings.theme', 'Theme'),
-          type: 'select' as const,
-          options: [
-            { value: 'light', label: t('settings.light', 'Light') },
-            { value: 'dark', label: t('settings.dark', 'Dark') },
-            { value: 'system', label: t('settings.system', 'System') },
           ],
         },
       ],
@@ -219,6 +219,80 @@ export default function SettingsPage() {
 
             <div>
               <div className="flex items-center gap-2 mb-2.5">
+                <Monitor style={{ width: 13, height: 13, color: 'var(--c-text-faint)' }} />
+                <h3 style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em' }} className="uppercase">{t('settings.theme', 'Theme')}</h3>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {([
+                  { value: 'light' as ThemeMode, icon: Sun, label: t('settings.light', 'Light'), preview: { bg: '#f0f2f7', card: '#fff', accent: '#2363eb', dot: '#059669' } },
+                  { value: 'dark' as ThemeMode, icon: Moon, label: t('settings.dark', 'Dark'), preview: { bg: '#0f1117', card: '#1a1d2e', accent: '#34d399', dot: '#4ade80' } },
+                  { value: 'system' as ThemeMode, icon: MonitorSmartphone, label: t('settings.system', 'System'), preview: { bg: 'linear-gradient(135deg, #f0f2f7 50%, #0f1117 50%)', card: 'linear-gradient(135deg, #fff 50%, #1a1d2e 50%)', accent: 'linear-gradient(135deg, #2363eb 50%, #34d399 50%)', dot: '#facc15' } },
+                ]).map((opt) => {
+                  const active = themeMode === opt.value
+                  return (
+                    <button
+                      key={opt.value}
+                      onClick={() => {
+                        setThemeMode(opt.value)
+                        updateSetting('app.theme', opt.value)
+                      }}
+                      className="flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-200"
+                      style={{
+                        background: active ? 'var(--c-accent-soft)' : 'var(--c-bg-input)',
+                        border: active ? '1.5px solid var(--c-accent)' : '1.5px solid var(--c-border)',
+                        cursor: 'pointer',
+                        outline: 'none',
+                      }}
+                    >
+                      <div
+                        className="w-full rounded-lg overflow-hidden"
+                        style={{
+                          height: 56,
+                          background: typeof opt.preview.bg === 'string' && opt.preview.bg.includes('gradient') ? opt.preview.bg : opt.preview.bg,
+                          padding: 6,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 4,
+                        }}
+                      >
+                        <div
+                          className="rounded"
+                          style={{
+                            height: 8,
+                            width: '60%',
+                            background: typeof opt.preview.accent === 'string' && opt.preview.accent.includes('gradient') ? opt.preview.accent : opt.preview.accent,
+                            borderRadius: 3,
+                          }}
+                        />
+                        <div style={{ display: 'flex', gap: 3, flex: 1 }}>
+                          <div
+                            className="rounded"
+                            style={{
+                              width: '40%',
+                              background: typeof opt.preview.card === 'string' && opt.preview.card.includes('gradient') ? opt.preview.card : opt.preview.card,
+                              borderRadius: 3,
+                            }}
+                          />
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                            <div className="rounded" style={{ height: 4, width: '70%', background: 'rgba(128,128,128,0.2)', borderRadius: 2 }} />
+                            <div className="rounded" style={{ height: 4, width: '50%', background: 'rgba(128,128,128,0.15)', borderRadius: 2 }} />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <opt.icon style={{ width: 12, height: 12, color: active ? 'var(--c-accent)' : 'var(--c-text-muted)' }} />
+                        <span style={{ fontSize: 11, fontWeight: active ? 600 : 500, color: active ? 'var(--c-accent)' : 'var(--c-text-secondary)' }}>
+                          {opt.label}
+                        </span>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2 mb-2.5">
                 <Shield style={{ width: 13, height: 13, color: 'var(--c-text-faint)' }} />
                 <h3 style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em' }} className="uppercase">{t('settings.supportedTools', 'Supported Tools')}</h3>
               </div>
@@ -260,7 +334,7 @@ export default function SettingsPage() {
               <div className="glass-card p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('settings.version', 'Version')}</span>
-                  <span style={{ fontSize: 12, color: 'var(--c-text-secondary)', fontFamily: 'monospace' }}>0.1.0</span>
+                  <span style={{ fontSize: 12, color: 'var(--c-text-secondary)', fontFamily: 'monospace' }}>{APP_VERSION}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>Build</span>

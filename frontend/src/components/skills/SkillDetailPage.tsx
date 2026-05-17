@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { wailsApi } from '@/services/wailsBridge'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -87,14 +88,15 @@ const toolIcons: Record<string, { color: string; label: string }> = {
   custom: { color: '#6B7280', label: 'Custom' },
 }
 
-const tabConfig: { key: DetailTab; label: string; icon: typeof FileText }[] = [
-  { key: 'overview', label: '概览', icon: Globe },
-  { key: 'readme', label: 'README', icon: FileText },
-  { key: 'locations', label: '安装位置', icon: FolderOpen },
-  { key: 'verify', label: '校验信息', icon: Shield },
+const tabConfig: { key: DetailTab; labelKey: string; icon: typeof FileText }[] = [
+  { key: 'overview', labelKey: 'detail.tabOverview', icon: Globe },
+  { key: 'readme', labelKey: 'detail.tabReadme', icon: FileText },
+  { key: 'locations', labelKey: 'detail.tabLocations', icon: FolderOpen },
+  { key: 'verify', labelKey: 'detail.tabVerify', icon: Shield },
 ]
 
 export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProps) {
+  const { t } = useTranslation()
   const [detail, setDetail] = useState<SkillDetailData | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<DetailTab>('overview')
@@ -146,13 +148,13 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3">
         <XCircle style={{ width: 40, height: 40, color: 'var(--c-text-faint)' }} />
-        <p style={{ color: 'var(--c-text-muted)', fontSize: 13 }}>Failed to load skill detail</p>
+        <p style={{ color: 'var(--c-text-muted)', fontSize: 13 }}>{t('detail.loadFailed', 'Failed to load skill detail')}</p>
         <button
           className="ghost-button"
           onClick={onBack}
           style={{ color: 'var(--c-accent)', fontSize: 12, padding: '6px 14px', borderRadius: 6, cursor: 'pointer', background: 'transparent', border: 'none' }}
         >
-          ‹ 返回列表
+          ‹ {t('detail.back', 'Back')}
         </button>
       </div>
     )
@@ -178,7 +180,7 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
             onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--c-text-muted)' }}
           >
             <ArrowLeft style={{ width: 14, height: 14 }} />
-            返回
+            {t('detail.back', 'Back')}
           </button>
         </div>
 
@@ -212,11 +214,11 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
                   borderRadius: 999,
                 }}
               >
-                {skill.status === 'installed' ? '✓ 已安装' : skill.status}
+                {skill.status === 'installed' ? t('detail.installed', 'Installed') : skill.status}
               </span>
             </div>
             <p style={{ fontSize: 12, color: 'var(--c-text-muted)', marginTop: 4, lineHeight: 1.5, margin: '4px 0 0' }}>
-              {skill.description || gitInfo?.description || '暂无描述'}
+              {skill.description || gitInfo?.description || t('detail.noDesc', 'No description')}
             </p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               {skill.tags?.map((tag) => (
@@ -302,7 +304,7 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
                 onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'var(--c-text-faint)' }}
               >
                 <Icon style={{ width: 13, height: 13 }} />
-                {tab.label}
+                {t(tab.labelKey, tab.labelKey.split('.').pop() ?? tab.key)}
               </button>
             )
           })}
@@ -337,6 +339,7 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
   installedCount: number
   totalLocations: number
 }) {
+  const { t } = useTranslation()
   const { skill, gitInfo, installLocations, relatedFiles } = detail
 
   return (
@@ -345,26 +348,26 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
       <div className="space-y-4">
         {/* Summary Card */}
         <div className="glass-card p-4">
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>技能概览</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.overview', 'Overview')}</h3>
           <div className="space-y-4">
             <div>
-              <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>适合场景</strong>
+              <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.useCases', 'Use Cases')}</strong>
               <p style={{ fontSize: 12, color: 'var(--c-text-secondary)', lineHeight: 1.6, margin: 0 }}>
-                {skill.description || gitInfo?.description || '用于增强 AI 编程助手的特定能力。'}
+                {skill.description || gitInfo?.description || t('detail.enhanceAI', 'Enhance specific capabilities of AI coding assistants.')}
               </p>
             </div>
             <div>
-              <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>你可以怎么用</strong>
+              <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.howToUse', 'How to Use')}</strong>
               <ul style={{ fontSize: 12, color: 'var(--c-text-secondary)', lineHeight: 1.8, margin: 0, paddingLeft: 18 }}>
-                <li>查看技能的完整内容与校验信息。</li>
-                <li>管理它在不同平台上的安装位置。</li>
-                <li>确认它已经同步到哪些应用。</li>
-                <li>通过 GitHub 查看源码和更新。</li>
+                <li>{t('detail.howTo1', 'View the full content and verification info.')}</li>
+                <li>{t('detail.howTo2', 'Manage installation locations across platforms.')}</li>
+                <li>{t('detail.howTo3', 'Check which apps it has been synced to.')}</li>
+                <li>{t('detail.howTo4', 'View source code and updates on GitHub.')}</li>
               </ul>
             </div>
             {skill.tags && skill.tags.length > 0 && (
               <div>
-                <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>主题标签</strong>
+                <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.tags', 'Tags')}</strong>
                 <div className="flex flex-wrap gap-2">
                   {skill.tags.map((tag) => (
                     <span
@@ -379,7 +382,7 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
             )}
             {skill.enabledTools && skill.enabledTools.length > 0 && (
               <div>
-                <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>已启用平台</strong>
+                <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.enabledPlatforms', 'Enabled Platforms')}</strong>
                 <div className="flex flex-wrap gap-2">
                   {skill.enabledTools.map((tool) => {
                     const info = toolIcons[tool] || { color: '#6B7280', label: tool }
@@ -409,9 +412,9 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
         {relatedFiles && relatedFiles.length > 0 && (
           <div className="glass-card p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: 0 }}>关联文件</h3>
+              <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: 0 }}>{t('detail.relatedFiles', 'Related Files')}</h3>
               <span style={{ fontSize: 11, color: 'var(--c-text-faint)', background: 'var(--c-bg-input)', padding: '2px 8px', borderRadius: 6 }}>
-                {relatedFiles.length} 个文件
+                {relatedFiles.length} {t('detail.files', 'files')}
               </span>
             </div>
             <div className="space-y-1">
@@ -434,19 +437,19 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
       <div className="space-y-4">
         {/* Status Card */}
         <div className="glass-card p-4">
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>当前状态</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.currentStatus', 'Current Status')}</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>安装状态</span>
+              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.installStatus', 'Install Status')}</span>
               <span className="flex items-center gap-1.5" style={{ fontSize: 12, color: skill.status === 'installed' ? 'var(--c-green)' : 'var(--c-orange)' }}>
                 {skill.status === 'installed' ? <CheckCircle2 style={{ width: 13, height: 13 }} /> : <XCircle style={{ width: 13, height: 13 }} />}
-                {skill.status === 'installed' ? '已安装' : skill.status}
+                {skill.status === 'installed' ? t('detail.installed', 'Installed') : skill.status}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>安装位置</span>
+              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.locations', 'Locations')}</span>
               <span style={{ fontSize: 12, color: 'var(--c-text-secondary)' }}>
-                {installedCount}/{totalLocations} 个平台
+                {installedCount}/{totalLocations}
               </span>
             </div>
             {skill.gitBranch && (
@@ -467,7 +470,7 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
         {/* GitHub Info */}
         {gitInfo && (
           <div className="glass-card p-4">
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>GitHub 仓库</h3>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.githubRepo', 'GitHub Repository')}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-1.5" style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>

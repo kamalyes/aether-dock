@@ -3,6 +3,12 @@ import type { Skill, SkillSource, SkillViewMode, SortField, SortOrder } from '@/
 import { wailsApi } from '@/services/wailsBridge'
 import { toast } from '@/stores/toastStore'
 
+interface InstallLogEntry {
+  timestamp: string
+  level: 'info' | 'warn' | 'error' | 'success'
+  message: string
+}
+
 interface SkillState {
   skills: Skill[]
   total: number
@@ -22,6 +28,8 @@ interface SkillState {
   searchQuery: string
   selectedSkillIds: Set<string>
   favorites: Set<string>
+  installStatus: 'idle' | 'installing' | 'success' | 'error'
+  installLog: InstallLogEntry[]
   fetchSkills: () => Promise<void>
   fetchSources: () => Promise<void>
   setCurrentSkill: (skill: Skill | null) => void
@@ -34,6 +42,8 @@ interface SkillState {
   selectAllVisible: (ids: string[]) => void
   clearSelection: () => void
   toggleFavorite: (id: string) => void
+  addInstallLog: (level: InstallLogEntry['level'], message: string) => void
+  clearInstallLog: () => void
   installFromGit: (url: string, branch: string, name: string, sourceName: string) => Promise<boolean>
   installFromLocal: (localPath: string, name: string, sourceName: string) => Promise<boolean>
   deleteSkill: (id: string) => Promise<boolean>
@@ -63,6 +73,8 @@ export const useSkillStore = create<SkillState>((set, get) => ({
   searchQuery: '',
   selectedSkillIds: new Set(),
   favorites: new Set(),
+  installStatus: 'idle',
+  installLog: [],
 
   fetchSkills: async () => {
     set({ loading: true, error: null })
@@ -116,27 +128,45 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     })
   },
 
+  addInstallLog: (level, message) => {
+    set((state) => ({
+      installLog: [...state.installLog, { timestamp: new Date().toISOString(), level, message }],
+    }))
+  },
+
+  clearInstallLog: () => set({ installLog: [], installStatus: 'idle' }),
+
   installFromGit: async (url, branch, name, sourceName) => {
+    set({ installStatus: 'installing' })
+    get().addInstallLog('info', `Cloning from ${url} (branch: ${branch})`)
     const resp = await wailsApi.installSkillFromGit({ url, branch, name, sourceName })
     if (resp.success) {
+      set({ installStatus: 'success' })
+      get().addInstallLog('success', `Skill "${name || url}" installed successfully`)
       toast.success(`Skill "${name || url}" installed from Git`)
       get().fetchSkills()
       return true
     }
+    set({ installStatus: 'error', error: resp.error })
+    get().addInstallLog('error', resp.error ?? 'Failed to install from Git')
     toast.error(resp.error ?? 'Failed to install from Git')
-    set({ error: resp.error })
     return false
   },
 
   installFromLocal: async (localPath, name, sourceName) => {
+    set({ installStatus: 'installing' })
+    get().addInstallLog('info', `Importing from ${localPath}`)
     const resp = await wailsApi.installSkillFromLocal({ localPath, name, sourceName })
     if (resp.success) {
+      set({ installStatus: 'success' })
+      get().addInstallLog('success', `Skill "${name || localPath}" imported successfully`)
       toast.success(`Skill "${name || localPath}" imported`)
       get().fetchSkills()
       return true
     }
+    set({ installStatus: 'error', error: resp.error })
+    get().addInstallLog('error', resp.error ?? 'Failed to import from local')
     toast.error(resp.error ?? 'Failed to import from local')
-    set({ error: resp.error })
     return false
   },
 

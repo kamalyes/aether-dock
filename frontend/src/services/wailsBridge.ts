@@ -89,9 +89,105 @@ function parseResponse<T>(raw: string): ApiResponse<T> {
   }
 }
 
-async function callApi<T>(fn: () => Promise<string>): Promise<ApiResponse<T>> {
+const isDev = typeof window !== 'undefined' && !window?.go?.main?.App
+
+const mockSkills: Skill[] = [
+  {
+    id: 'mock-1', name: 'react-patterns', description: 'Common React patterns and best practices',
+    version: '1.0.0', gitUrl: 'https://github.com/example/react-patterns', gitBranch: 'main', gitCommit: 'abc1234',
+    status: 'installed', sourceId: 'mock-src', sourceName: 'GitHub',
+    installPath: '/skills/react-patterns', enabledTools: ['cursor', 'windsurf'],
+    tags: ['react', 'frontend', 'patterns'], metadata: {}, createdAt: '2025-01-15T10:00:00Z', updatedAt: '2025-03-20T14:30:00Z',
+  },
+  {
+    id: 'mock-2', name: 'go-clean-arch', description: 'Clean architecture patterns for Go projects',
+    version: '2.1.0', gitUrl: 'https://github.com/example/go-clean-arch', gitBranch: 'main', gitCommit: 'def5678',
+    status: 'installed', sourceId: 'mock-src', sourceName: 'GitHub',
+    installPath: '/skills/go-clean-arch', enabledTools: ['cursor'],
+    tags: ['go', 'architecture', 'backend'], metadata: {}, createdAt: '2025-02-10T08:00:00Z', updatedAt: '2025-04-01T09:15:00Z',
+  },
+  {
+    id: 'mock-3', name: 'typescript-advanced', description: 'Advanced TypeScript type gymnastics',
+    version: '3.0.0', gitUrl: 'https://github.com/example/typescript-advanced', gitBranch: 'main', gitCommit: 'ghi9012',
+    status: 'update_available', sourceId: 'mock-src', sourceName: 'GitHub',
+    installPath: '/skills/typescript-advanced', enabledTools: ['cursor', 'claude-code'],
+    tags: ['typescript', 'types', 'advanced'], metadata: {}, createdAt: '2025-01-20T12:00:00Z', updatedAt: '2025-02-28T16:45:00Z',
+  },
+  {
+    id: 'mock-4', name: 'docker-compose', description: 'Docker Compose configuration patterns',
+    version: '1.2.0', gitUrl: 'https://github.com/example/docker-compose', gitBranch: 'main', gitCommit: 'jkl3456',
+    status: 'error', sourceId: 'mock-src-2', sourceName: 'GitLab',
+    installPath: '/skills/docker-compose', enabledTools: [],
+    tags: ['docker', 'devops'], metadata: {}, createdAt: '2025-03-01T15:00:00Z', updatedAt: '2025-03-15T11:20:00Z',
+  },
+  {
+    id: 'mock-5', name: 'rust-async', description: 'Async programming patterns in Rust',
+    version: '0.9.0', gitUrl: 'https://github.com/example/rust-async', gitBranch: 'main', gitCommit: 'mno7890',
+    status: 'installed', sourceId: 'mock-src', sourceName: 'GitHub',
+    installPath: '/skills/rust-async', enabledTools: ['windsurf'],
+    tags: ['rust', 'async', 'systems'], metadata: {}, createdAt: '2025-02-05T09:00:00Z', updatedAt: '2025-04-10T13:00:00Z',
+  },
+]
+
+const mockMcpServers: McpServer[] = [
+  {
+    id: 'mock-mcp-1', name: 'filesystem-server', command: 'npx', args: ['-y', '@modelcontextprotocol/server-filesystem', '/home'],
+    env: {}, sourceType: 'manual', sourceUrl: '',
+    status: 'enabled', description: 'File system access MCP server', enabledTools: ['cursor', 'claude-code'],
+    createdAt: '2025-02-01T10:00:00Z', updatedAt: '2025-03-20T14:30:00Z',
+  },
+  {
+    id: 'mock-mcp-2', name: 'github-server', command: 'npx', args: ['-y', '@modelcontextprotocol/server-github'],
+    env: {}, sourceType: 'marketplace', sourceUrl: 'https://github.com/modelcontextprotocol/servers',
+    status: 'disabled', description: 'GitHub API MCP server', enabledTools: [],
+    createdAt: '2025-03-01T08:00:00Z', updatedAt: '2025-03-15T09:15:00Z',
+  },
+]
+
+const mockTools: ToolConfig[] = [
+  { id: 't1', toolName: 'cursor', displayName: 'Cursor', configPath: '/cursor/config.json', skillDir: '/cursor/skills', mcpDir: '/cursor/mcp', isDetected: true, isEnabled: true, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
+  { id: 't2', toolName: 'windsurf', displayName: 'Windsurf', configPath: '/windsurf/config.json', skillDir: '/windsurf/skills', mcpDir: '/windsurf/mcp', isDetected: true, isEnabled: true, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
+  { id: 't3', toolName: 'claude-code', displayName: 'Claude Code', configPath: '/claude/config.json', skillDir: '/claude/skills', mcpDir: '/claude/mcp', isDetected: true, isEnabled: false, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
+  { id: 't4', toolName: 'cline', displayName: 'Cline', configPath: '/cline/config.json', skillDir: '/cline/skills', mcpDir: '/cline/mcp', isDetected: false, isEnabled: false, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
+]
+
+const mockSources: SkillSource[] = [
+  { id: 'mock-src', name: 'GitHub', type: 'git', url: 'https://github.com/skills', branch: 'main', localPath: '', description: 'GitHub skills repository', createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
+  { id: 'mock-src-2', name: 'GitLab', type: 'git', url: 'https://gitlab.com/skills', branch: 'main', localPath: '', description: 'GitLab skills repository', createdAt: '2025-01-15T00:00:00Z', updatedAt: '2025-01-15T00:00:00Z' },
+]
+
+function mockCall<T>(key: string): ApiResponse<T> {
+  const delay = () => new Promise<void>((r) => setTimeout(r, 200 + Math.random() * 300))
+  const mockData: Record<string, unknown> = {
+    'getAppInfo': { name: 'AetherDock', version: '0.2.0-dev' },
+    'listSkills': { skills: mockSkills, total: mockSkills.length },
+    'listMcpServers': { servers: mockMcpServers, total: mockMcpServers.length },
+    'listTools': mockTools,
+    'detectTools': mockTools,
+    'listSources': mockSources,
+    'getSettings': { 'app.language': 'auto', 'app.theme': 'light', 'install.autoSync': 'true', 'app.checkUpdates': 'true' },
+    'listActivities': [
+      { id: 'a1', type: 'install', targetName: 'react-patterns', targetType: 'skill', toolName: '', detail: 'Installed from GitHub', createdAt: '2025-04-10T13:00:00Z' },
+      { id: 'a2', type: 'sync', targetName: 'go-clean-arch', targetType: 'skill', toolName: 'cursor', detail: 'Synced to Cursor', createdAt: '2025-04-09T10:00:00Z' },
+      { id: 'a3', type: 'install', targetName: 'filesystem-server', targetType: 'mcp', toolName: '', detail: 'Added MCP server', createdAt: '2025-04-08T15:00:00Z' },
+      { id: 'a4', type: 'error', targetName: 'docker-compose', targetType: 'skill', toolName: '', detail: 'Hash mismatch detected', createdAt: '2025-04-07T09:00:00Z' },
+    ],
+    'getHomeDir': '/home/user',
+  }
+  const data = mockData[key]
+  if (data !== undefined) {
+    return { success: true, data: data as T }
+  }
+  return { success: true, data: undefined as T }
+}
+
+async function callApi<T>(fn: () => Promise<string>, mockKey?: string): Promise<ApiResponse<T>> {
   const app = getApp()
   if (!app) {
+    if (isDev && mockKey) {
+      await new Promise<void>((r) => setTimeout(r, 200 + Math.random() * 300))
+      return mockCall<T>(mockKey)
+    }
     return { success: false, error: 'Wails runtime not available' }
   }
   try {
@@ -103,10 +199,10 @@ async function callApi<T>(fn: () => Promise<string>): Promise<ApiResponse<T>> {
 }
 
 export const wailsApi = {
-  getAppInfo: () => callApi<Record<string, string>>(() => getApp()!.GetAppInfo()),
+  getAppInfo: () => callApi<Record<string, string>>(() => getApp()!.GetAppInfo(), 'getAppInfo'),
 
   listSkills: (page: number, pageSize: number, status = '', sourceID = '') =>
-    callApi<SkillListResult>(() => getApp()!.ListSkills(page, pageSize, status, sourceID)),
+    callApi<SkillListResult>(() => getApp()!.ListSkills(page, pageSize, status, sourceID), 'listSkills'),
 
   getSkill: (id: string) => callApi<Skill>(() => getApp()!.GetSkill(id)),
 
@@ -124,7 +220,7 @@ export const wailsApi = {
   disableSkillForTool: (id: string, toolName: string) =>
     callApi<void>(() => getApp()!.DisableSkillForTool(id, toolName)),
 
-  listSources: () => callApi<SkillSource[]>(() => getApp()!.ListSources()),
+  listSources: () => callApi<SkillSource[]>(() => getApp()!.ListSources(), 'listSources'),
 
   createSource: (req: CreateSourceRequest) =>
     callApi<SkillSource>(() => getApp()!.CreateSource(JSON.stringify(req))),
@@ -132,7 +228,7 @@ export const wailsApi = {
   deleteSource: (id: string) => callApi<void>(() => getApp()!.DeleteSource(id)),
 
   listMcpServers: (page: number, pageSize: number, status = '') =>
-    callApi<McpServerListResult>(() => getApp()!.ListMcpServers(page, pageSize, status)),
+    callApi<McpServerListResult>(() => getApp()!.ListMcpServers(page, pageSize, status), 'listMcpServers'),
 
   getMcpServer: (id: string) => callApi<McpServer>(() => getApp()!.GetMcpServer(id)),
 
@@ -152,9 +248,9 @@ export const wailsApi = {
 
   discoverMcpTools: (id: string) => callApi<McpTool[]>(() => getApp()!.DiscoverMcpTools(id)),
 
-  listTools: () => callApi<ToolConfig[]>(() => getApp()!.ListTools()),
+  listTools: () => callApi<ToolConfig[]>(() => getApp()!.ListTools(), 'listTools'),
 
-  detectTools: () => callApi<ToolConfig[]>(() => getApp()!.DetectTools()),
+  detectTools: () => callApi<ToolConfig[]>(() => getApp()!.DetectTools(), 'detectTools'),
 
   enableTool: (name: string) => callApi<void>(() => getApp()!.EnableTool(name)),
 
@@ -180,7 +276,7 @@ export const wailsApi = {
 
   gitPull: (repoPath: string) => callApi<void>(() => getApp()!.GitPull(repoPath)),
 
-  getSettings: () => callApi<Record<string, string>>(() => getApp()!.GetSettings()),
+  getSettings: () => callApi<Record<string, string>>(() => getApp()!.GetSettings(), 'getSettings'),
 
   setSetting: (key: string, value: string) => callApi<void>(() => getApp()!.SetSetting(key, value)),
 
@@ -227,7 +323,7 @@ export const wailsApi = {
       }
     }>(() => getApp()!.GetSkillDetail(id)),
 
-  getHomeDir: () => callApi<string>(() => getApp()!.GetHomeDir()),
+  getHomeDir: () => callApi<string>(() => getApp()!.GetHomeDir(), 'getHomeDir'),
 
   browseFolder: () => callApi<string>(() => getApp()!.BrowseFolder()),
 
@@ -235,7 +331,7 @@ export const wailsApi = {
 
   saveFile: (defaultFilename: string) => callApi<string>(() => getApp()!.SaveFile(defaultFilename)),
 
-  listActivities: (limit: number) => callApi<{ id: string; type: string; targetName: string; targetType: string; toolName: string; detail: string; createdAt: string }[]>(() => getApp()!.ListActivities(limit)),
+  listActivities: (limit: number) => callApi<{ id: string; type: string; targetName: string; targetType: string; toolName: string; detail: string; createdAt: string }[]>(() => getApp()!.ListActivities(limit), 'listActivities'),
 
   listGitBranches: (owner: string, repo: string) => callApi<string[]>(() => getApp()!.ListGitBranches(owner, repo)),
 }

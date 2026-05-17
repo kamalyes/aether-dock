@@ -18,6 +18,7 @@ import {
   Upload as UploadIcon,
   FolderSync,
   RefreshCw,
+  AlertCircle,
 } from 'lucide-react'
 import { Input, Select, SearchInput } from '@/components/ui/Form'
 import { Upload as UploadComp } from '@/components/ui/Upload'
@@ -61,6 +62,7 @@ export default function InstallPage() {
   const [marketSkills, setMarketSkills] = useState<MarketplaceItem[]>([])
   const [marketMcp, setMarketMcp] = useState<MarketplaceItem[]>([])
   const [marketLoading, setMarketLoading] = useState(false)
+  const [marketError, setMarketError] = useState<string | null>(null)
   const [installingId, setInstallingId] = useState<string | null>(null)
   const [categoryFilter, setCategoryFilter] = useState('all')
 
@@ -79,8 +81,9 @@ export default function InstallPage() {
   const [importing, setImporting] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [detailItem, setDetailItem] = useState<MarketplaceItem | null>(null)
+  const [installError, setInstallError] = useState<string | null>(null)
 
-  const { installFromGit, installFromLocal, skills } = useSkillStore()
+  const { installFromGit, installFromLocal, skills, installStatus, installLog, clearInstallLog } = useSkillStore()
   const { addServer } = useMcpStore()
 
   const tabs: { key: InstallTab; icon: typeof GitBranch; label: string }[] = [
@@ -152,6 +155,7 @@ export default function InstallPage() {
 
   const searchMarketplace = useCallback(async (query: string) => {
     setMarketLoading(true)
+    setMarketError(null)
     try {
       const [skillResp, mcpResp] = await Promise.all([
         wailsApi.searchMarketplace(query),
@@ -163,10 +167,14 @@ export default function InstallPage() {
       if (mcpResp.success && mcpResp.data?.skills) {
         setMarketMcp(mcpResp.data.skills)
       }
-    } catch {
+      if (!skillResp.success && !mcpResp.success) {
+        setMarketError(skillResp.error || mcpResp.error || t('install.searchFailed', 'Search failed'))
+      }
+    } catch (e) {
+      setMarketError(String(e))
     }
     setMarketLoading(false)
-  }, [])
+  }, [t])
 
   useEffect(() => {
     searchMarketplace('')
@@ -192,26 +200,42 @@ export default function InstallPage() {
   const handleGitInstall = async () => {
     if (!gitUrl) return
     setInstalling(true)
+    setInstallError(null)
     const { httpsUrl } = parseGitUrl(gitUrl)
-    await installFromGit(httpsUrl || gitUrl, gitBranch, gitName, '')
+    const ok = await installFromGit(httpsUrl || gitUrl, gitBranch, gitName, '')
     setInstalling(false)
-    navigate('/')
+    if (ok) {
+      navigate('/')
+    } else {
+      setInstallError(t('install.gitFailed', 'Failed to clone repository. Check the URL and try again.'))
+    }
   }
 
   const handleLocalInstall = async () => {
     if (!localPath) return
     setInstalling(true)
-    await installFromLocal(localPath, localName, '')
+    setInstallError(null)
+    const ok = await installFromLocal(localPath, localName, '')
     setInstalling(false)
-    navigate('/')
+    if (ok) {
+      navigate('/')
+    } else {
+      setInstallError(t('install.localFailed', 'Failed to import from local folder. Check the path and try again.'))
+    }
   }
 
   const handleMcpAdd = async () => {
     if (!mcpName || !mcpCommand) return
     setInstalling(true)
-    await addServer(mcpName, mcpCommand, mcpArgs ? mcpArgs.split(/\s+/) : [], {}, mcpDesc)
-    setInstalling(false)
-    navigate('/mcp')
+    setInstallError(null)
+    try {
+      await addServer(mcpName, mcpCommand, mcpArgs ? mcpArgs.split(/\s+/) : [], {}, mcpDesc)
+      setInstalling(false)
+      navigate('/mcp')
+    } catch (e) {
+      setInstalling(false)
+      setInstallError(String(e))
+    }
   }
 
   const handleImport = async () => {
@@ -363,7 +387,25 @@ export default function InstallPage() {
               </div>
             )}
 
-            {!marketLoading && marketSkills.length === 0 && marketMcp.length === 0 && (
+            {!marketLoading && marketError && (
+              <div className="flex flex-col items-center justify-center py-16">
+                <AlertCircle style={{ width: 36, height: 36, color: 'var(--c-red)', marginBottom: 12 }} />
+                <p style={{ color: 'var(--c-text-muted)', fontSize: 13, fontWeight: 500 }}>{t('install.searchFailed', 'Search failed')}</p>
+                <p style={{ color: 'var(--c-text-faint)', fontSize: 11, marginTop: 4, maxWidth: 300, textAlign: 'center' }}>{marketError}</p>
+                <button
+                  className="mt-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors"
+                  style={{ background: 'var(--c-accent-soft)', color: 'var(--c-accent)' }}
+                  onClick={() => searchMarketplace(marketQuery)}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(35, 99, 235, 0.12)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-accent-soft)' }}
+                >
+                  <RefreshCw style={{ width: 12, height: 12 }} />
+                  {t('install.retry', 'Retry')}
+                </button>
+              </div>
+            )}
+
+            {!marketLoading && !marketError && marketSkills.length === 0 && marketMcp.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16">
                 <ShoppingBag style={{ width: 36, height: 36, color: 'var(--c-text-faint)', marginBottom: 12 }} />
                 <p style={{ color: 'var(--c-text-muted)', fontSize: 13, fontWeight: 500 }}>No results found</p>
@@ -404,7 +446,7 @@ export default function InstallPage() {
                         label={t('install.branch', 'Branch')}
                         value={gitBranch}
                         onChange={(e) => setGitBranch(e.target.value)}
-                        placeholder="master"
+                        placeholder="main"
                         suffix={branchesLoading ? <Loader2 style={{ width: 12, height: 12 }} className="animate-spin" /> : undefined}
                       />
                     )}
@@ -431,9 +473,55 @@ export default function InstallPage() {
                   )}
                   {installing ? t('install.installing', 'Cloning...') : t('install.cloneInstall', 'Clone & Install')}
                 </button>
+
+                {installError && activeTab === 'git' && (
+                  <div
+                    className="flex items-start gap-2 px-3 py-2.5 rounded-lg"
+                    style={{ background: 'var(--c-red-soft)', border: '1px solid rgba(239, 68, 68, 0.12)' }}
+                  >
+                    <AlertCircle style={{ width: 14, height: 14, color: 'var(--c-red)', flexShrink: 0, marginTop: 1 }} />
+                    <div>
+                      <p style={{ fontSize: 11, color: 'var(--c-red)', fontWeight: 500 }}>{t('install.failed', 'Installation Failed')}</p>
+                      <p style={{ fontSize: 10, color: 'var(--c-text-faint)', marginTop: 2 }}>{installError}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
+            {installLog.length > 0 && activeTab === 'git' && (
+              <div className="mt-4 glass-card p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em' }} className="uppercase">{t('install.log', 'Install Log')}</h4>
+                  <button
+                    className="text-[10px] transition-colors"
+                    style={{ color: 'var(--c-text-faint)' }}
+                    onClick={clearInstallLog}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--c-text-muted)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--c-text-faint)' }}
+                  >
+                    {t('install.clearLog', 'Clear')}
+                  </button>
+                </div>
+                <div className="space-y-1 max-h-40 overflow-y-auto">
+                  {installLog.map((entry, idx) => (
+                    <div key={idx} className="flex items-start gap-2 px-2 py-1 rounded" style={{ background: entry.level === 'error' ? 'rgba(239, 68, 68, 0.04)' : 'transparent' }}>
+                      <span style={{ fontSize: 9, color: 'var(--c-text-faint)', fontFamily: 'monospace', flexShrink: 0, marginTop: 1 }}>
+                        {new Date(entry.timestamp).toLocaleTimeString()}
+                      </span>
+                      <span style={{
+                        fontSize: 10,
+                        color: entry.level === 'error' ? 'var(--c-red)' : entry.level === 'success' ? 'var(--c-green)' : entry.level === 'warn' ? 'var(--c-amber)' : 'var(--c-text-muted)',
+                        fontFamily: 'monospace',
+                      }}>
+                        {entry.message}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          }
             <div className="mt-4 glass-card p-4">
               <h4 style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em', marginBottom: 10 }} className="uppercase">{t('install.supportedHosts', 'Supported URL Formats')}</h4>
               <div className="space-y-1.5">
@@ -495,6 +583,19 @@ export default function InstallPage() {
                   {installing ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <FolderOpen style={{ width: 14, height: 14 }} />}
                   {installing ? t('install.importing', 'Importing...') : t('install.importInstall', 'Import & Install')}
                 </button>
+
+                {installError && activeTab === 'local' && (
+                  <div
+                    className="flex items-start gap-2 px-3 py-2.5 rounded-lg"
+                    style={{ background: 'var(--c-red-soft)', border: '1px solid rgba(239, 68, 68, 0.12)' }}
+                  >
+                    <AlertCircle style={{ width: 14, height: 14, color: 'var(--c-red)', flexShrink: 0, marginTop: 1 }} />
+                    <div>
+                      <p style={{ fontSize: 11, color: 'var(--c-red)', fontWeight: 500 }}>{t('install.failed', 'Import Failed')}</p>
+                      <p style={{ fontSize: 10, color: 'var(--c-text-faint)', marginTop: 2 }}>{installError}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -546,6 +647,19 @@ export default function InstallPage() {
                   {installing ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <Plus style={{ width: 14, height: 14 }} />}
                   {installing ? 'Adding...' : 'Add Server'}
                 </button>
+
+                {installError && activeTab === 'mcp' && (
+                  <div
+                    className="flex items-start gap-2 px-3 py-2.5 rounded-lg"
+                    style={{ background: 'var(--c-red-soft)', border: '1px solid rgba(239, 68, 68, 0.12)' }}
+                  >
+                    <AlertCircle style={{ width: 14, height: 14, color: 'var(--c-red)', flexShrink: 0, marginTop: 1 }} />
+                    <div>
+                      <p style={{ fontSize: 11, color: 'var(--c-red)', fontWeight: 500 }}>{t('install.failed', 'Add Server Failed')}</p>
+                      <p style={{ fontSize: 10, color: 'var(--c-text-faint)', marginTop: 2 }}>{installError}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

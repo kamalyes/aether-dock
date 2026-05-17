@@ -5,7 +5,6 @@ import {
   Server,
   RefreshCw,
   Plus,
-  Search,
   Trash2,
   Pencil,
   ChevronDown,
@@ -23,6 +22,7 @@ import type { McpServer } from '@/types'
 import { TOOL_ICONS, SUPPORTED_TOOLS } from '@/constants/tools'
 import ConfirmDialog, { useConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ListLoading } from '@/components/ui/Loading'
+import { SearchInput, Select } from '@/components/ui/Form'
 
 export default function McpPage() {
   const { t } = useTranslation()
@@ -67,48 +67,23 @@ export default function McpPage() {
             <span style={{ fontSize: 11, color: 'var(--c-text-faint)' }} className="tabular-nums">{total} {t('mcp.configured')}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="relative">
-              <Search style={{ width: 14, height: 14, position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--c-text-faint)' }} />
-              <input
-                type="text"
-                placeholder={t('mcp.search')}
-                style={{
-                  paddingLeft: 32,
-                  paddingRight: 12,
-                  paddingTop: 6,
-                  paddingBottom: 6,
-                  background: 'var(--c-bg-input)',
-                  border: '1px solid var(--c-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: 11,
-                  color: 'var(--c-text)',
-                  outline: 'none',
-                  width: 176,
-                }}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={(e) => { e.target.style.borderColor = 'var(--c-border-accent)' }}
-                onBlur={(e) => { e.target.style.borderColor = 'var(--c-border)' }}
-              />
-            </div>
-            <select
-              style={{
-                padding: '4px 8px',
-                background: 'var(--c-bg-input)',
-                border: '1px solid var(--c-border)',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: 11,
-                color: 'var(--c-text-muted)',
-                outline: 'none',
-              }}
+            <SearchInput
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder={t('mcp.search')}
+              style={{ width: 176 }}
+            />
+            <Select
               value={filter.status}
               onChange={(e) => setFilter({ status: e.target.value })}
-            >
-              <option value="">{t('skills.all')}</option>
-              <option value="enabled">{t('mcp.enabled')}</option>
-              <option value="disabled">{t('mcp.disabled')}</option>
-              <option value="error">{t('skills.error')}</option>
-            </select>
+              options={[
+                { value: '', label: t('skills.all') },
+                { value: 'enabled', label: t('mcp.enabled') },
+                { value: 'disabled', label: t('mcp.disabled') },
+                { value: 'error', label: t('skills.error') },
+              ]}
+              selectStyle={{ width: 100 }}
+            />
             <button
               className="p-1.5 rounded-lg transition-colors"
               style={{ color: 'var(--c-text-faint)' }}

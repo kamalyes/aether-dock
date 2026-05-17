@@ -235,6 +235,78 @@ export default function DashboardPage() {
           </div>
         </FadeIn>
 
+        <FadeIn delay={0.35}>
+          <div>
+            <h2 style={{ color: 'var(--c-text-secondary)', fontSize: 13, fontWeight: 600, marginBottom: 12 }}>
+              {t('dashboard.healthCheck', 'Health Check')}
+            </h2>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="glass-card p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="status-dot" style={{ background: installedCount > 0 ? 'var(--c-green)' : 'var(--c-text-faint)' }} />
+                  <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-text-secondary)' }}>{t('dashboard.installed', 'Installed')}</span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span style={{ fontSize: 24, fontWeight: 700, color: 'var(--c-text)' }}>{installedCount}</span>
+                  <span style={{ fontSize: 11, color: 'var(--c-text-faint)' }}>/ {skillTotal}</span>
+                </div>
+                <div
+                  className="mt-2 rounded-full overflow-hidden"
+                  style={{ height: 3, background: 'var(--c-bg-input)' }}
+                >
+                  <div
+                    className="rounded-full"
+                    style={{
+                      height: '100%',
+                      width: skillTotal > 0 ? `${(installedCount / skillTotal) * 100}%` : '0%',
+                      background: 'var(--c-green)',
+                      transition: 'width 0.5s ease',
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="glass-card p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="status-dot" style={{ background: updateCount > 0 ? 'var(--c-amber)' : 'var(--c-green)' }} />
+                  <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-text-secondary)' }}>{t('dashboard.updates', 'Updates')}</span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span style={{ fontSize: 24, fontWeight: 700, color: updateCount > 0 ? 'var(--c-amber)' : 'var(--c-text)' }}>{updateCount}</span>
+                  <span style={{ fontSize: 11, color: 'var(--c-text-faint)' }}>{t('dashboard.available', 'available')}</span>
+                </div>
+                {updateCount > 0 && (
+                  <button
+                    onClick={() => navigate('/skills')}
+                    className="mt-2 text-[10px] font-medium transition-colors"
+                    style={{ color: 'var(--c-amber)' }}
+                  >
+                    {t('dashboard.viewUpdates', 'View updates')} →
+                  </button>
+                )}
+              </div>
+              <div className="glass-card p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="status-dot" style={{ background: errorCount > 0 ? 'var(--c-red)' : 'var(--c-green)' }} />
+                  <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--c-text-secondary)' }}>{t('dashboard.errors', 'Errors')}</span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span style={{ fontSize: 24, fontWeight: 700, color: errorCount > 0 ? 'var(--c-red)' : 'var(--c-text)' }}>{errorCount}</span>
+                  <span style={{ fontSize: 11, color: 'var(--c-text-faint)' }}>{t('dashboard.issues', 'issues')}</span>
+                </div>
+                {errorCount > 0 && (
+                  <button
+                    onClick={() => navigate('/skills')}
+                    className="mt-2 text-[10px] font-medium transition-colors"
+                    style={{ color: 'var(--c-red)' }}
+                  >
+                    {t('dashboard.viewErrors', 'View errors')} →
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </FadeIn>
+
         <FadeIn delay={0.4}>
           <div>
             <h2 style={{ color: 'var(--c-text-secondary)', fontSize: 13, fontWeight: 600, marginBottom: 12 }}>

@@ -61,7 +61,7 @@ func (s *SkillService) InstallFromGit(req InstallFromGitRequest) (*models.Skill,
 		return nil, errors.ErrInvalidInput
 	}
 	if req.Branch == "" {
-		req.Branch = "master"
+		req.Branch = "main"
 	}
 	if req.Name == "" {
 		parts := strings.Split(strings.TrimSuffix(req.URL, "/"), "/")
