@@ -199,6 +199,8 @@ const zh = {
     retry: '重试',
     gitFailed: '克隆仓库失败，请检查地址后重试。',
     localFailed: '从本地导入失败，请检查路径后重试。',
+    duplicateSkill: '该技能已安装，请勿重复安装',
+    duplicateMcp: '该MCP服务已存在，请勿重复添加',
     failed: '安装失败',
     log: '安装日志',
     clearLog: '清除',

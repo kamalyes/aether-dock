@@ -199,6 +199,8 @@ const en = {
     retry: 'Retry',
     gitFailed: 'Failed to clone repository. Check the URL and try again.',
     localFailed: 'Failed to import from local folder. Check the path and try again.',
+    duplicateSkill: 'This skill is already installed',
+    duplicateMcp: 'This MCP server already exists',
     failed: 'Installation Failed',
     log: 'Install Log',
     clearLog: 'Clear',

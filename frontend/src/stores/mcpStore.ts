@@ -55,6 +55,13 @@ export const useMcpStore = create<McpState>((set, get) => ({
   setFilter: (filter) => set({ filter: { ...get().filter, ...filter } }),
 
   addServer: async (name, command, args, env, description) => {
+    const existing = get().servers.find(
+      (s) => s.name === name || (s.command === command && JSON.stringify(s.args) === JSON.stringify(args))
+    )
+    if (existing) {
+      toast.warning(`MCP server "${existing.name}" already exists with the same name or command`)
+      return false
+    }
     const resp = await wailsApi.addMcpServer({
       name, command, args, env, description, sourceType: 'manual', sourceUrl: '',
     })

@@ -145,6 +145,13 @@ export const useSkillStore = create<SkillState>((set, get) => ({
   clearInstallLog: () => set({ installLog: [], installStatus: 'idle' }),
 
   installFromGit: async (url, branch, name, sourceName) => {
+    const existing = get().skills.find(
+      (s) => s.gitUrl === url && s.gitBranch === branch
+    )
+    if (existing) {
+      toast.warning(`Skill "${existing.name}" is already installed from this URL and branch`)
+      return false
+    }
     set({ installStatus: 'installing' })
     get().addInstallLog('info', `Cloning from ${url} (branch: ${branch})`)
     const resp = await wailsApi.installSkillFromGit({ url, branch, name, sourceName })
@@ -163,6 +170,13 @@ export const useSkillStore = create<SkillState>((set, get) => ({
   },
 
   installFromLocal: async (localPath, name, sourceName) => {
+    const existing = get().skills.find(
+      (s) => s.name === name || s.installPath === localPath
+    )
+    if (existing) {
+      toast.warning(`Skill "${existing.name}" already exists with the same name or path`)
+      return false
+    }
     set({ installStatus: 'installing' })
     get().addInstallLog('info', `Importing from ${localPath}`)
     const resp = await wailsApi.installSkillFromLocal({ localPath, name, sourceName })
