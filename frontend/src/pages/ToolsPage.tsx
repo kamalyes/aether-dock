@@ -75,7 +75,9 @@ export default function ToolsPage() {
 function ToolCard({ tool, onToggle }: { tool: any; onToggle: () => void }) {
   const { t } = useTranslation()
   const icon = TOOL_ICONS[tool.displayName] || TOOL_ICONS[tool.toolName]
+  const canEnable = tool.isDetected
   const canOpenDir = tool.isEnabled && tool.isDetected
+  const showToggleOn = tool.isEnabled && tool.isDetected
 
   const handleOpenDir = (path: string) => {
     if (!canOpenDir) {
@@ -97,9 +99,17 @@ function ToolCard({ tool, onToggle }: { tool: any; onToggle: () => void }) {
     }
   }
 
+  const handleToggle = () => {
+    if (!canEnable) {
+      toast.warning(t('tools.detectFirst', 'Detect this tool first before enabling'))
+      return
+    }
+    onToggle()
+  }
+
   return (
     <div className="glass-card p-4 transition-all duration-150"
-      style={{ opacity: tool.isDetected ? 1 : 0.55 }}
+      style={{ opacity: tool.isDetected ? 1 : 0.5 }}
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
@@ -159,33 +169,29 @@ function ToolCard({ tool, onToggle }: { tool: any; onToggle: () => void }) {
             </div>
           </div>
         </div>
-        <button onClick={onToggle} className={tool.isEnabled ? 'toggle-on' : 'toggle-off'} />
+        <button
+          onClick={handleToggle}
+          className={showToggleOn ? 'toggle-on' : 'toggle-off'}
+          style={!canEnable ? { opacity: 0.35, cursor: 'not-allowed', pointerEvents: 'auto' } : undefined}
+          title={!canEnable ? t('tools.detectFirst', 'Detect first') : undefined}
+        />
       </div>
 
       <div className="space-y-2">
-        {tool.skillDir && (
-          <PathRow
-            icon={<FolderOpen style={{ width: 13, height: 13, color: 'var(--c-accent)' }} className="shrink-0" />}
-            path={tool.skillDir}
-            label={t('tools.skillDir')}
-            enabled={canOpenDir}
-            onOpen={() => handleOpenDir(tool.skillDir)}
-          />
-        )}
-        {tool.mcpDir && (
-          <PathRow
-            icon={<FileText style={{ width: 13, height: 13, color: 'var(--c-violet)' }} className="shrink-0" />}
-            path={tool.mcpDir}
-            label={t('tools.mcpDir')}
-            enabled={canOpenDir}
-            onOpen={() => handleOpenDir(tool.mcpDir)}
-          />
-        )}
-        {!tool.skillDir && !tool.mcpDir && (
-          <span style={{ fontSize: 11, color: 'var(--c-text-faint)' }}>
-            {tool.isEnabled ? t('tools.noPathsYet', 'No paths configured yet') : t('tools.enableToCreate', 'Enable to create directories')}
-          </span>
-        )}
+        <PathRow
+          icon={<FolderOpen style={{ width: 13, height: 13, color: 'var(--c-accent)' }} className="shrink-0" />}
+          path={tool.skillDir || '—'}
+          label={t('tools.skillDir')}
+          enabled={canOpenDir && !!tool.skillDir}
+          onOpen={() => tool.skillDir && handleOpenDir(tool.skillDir)}
+        />
+        <PathRow
+          icon={<FileText style={{ width: 13, height: 13, color: 'var(--c-violet)' }} className="shrink-0" />}
+          path={tool.mcpDir || '—'}
+          label={t('tools.mcpDir')}
+          enabled={canOpenDir && !!tool.mcpDir}
+          onOpen={() => tool.mcpDir && handleOpenDir(tool.mcpDir)}
+        />
       </div>
     </div>
   )

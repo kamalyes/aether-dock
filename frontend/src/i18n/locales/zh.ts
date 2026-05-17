@@ -164,6 +164,7 @@ const zh = {
     detectedLabel: '已检测',
     notDetected: '未检测到',
     enableFirst: '请先启用此工具才能访问目录',
+    detectFirst: '请先检测到此工具才能启用',
     openDir: '打开目录',
     noPathsYet: '暂无路径配置',
     enableToCreate: '启用后自动创建目录',

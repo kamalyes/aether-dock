@@ -164,6 +164,7 @@ const en = {
     detectedLabel: 'Detected',
     notDetected: 'Not detected',
     enableFirst: 'Enable this tool first to access its directory',
+    detectFirst: 'Detect this tool first before enabling',
     openDir: 'Open directory',
     noPathsYet: 'No paths configured yet',
     enableToCreate: 'Enable to create directories',
