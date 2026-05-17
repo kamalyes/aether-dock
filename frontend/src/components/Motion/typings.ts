@@ -6,6 +6,7 @@ export interface FadeInProps {
   delay?: number
   direction?: 'up' | 'down' | 'left' | 'right' | 'none'
   duration?: number
+  style?: React.CSSProperties
 }
 
 export interface StaggerContainerProps {

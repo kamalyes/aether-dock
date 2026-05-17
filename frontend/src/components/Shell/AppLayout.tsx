@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { ToastContainer } from '@/components/Toast'
 import CommandPalette from './CommandPalette'
+import SidebarScanWidget from './SidebarScanWidget'
 import { useThemeStore } from '@/stores/themeStore'
 
 interface NavItem {
@@ -109,20 +110,7 @@ export default function AppLayout() {
         </nav>
 
         <div className="px-3 pb-3 pt-2">
-          <div
-            className="rounded-md px-3 py-3"
-            style={{ background: 'var(--c-bg-input)', border: '1px solid var(--c-border)' }}
-          >
-            <div className="flex items-center justify-between gap-2">
-              <strong style={{ fontSize: 12, color: 'var(--c-text)', fontWeight: 750 }}>Scan</strong>
-              <span className="inline-flex items-center gap-1 rounded px-2 py-0.5" style={{ color: 'var(--c-green)', background: 'var(--c-green-soft)', fontSize: 10, fontWeight: 700 }}>
-                <span className="status-dot status-dot-installed" />
-                Done
-              </span>
-            </div>
-            <p style={{ marginTop: 9, fontSize: 10.5, color: 'var(--c-text-faint)' }}>Last scan: local</p>
-            <p style={{ marginTop: 4, fontSize: 10.5, color: 'var(--c-text-faint)' }}>Sources: active</p>
-          </div>
+          <SidebarScanWidget />
         </div>
 
         <div className="px-4 py-2.5" style={{ borderTop: '1px solid var(--c-border)' }}>
@@ -136,7 +124,7 @@ export default function AppLayout() {
               style={{ background: 'var(--c-bg-input)', border: '1px solid var(--c-border)' }}
             >
               <Command style={{ width: 9, height: 9, color: 'var(--c-text-faint)' }} />
-              <span style={{ fontSize: 9, color: 'var(--c-text-faint)' }}>Ctrl K</span>
+              <span style={{ fontSize: 9, color: 'var(--c-text-faint)' }}>⇧⌘P</span>
             </div>
           </div>
         </div>

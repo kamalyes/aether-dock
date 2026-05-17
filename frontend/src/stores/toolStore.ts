@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import i18next from 'i18next'
 import type { ToolConfig } from '@/types'
 import { wailsApi } from '@/services/wailsBridge'
 import { toast } from '@/stores/toastStore'
@@ -24,7 +25,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
     if (resp.success && resp.data) {
       set({ tools: resp.data, loading: false })
     } else {
-      set({ error: resp.error ?? 'Failed to fetch tools', loading: false })
+      set({ error: resp.error ?? i18next.t('tools.fetchFailed', 'Failed to fetch tools'), loading: false })
     }
   },
 
@@ -33,10 +34,10 @@ export const useToolStore = create<ToolState>((set, get) => ({
     const resp = await wailsApi.detectTools()
     if (resp.success && resp.data) {
       set({ tools: resp.data, loading: false })
-      toast.success(`Detected ${resp.data.filter((t) => t.isDetected).length} tools`)
+      toast.success(i18next.t('tools.detectedCount', 'Detected {{count}} tools', { count: resp.data.filter((t) => t.isDetected).length }))
     } else {
       set({ loading: false })
-      toast.error(resp.error ?? 'Detection failed')
+      toast.error(resp.error ?? i18next.t('tools.detectFailed', 'Detection failed'))
     }
     get().fetchTools()
   },
@@ -49,11 +50,11 @@ export const useToolStore = create<ToolState>((set, get) => ({
     }))
     const resp = await wailsApi.enableTool(name)
     if (resp.success) {
-      toast.success(`${name} enabled`)
+      toast.success(i18next.t('tools.enabledSuccess', '{{name}} enabled', { name }))
       get().fetchTools()
       return true
     }
-    toast.error(`Failed to enable ${name}`)
+    toast.error(i18next.t('tools.enableFailed', 'Failed to enable {{name}}', { name }))
     get().fetchTools()
     return false
   },
@@ -66,11 +67,11 @@ export const useToolStore = create<ToolState>((set, get) => ({
     }))
     const resp = await wailsApi.disableTool(name)
     if (resp.success) {
-      toast.info(`${name} disabled`)
+      toast.info(i18next.t('tools.disabledInfo', '{{name}} disabled', { name }))
       get().fetchTools()
       return true
     }
-    toast.error(`Failed to disable ${name}`)
+    toast.error(i18next.t('tools.disableFailed', 'Failed to disable {{name}}', { name }))
     get().fetchTools()
     return false
   },

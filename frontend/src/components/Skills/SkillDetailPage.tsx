@@ -36,6 +36,7 @@ import { useSkillStore } from '@/stores/skillStore'
 import { SkillIcon } from './SkillIcon'
 import { SkillStatusBadge } from './SkillStatusBadge'
 import { getToolIconByName } from './utils'
+import { Skeleton, SkeletonCard } from '@/components/Loading'
 const Markdown = ReactMarkdown as any
 
 type DetailTab = 'overview' | 'readme' | 'locations' | 'verify'
@@ -153,8 +154,33 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <RefreshCw style={{ width: 24, height: 24, color: 'var(--c-text-faint)' }} className="animate-spin" />
+      <div className="flex flex-col h-full overflow-hidden">
+        <div className="shrink-0 px-5 py-3" style={{ borderBottom: '1px solid var(--c-border)', background: 'var(--c-bg-panel)' }}>
+          <Skeleton width={60} height={14} style={{ marginBottom: 12 }} />
+          <div className="flex items-start gap-4">
+            <Skeleton width={56} height={56} borderRadius={12} />
+            <div className="flex-1 space-y-2">
+              <Skeleton width="40%" height={18} />
+              <Skeleton width="70%" height={10} />
+              <div className="flex gap-2">
+                <Skeleton width={60} height={22} borderRadius={4} />
+                <Skeleton width={80} height={22} borderRadius={4} />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="grid gap-5" style={{ gridTemplateColumns: '1fr 280px' }}>
+            <div className="space-y-4">
+              <SkeletonCard rows={4} />
+              <SkeletonCard rows={6} />
+            </div>
+            <div className="space-y-4">
+              <SkeletonCard rows={3} />
+              <SkeletonCard rows={2} />
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

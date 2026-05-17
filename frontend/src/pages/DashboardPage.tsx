@@ -15,8 +15,8 @@ import {
   Loader2,
   RefreshCw,
   Search,
+  ScanSearch,
   Server,
-  ShieldCheck,
   Sparkles,
   TrendingUp,
   Upload,
@@ -158,6 +158,13 @@ export default function DashboardPage() {
               <SkeletonCard key={index} rows={2} />
             ))}
           </div>
+          <div className="grid gap-4" style={{ gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 0.8fr)' }}>
+            <SkeletonCard rows={6} />
+            <div className="flex flex-col gap-4">
+              <SkeletonCard rows={3} />
+              <SkeletonCard rows={3} />
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <SkeletonCard rows={5} />
             <SkeletonCard rows={5} />
@@ -287,13 +294,13 @@ export default function DashboardPage() {
           </StaggerItem>
         </StaggerContainer>
 
-        <div className="grid gap-4" style={{ gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 0.8fr)' }}>
-          <FadeIn delay={0.1}>
-            <section className="glass-card p-4 h-full">
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 0.8fr)', alignItems: 'stretch' }}>
+          <FadeIn delay={0.1} style={{ display: 'flex' }}>
+            <section className="glass-card p-4 flex flex-col flex-1">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <span className="icon-box icon-box-green" style={{ width: 30, height: 30 }}>
-                    <ShieldCheck style={{ width: 15, height: 15 }} />
+                    <ScanSearch style={{ width: 15, height: 15 }} />
                   </span>
                   <div>
                     <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700 }}>
@@ -315,14 +322,7 @@ export default function DashboardPage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-4 gap-2 mb-4">
-                <MiniStatus label={t('dashboard.foundSkills', 'Found skills')} value={skills.length} tone="accent" />
-                <MiniStatus label={t('dashboard.scanDirs', 'Scan dirs')} value={sources.length} tone="green" />
-                <MiniStatus label={t('dashboard.changedSkills', 'Changed')} value={dashboard.modifiedCount + dashboard.updateCount} tone="amber" />
-                <MiniStatus label={t('dashboard.issues', 'Issues')} value={dashboard.errorCount} tone={dashboard.errorCount > 0 ? 'red' : 'green'} />
-              </div>
-
-              <div className="space-y-3">
+              <div className="space-y-3 flex-1">
                 {dashboard.appStats.map(({ tool, count, detected }) => (
                   <div key={tool.id}>
                     <div className="flex items-center justify-between mb-1.5">
@@ -352,99 +352,126 @@ export default function DashboardPage() {
             </section>
           </FadeIn>
 
-          <FadeIn delay={0.15}>
-            <section className="glass-card p-4 h-full">
-              <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
-                {t('dashboard.appInstallChart', 'App install matrix')}
-              </h2>
-              <ReactECharts
-                option={{
-                  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-                  grid: { left: 28, right: 12, top: 18, bottom: 34 },
-                  xAxis: {
-                    type: 'category',
-                    data: dashboard.appStats.map(({ tool }) => tool.label),
-                    axisLabel: { fontSize: 10, color: 'var(--c-text-faint)' },
-                    axisTick: { show: false },
-                    axisLine: { lineStyle: { color: 'var(--c-border)' } },
-                  },
-                  yAxis: {
-                    type: 'value',
-                    axisLabel: { fontSize: 10, color: 'var(--c-text-faint)' },
-                    splitLine: { lineStyle: { color: 'var(--c-border)' } },
-                  },
-                  series: [{
-                    type: 'bar',
-                    barWidth: 32,
-                    data: dashboard.appStats.map(({ tool, count }) => ({
-                      value: count,
-                      itemStyle: { color: tool.color, borderRadius: [6, 6, 0, 0] },
-                    })),
-                  }],
-                }}
-                style={{ height: 220 }}
-              />
-            </section>
+          <FadeIn delay={0.15} style={{ display: 'flex' }}>
+            <div className="flex flex-col gap-4 flex-1">
+              <section className="glass-card p-4">
+                <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
+                  {t('dashboard.appInstallChart', 'App install matrix')}
+                </h2>
+                {dashboard.totalAppInstalls === 0 ? (
+                  <div className="flex flex-col items-center justify-center" style={{ height: 220 }}>
+                    <BarChart3 style={{ width: 28, height: 28, color: 'var(--c-text-faint)', marginBottom: 8 }} />
+                    <p style={{ fontSize: 12, color: 'var(--c-text-faint)' }}>{t('dashboard.noData', 'No data')}</p>
+                  </div>
+                ) : (
+                <ReactECharts
+                  option={{
+                    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                    grid: { left: 28, right: 12, top: 18, bottom: 34 },
+                    xAxis: {
+                      type: 'category',
+                      data: dashboard.appStats.map(({ tool }) => tool.label),
+                      axisLabel: { fontSize: 10, color: 'var(--c-text-faint)' },
+                      axisTick: { show: false },
+                      axisLine: { lineStyle: { color: 'var(--c-border)' } },
+                    },
+                    yAxis: {
+                      type: 'value',
+                      axisLabel: { fontSize: 10, color: 'var(--c-text-faint)' },
+                      splitLine: { lineStyle: { color: 'var(--c-border)' } },
+                    },
+                    series: [{
+                      type: 'bar',
+                      barWidth: 32,
+                      data: dashboard.appStats.map(({ tool, count }) => ({
+                        value: count,
+                        itemStyle: { color: tool.color, borderRadius: [6, 6, 0, 0] },
+                      })),
+                    }],
+                  }}
+                  style={{ height: 220 }}
+                />
+                )}
+              </section>
+
+              <section className="glass-card p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700 }}>
+                    {t('dashboard.usageTrend7d', '7-day usage trend')}
+                  </h2>
+                  <span style={{ color: 'var(--c-text-faint)', fontSize: 10 }}>{t('dashboard.localActivity', 'Local activity')}</span>
+                </div>
+                {trend.every((item) => item.count === 0) ? (
+                  <div className="flex flex-col items-center justify-center" style={{ height: 230 }}>
+                    <TrendingUp style={{ width: 28, height: 28, color: 'var(--c-text-faint)', marginBottom: 8 }} />
+                    <p style={{ fontSize: 12, color: 'var(--c-text-faint)' }}>{t('dashboard.noData', 'No data')}</p>
+                  </div>
+                ) : (
+                <ReactECharts
+                  option={{
+                    tooltip: { trigger: 'axis' },
+                    grid: { left: 32, right: 14, top: 18, bottom: 28 },
+                    xAxis: {
+                      type: 'category',
+                      data: trend.map((item) => item.label),
+                      boundaryGap: false,
+                      axisLabel: { fontSize: 10, color: 'var(--c-text-faint)' },
+                      axisLine: { lineStyle: { color: 'var(--c-border)' } },
+                    },
+                    yAxis: {
+                      type: 'value',
+                      axisLabel: { fontSize: 10, color: 'var(--c-text-faint)' },
+                      splitLine: { lineStyle: { color: 'var(--c-border)' } },
+                    },
+                    series: [{
+                      type: 'line',
+                      smooth: true,
+                      symbolSize: 7,
+                      areaStyle: { color: 'rgba(35, 99, 235, 0.10)' },
+                      lineStyle: { width: 3, color: 'var(--c-accent)' },
+                      itemStyle: { color: 'var(--c-accent)' },
+                      data: trend.map((item) => item.count),
+                    }],
+                  }}
+                  style={{ height: 230 }}
+                />
+                )}
+              </section>
+            </div>
           </FadeIn>
         </div>
 
-        <div className="grid gap-4" style={{ gridTemplateColumns: 'minmax(0, 1fr) 300px 300px' }}>
-          <FadeIn delay={0.2}>
-            <section className="glass-card p-4">
-              <div className="flex items-center justify-between mb-3">
+        <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 1fr', alignItems: 'stretch' }}>
+          <FadeIn delay={0.2} style={{ display: 'flex' }}>
+            <section className="glass-card overflow-hidden flex flex-col flex-1">
+              <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid var(--c-border)' }}>
                 <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700 }}>
-                  {t('dashboard.usageTrend7d', '7-day usage trend')}
+                  {t('dashboard.topSkills', 'Top skills')}
                 </h2>
-                <span style={{ color: 'var(--c-text-faint)', fontSize: 10 }}>{t('dashboard.localActivity', 'Local activity')}</span>
+                <button
+                  onClick={() => navigate('/skills?view=usage')}
+                  className="inline-flex items-center gap-1 text-[10px] font-semibold"
+                  style={{ color: 'var(--c-accent)' }}
+                  type="button"
+                >
+                  {t('dashboard.view', 'View')}
+                  <ArrowRight style={{ width: 12, height: 12 }} />
+                </button>
               </div>
-              <ReactECharts
-                option={{
-                  tooltip: { trigger: 'axis' },
-                  grid: { left: 32, right: 14, top: 18, bottom: 28 },
-                  xAxis: {
-                    type: 'category',
-                    data: trend.map((item) => item.label),
-                    boundaryGap: false,
-                    axisLabel: { fontSize: 10, color: 'var(--c-text-faint)' },
-                    axisLine: { lineStyle: { color: 'var(--c-border)' } },
-                  },
-                  yAxis: {
-                    type: 'value',
-                    axisLabel: { fontSize: 10, color: 'var(--c-text-faint)' },
-                    splitLine: { lineStyle: { color: 'var(--c-border)' } },
-                  },
-                  series: [{
-                    type: 'line',
-                    smooth: true,
-                    symbolSize: 7,
-                    areaStyle: { color: 'rgba(35, 99, 235, 0.10)' },
-                    lineStyle: { width: 3, color: 'var(--c-accent)' },
-                    itemStyle: { color: 'var(--c-accent)' },
-                    data: trend.map((item) => item.count),
-                  }],
-                }}
-                style={{ height: 230 }}
-              />
-            </section>
-          </FadeIn>
-
-          <FadeIn delay={0.25}>
-            <section className="glass-card p-4">
-              <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
-                {t('dashboard.topSkills', 'Top skills')}
-              </h2>
-              <div className="space-y-3">
-                {dashboard.topSkills.length === 0 ? (
-                  <EntityEmptyState icon={<Zap style={{ width: 24, height: 24 }} />} title={t('dashboard.noSkills', 'No skills yet')} />
-                ) : dashboard.topSkills.map(({ skill, calls }, index) => (
-                  <TopSkillRow key={skill.id} skill={skill} value={calls} index={index} />
-                ))}
+              <div className="overflow-y-auto flex-1 px-4 py-3">
+                <div className="space-y-3">
+                  {dashboard.topSkills.length === 0 ? (
+                    <EntityEmptyState icon={<Zap style={{ width: 24, height: 24 }} />} title={t('dashboard.noSkills', 'No skills yet')} />
+                  ) : dashboard.topSkills.map(({ skill, calls }, index) => (
+                    <TopSkillRow key={skill.id} skill={skill} value={calls} index={index} />
+                  ))}
+                </div>
               </div>
             </section>
           </FadeIn>
 
-          <FadeIn delay={0.3}>
-            <section className="glass-card overflow-hidden">
+          <FadeIn delay={0.25} style={{ display: 'flex' }}>
+            <section className="glass-card overflow-hidden flex flex-col flex-1">
               <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid var(--c-border)' }}>
                 <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700 }}>
                   {t('dashboard.recentChanges', 'Recent changes')}
@@ -552,15 +579,6 @@ export default function DashboardPage() {
           </FadeIn>
         ) : null}
       </div>
-    </div>
-  )
-}
-
-function MiniStatus({ label, value, tone }: { label: string; value: number; tone: 'accent' | 'green' | 'amber' | 'red' }) {
-  return (
-    <div className="rounded-lg px-3 py-2" style={{ background: 'var(--c-bg-input)', border: '1px solid var(--c-border)' }}>
-      <span style={{ display: 'block', color: 'var(--c-text-faint)', fontSize: 10 }}>{label}</span>
-      <strong style={{ display: 'block', color: `var(--c-${tone})`, fontSize: 18, marginTop: 2 }}>{value}</strong>
     </div>
   )
 }

@@ -36,7 +36,7 @@ export default function McpPage() {
   const {
     servers, total, loading, filter,
     fetchServers, setFilter,
-    deleteServer, enableForTool, disableForTool,
+    addServer, deleteServer, enableForTool, disableForTool,
     discoverTools, updateServer,
   } = useMcpStore()
 
@@ -44,6 +44,7 @@ export default function McpPage() {
   const [expandedServer, setExpandedServer] = useState<string | null>(null)
   const [selectedServer, setSelectedServer] = useState<McpServer | null>(null)
   const [editingServer, setEditingServer] = useState<McpServer | null>(null)
+  const [addingServer, setAddingServer] = useState(false)
   const { dialogState, confirm, cancel } = useConfirmDialog()
 
   useEffect(() => {
@@ -81,7 +82,7 @@ export default function McpPage() {
                   <RefreshCw style={{ width: 14, height: 14 }} className={loading ? 'animate-spin' : ''} />
                 </button>
                 <button
-                  onClick={() => window.location.hash = '/install?tab=mcp'}
+                  onClick={() => setAddingServer(true)}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors"
                   style={{ background: 'var(--c-accent-soft)', color: 'var(--c-accent)' }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(35, 99, 235, 0.12)' }}
@@ -179,11 +180,22 @@ export default function McpPage() {
       />
 
       {editingServer && (
-        <EditMcpDialog
+        <McpFormDialog
+          mode="edit"
           server={editingServer}
           onClose={() => setEditingServer(null)}
           onSave={async (id, name, command, args, env, description) => {
             return await updateServer(id, name, command, args, env, description)
+          }}
+        />
+      )}
+
+      {addingServer && (
+        <McpFormDialog
+          mode="add"
+          onClose={() => setAddingServer(false)}
+          onSave={async (_, name, command, args, env, description) => {
+            return await addServer(name, command, args, env, description)
           }}
         />
       )}
@@ -452,19 +464,22 @@ function McpDetailPanel({
   )
 }
 
-function EditMcpDialog({
+function McpFormDialog({
+  mode,
   server,
   onClose,
   onSave,
 }: {
-  server: McpServer
+  mode: 'add' | 'edit'
+  server?: McpServer | null
   onClose: () => void
   onSave: (id: string, name: string, command: string, args: string[], env: Record<string, unknown>, description: string) => Promise<boolean>
 }) {
-  const [name, setName] = useState(server.name)
-  const [command, setCommand] = useState(server.command || '')
-  const [argsStr, setArgsStr] = useState(server.args?.join(' ') || '')
-  const [description, setDescription] = useState(server.description || '')
+  const { t } = useTranslation()
+  const [name, setName] = useState(server?.name || '')
+  const [command, setCommand] = useState(server?.command || '')
+  const [argsStr, setArgsStr] = useState(server?.args?.join(' ') || '')
+  const [description, setDescription] = useState(server?.description || '')
   const [saving, setSaving] = useState(false)
 
   const inputStyle: React.CSSProperties = {
@@ -482,10 +497,13 @@ function EditMcpDialog({
     if (!name || !command) return
     setSaving(true)
     const args = argsStr.trim() ? argsStr.trim().split(/\s+/) : []
-    const ok = await onSave(server.id, name, command, args, server.env || {}, description)
+    const ok = await onSave(server?.id || '', name, command, args, server?.env || {}, description)
     setSaving(false)
     if (ok) onClose()
   }
+
+  const isEdit = mode === 'edit'
+  const title = isEdit ? t('mcp.editServer') : t('mcp.addServer')
 
   return (
     <div
@@ -499,7 +517,7 @@ function EditMcpDialog({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)' }}>Edit MCP Server</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)' }}>{title}</h3>
           <button onClick={onClose} className="p-1 rounded-md" style={{ color: 'var(--c-text-faint)' }}>
             <X style={{ width: 16, height: 16 }} />
           </button>
@@ -507,45 +525,49 @@ function EditMcpDialog({
 
         <div className="space-y-3">
           <div>
-            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>Name</label>
+            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.nameLabel', 'Name')}</label>
             <input
               type="text"
               style={inputStyle}
               value={name}
               onChange={(e) => setName(e.target.value)}
+              placeholder={t('mcp.namePlaceholder', 'e.g. filesystem-server')}
               onFocus={(e) => { e.target.style.borderColor = 'var(--c-border-accent)' }}
               onBlur={(e) => { e.target.style.borderColor = 'var(--c-border)' }}
             />
           </div>
           <div>
-            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>Command</label>
+            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.commandLabel', 'Command')}</label>
             <input
               type="text"
               style={{ ...inputStyle, fontFamily: 'monospace' }}
               value={command}
               onChange={(e) => setCommand(e.target.value)}
+              placeholder="npx"
               onFocus={(e) => { e.target.style.borderColor = 'var(--c-border-accent)' }}
               onBlur={(e) => { e.target.style.borderColor = 'var(--c-border)' }}
             />
           </div>
           <div>
-            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>Arguments (space-separated)</label>
+            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.argsLabel', 'Arguments (space-separated)')}</label>
             <input
               type="text"
               style={{ ...inputStyle, fontFamily: 'monospace' }}
               value={argsStr}
               onChange={(e) => setArgsStr(e.target.value)}
+              placeholder="-y @modelcontextprotocol/server-filesystem /home"
               onFocus={(e) => { e.target.style.borderColor = 'var(--c-border-accent)' }}
               onBlur={(e) => { e.target.style.borderColor = 'var(--c-border)' }}
             />
           </div>
           <div>
-            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>Description</label>
+            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.descLabel', 'Description')}</label>
             <input
               type="text"
               style={inputStyle}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              placeholder={t('mcp.descPlaceholder', 'Optional description')}
               onFocus={(e) => { e.target.style.borderColor = 'var(--c-border-accent)' }}
               onBlur={(e) => { e.target.style.borderColor = 'var(--c-border)' }}
             />
@@ -560,7 +582,7 @@ function EditMcpDialog({
             onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(15, 23, 42, 0.08)' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(15, 23, 42, 0.04)' }}
           >
-            Cancel
+            {t('mcp.cancel', 'Cancel')}
           </button>
           <button
             onClick={handleSave}
@@ -571,7 +593,7 @@ function EditMcpDialog({
             onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
           >
             {saving ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <Check style={{ width: 14, height: 14 }} />}
-            Save
+            {isEdit ? t('mcp.save', 'Save') : t('mcp.add', 'Add')}
           </button>
         </div>
       </div>

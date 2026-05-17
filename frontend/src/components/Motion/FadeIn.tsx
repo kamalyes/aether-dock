@@ -9,10 +9,11 @@ const directionOffset = {
   none: {},
 }
 
-export function FadeIn({ children, className = '', delay = 0, direction = 'up', duration = 0.4 }: FadeInProps) {
+export function FadeIn({ children, className = '', delay = 0, direction = 'up', duration = 0.4, style }: FadeInProps) {
   return (
     <motion.div
       className={className}
+      style={style}
       initial={{ opacity: 0, ...directionOffset[direction] }}
       animate={{ opacity: 1, x: 0, y: 0 }}
       transition={{ duration, delay, ease: [0.25, 0.46, 0.45, 0.94] }}

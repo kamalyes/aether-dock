@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import type { SkillVersionDiff } from '@/types'
 import { useSkillStore } from '@/stores/skillStore'
+import { Skeleton, SkeletonCard } from '@/components/Loading'
 
 interface SkillDiffModalProps {
   skillId: string
@@ -137,11 +138,17 @@ export default function SkillDiffModal({ skillId, skillName, open, onClose }: Sk
 
               <div className="flex-1 overflow-y-auto px-5 py-4">
                 {loading ? (
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <Loader2 style={{ width: 24, height: 24, color: 'var(--c-accent)' }} className="animate-spin" />
-                    <p style={{ fontSize: 12, color: 'var(--c-text-muted)', marginTop: 12 }}>
-                      {t('diff.loading', 'Checking for updates...')}
-                    </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Skeleton width={40} height={40} borderRadius={10} />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton width="50%" height={14} />
+                        <Skeleton width="30%" height={10} />
+                      </div>
+                    </div>
+                    <SkeletonCard rows={2} />
+                    <SkeletonCard rows={3} />
+                    <SkeletonCard rows={2} />
                   </div>
                 ) : diff ? (
                   <>

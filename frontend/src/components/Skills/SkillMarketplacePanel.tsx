@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { wailsApi } from '@/services/wailsBridge'
 import { MetricTile } from '@/components/Card'
 import { SearchInput } from '@/components/Input'
+import { SkeletonCard } from '@/components/Loading'
 
 interface MarketplaceItem {
   id: string
@@ -132,8 +133,10 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
         ) : null}
 
         {loading ? (
-          <div className="glass-card p-8 text-center">
-            <Loader2 style={{ width: 22, height: 22, color: 'var(--c-text-faint)', margin: '0 auto' }} className="animate-spin" />
+          <div className="grid grid-cols-2 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <SkeletonCard key={i} rows={3} />
+            ))}
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">

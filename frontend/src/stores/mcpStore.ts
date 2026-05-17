@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import i18next from 'i18next'
 import type { McpServer, McpTool } from '@/types'
 import { wailsApi } from '@/services/wailsBridge'
 import { toast } from '@/stores/toastStore'
@@ -46,7 +47,7 @@ export const useMcpStore = create<McpState>((set, get) => ({
     if (resp.success && resp.data) {
       set({ servers: resp.data.servers, total: resp.data.total, loading: false })
     } else {
-      set({ error: resp.error ?? 'Failed to fetch MCP servers', loading: false })
+      set({ error: resp.error ?? i18next.t('mcp.fetchFailed', 'Failed to fetch MCP servers'), loading: false })
     }
   },
 
@@ -59,18 +60,18 @@ export const useMcpStore = create<McpState>((set, get) => ({
       (s) => s.name === name || (s.command === command && JSON.stringify(s.args) === JSON.stringify(args))
     )
     if (existing) {
-      toast.warning(`MCP server "${existing.name}" already exists with the same name or command`)
+      toast.warning(i18next.t('mcp.alreadyExists', 'MCP server "{{name}}" already exists with the same name or command', { name: existing.name }))
       return false
     }
     const resp = await wailsApi.addMcpServer({
       name, command, args, env, description, sourceType: 'manual', sourceUrl: '',
     })
     if (resp.success) {
-      toast.success(`MCP server "${name}" added`)
+      toast.success(i18next.t('mcp.addedSuccess', 'MCP server "{{name}}" added', { name }))
       get().fetchServers()
       return true
     }
-    toast.error(resp.error ?? 'Failed to add MCP server')
+    toast.error(resp.error ?? i18next.t('mcp.addFailed', 'Failed to add MCP server'))
     set({ error: resp.error })
     return false
   },
@@ -80,11 +81,11 @@ export const useMcpStore = create<McpState>((set, get) => ({
       name, command, args, env, description, sourceType: 'manual', sourceUrl: '',
     })
     if (resp.success) {
-      toast.success(`MCP server "${name}" updated`)
+      toast.success(i18next.t('mcp.updatedSuccess', 'MCP server "{{name}}" updated', { name }))
       get().fetchServers()
       return true
     }
-    toast.error(resp.error ?? 'Failed to update MCP server')
+    toast.error(resp.error ?? i18next.t('mcp.updateFailed', 'Failed to update MCP server'))
     set({ error: resp.error })
     return false
   },
@@ -97,13 +98,13 @@ export const useMcpStore = create<McpState>((set, get) => ({
     }))
     const resp = await wailsApi.deleteMcpServer(id)
     if (resp.success) {
-      toast.success(`MCP server "${server?.name ?? id}" deleted`)
+      toast.success(i18next.t('mcp.deletedSuccess', 'MCP server "{{name}}" deleted', { name: server?.name ?? id }))
       if (get().currentServer?.id === id) {
         set({ currentServer: null })
       }
       return true
     }
-    toast.error(resp.error ?? 'Failed to delete MCP server')
+    toast.error(resp.error ?? i18next.t('mcp.deleteFailed', 'Failed to delete MCP server'))
     get().fetchServers()
     set({ error: resp.error })
     return false
@@ -117,11 +118,11 @@ export const useMcpStore = create<McpState>((set, get) => ({
     }))
     const resp = await wailsApi.enableMcpForTool(id, toolName)
     if (resp.success) {
-      toast.success(`MCP synced to ${toolName}`)
+      toast.success(i18next.t('mcp.syncedToTool', 'MCP synced to {{tool}}', { tool: toolName }))
       get().fetchServers()
       return true
     }
-    toast.error(`Failed to sync to ${toolName}`)
+    toast.error(i18next.t('mcp.syncFailed', 'Failed to sync to {{tool}}', { tool: toolName }))
     get().fetchServers()
     return false
   },
@@ -134,11 +135,11 @@ export const useMcpStore = create<McpState>((set, get) => ({
     }))
     const resp = await wailsApi.disableMcpForTool(id, toolName)
     if (resp.success) {
-      toast.info(`MCP removed from ${toolName}`)
+      toast.info(i18next.t('mcp.removedFromTool', 'MCP removed from {{tool}}', { tool: toolName }))
       get().fetchServers()
       return true
     }
-    toast.error(`Failed to remove from ${toolName}`)
+    toast.error(i18next.t('mcp.removeFailed', 'Failed to remove from {{tool}}', { tool: toolName }))
     get().fetchServers()
     return false
   },
@@ -147,9 +148,9 @@ export const useMcpStore = create<McpState>((set, get) => ({
     const resp = await wailsApi.discoverMcpTools(id)
     if (resp.success && resp.data) {
       set({ discoveredTools: resp.data })
-      toast.success(`Discovered ${resp.data.length} tools`)
+      toast.success(i18next.t('mcp.discoveredCount', 'Discovered {{count}} tools', { count: resp.data.length }))
     } else {
-      toast.error(resp.error ?? 'Failed to discover tools')
+      toast.error(resp.error ?? i18next.t('mcp.discoverFailed', 'Failed to discover tools'))
     }
   },
 }))

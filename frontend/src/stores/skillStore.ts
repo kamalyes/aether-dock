@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import i18next from 'i18next'
 import type { Skill, SkillSource, SkillViewMode, SortField, SortOrder, SkillVersionDiff } from '@/types'
 import { wailsApi } from '@/services/wailsBridge'
 import { toast } from '@/stores/toastStore'
@@ -91,7 +92,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     if (resp.success && resp.data) {
       set({ skills: resp.data.skills, total: resp.data.total, loading: false })
     } else {
-      set({ error: resp.error ?? 'Failed to fetch skills', loading: false })
+      set({ error: resp.error ?? i18next.t('skills.fetchFailed', 'Failed to fetch skills'), loading: false })
     }
   },
 
@@ -149,7 +150,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
       (s) => s.gitUrl === url && s.gitBranch === branch
     )
     if (existing) {
-      toast.warning(`Skill "${existing.name}" is already installed from this URL and branch`)
+      toast.warning(i18next.t('skills.alreadyInstalled', 'Skill "{{name}}" is already installed from this URL and branch', { name: existing.name }))
       return false
     }
     set({ installStatus: 'installing' })
@@ -157,15 +158,15 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     const resp = await wailsApi.installSkillFromGit({ url, branch, name, sourceName })
     if (resp.success) {
       set({ installStatus: 'success' })
-      get().addInstallLog('success', `Skill "${name || url}" installed successfully`)
-      toast.success(`Skill "${name || url}" installed from Git`)
+      get().addInstallLog('success', i18next.t('skills.installGitSuccess', 'Skill "{{name}}" installed successfully', { name: name || url }))
+      toast.success(i18next.t('skills.installGitToast', 'Skill "{{name}}" installed from Git', { name: name || url }))
       get().fetchSkills()
       get().fetchSources()
       return true
     }
     set({ installStatus: 'error', error: resp.error })
-    get().addInstallLog('error', resp.error ?? 'Failed to install from Git')
-    toast.error(resp.error ?? 'Failed to install from Git')
+    get().addInstallLog('error', resp.error ?? i18next.t('skills.installGitFailed', 'Failed to install from Git'))
+    toast.error(resp.error ?? i18next.t('skills.installGitFailed', 'Failed to install from Git'))
     get().fetchSkills()
     return false
   },
@@ -175,7 +176,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
       (s) => s.name === name || s.installPath === localPath
     )
     if (existing) {
-      toast.warning(`Skill "${existing.name}" already exists with the same name or path`)
+      toast.warning(i18next.t('skills.alreadyExistsLocal', 'Skill "{{name}}" already exists with the same name or path', { name: existing.name }))
       return false
     }
     set({ installStatus: 'installing' })
@@ -183,15 +184,15 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     const resp = await wailsApi.installSkillFromLocal({ localPath, name, sourceName })
     if (resp.success) {
       set({ installStatus: 'success' })
-      get().addInstallLog('success', `Skill "${name || localPath}" imported successfully`)
-      toast.success(`Skill "${name || localPath}" imported`)
+      get().addInstallLog('success', i18next.t('skills.importLocalSuccess', 'Skill "{{name}}" imported successfully', { name: name || localPath }))
+      toast.success(i18next.t('skills.importLocalToast', 'Skill "{{name}}" imported', { name: name || localPath }))
       get().fetchSkills()
       get().fetchSources()
       return true
     }
     set({ installStatus: 'error', error: resp.error })
-    get().addInstallLog('error', resp.error ?? 'Failed to import from local')
-    toast.error(resp.error ?? 'Failed to import from local')
+    get().addInstallLog('error', resp.error ?? i18next.t('skills.importLocalFailed', 'Failed to import from local'))
+    toast.error(resp.error ?? i18next.t('skills.importLocalFailed', 'Failed to import from local'))
     get().fetchSkills()
     return false
   },
@@ -204,14 +205,14 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     }))
     const resp = await wailsApi.deleteSkill(id)
     if (resp.success) {
-      toast.success(`Skill "${skill?.name ?? id}" deleted`)
+      toast.success(i18next.t('skills.deletedSuccess', 'Skill "{{name}}" deleted', { name: skill?.name ?? id }))
       if (get().currentSkill?.id === id) {
         set({ currentSkill: null })
       }
       get().fetchSources()
       return true
     }
-    toast.error(resp.error ?? 'Failed to delete skill')
+    toast.error(resp.error ?? i18next.t('skills.deleteFailed', 'Failed to delete skill'))
     get().fetchSkills()
     set({ error: resp.error })
     return false
@@ -225,11 +226,11 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     }))
     const resp = await wailsApi.enableSkillForTool(id, toolName)
     if (resp.success) {
-      toast.success(`Synced to ${toolName}`)
+      toast.success(i18next.t('skills.syncedToTool', 'Synced to {{tool}}', { tool: toolName }))
       get().fetchSkills()
       return true
     }
-    toast.error(`Failed to sync to ${toolName}`)
+    toast.error(i18next.t('skills.syncFailed', 'Failed to sync to {{tool}}', { tool: toolName }))
     get().fetchSkills()
     return false
   },
@@ -242,11 +243,11 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     }))
     const resp = await wailsApi.disableSkillForTool(id, toolName)
     if (resp.success) {
-      toast.info(`Removed from ${toolName}`)
+      toast.info(i18next.t('skills.removedFromTool', 'Removed from {{tool}}', { tool: toolName }))
       get().fetchSkills()
       return true
     }
-    toast.error(`Failed to remove from ${toolName}`)
+    toast.error(i18next.t('skills.removeFailed', 'Failed to remove from {{tool}}', { tool: toolName }))
     get().fetchSkills()
     return false
   },
@@ -268,11 +269,11 @@ export const useSkillStore = create<SkillState>((set, get) => ({
   pullSkill: async (installPath) => {
     const resp = await wailsApi.gitPull(installPath)
     if (resp.success) {
-      toast.success('Pull successful')
+      toast.success(i18next.t('skills.pullSuccess', 'Pull successful'))
       get().fetchSkills()
       return true
     }
-    toast.error(resp.error ?? 'Pull failed')
+    toast.error(resp.error ?? i18next.t('skills.pullFailed', 'Pull failed'))
     return false
   },
 
@@ -332,9 +333,9 @@ export const useSkillStore = create<SkillState>((set, get) => ({
       }))
       const updateCount = resp.data.filter((d) => d.hasUpdate).length
       if (updateCount > 0) {
-        toast.info(`${updateCount} skill(s) have updates available`)
+        toast.info(i18next.t('skills.updatesAvailable', '{{count}} skill(s) have updates available', { count: updateCount }))
       } else {
-        toast.success('All skills are up to date')
+        toast.success(i18next.t('skills.allUpToDate', 'All skills are up to date'))
       }
     } else {
       set({ updateChecking: false })
@@ -357,7 +358,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     if (!skill) return false
     const resp = await wailsApi.gitPull(skill.installPath)
     if (resp.success) {
-      toast.success(`Skill "${skill.name}" updated successfully`)
+      toast.success(i18next.t('skills.updateSuccess', 'Skill "{{name}}" updated successfully', { name: skill.name }))
       get().fetchSkills()
       get().fetchSources()
       set((state) => {
@@ -367,7 +368,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
       })
       return true
     }
-    toast.error(resp.error ?? 'Update failed')
+    toast.error(resp.error ?? i18next.t('skills.updateFailed', 'Update failed'))
     return false
   },
 }))

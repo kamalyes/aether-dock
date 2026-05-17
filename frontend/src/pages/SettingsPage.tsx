@@ -26,6 +26,7 @@ import { useThemeStore, type ThemeMode } from '@/stores/themeStore'
 import { useToolStore } from '@/stores/toolStore'
 import { APP_VERSION } from '@/constants/app'
 import { Switch } from '@/components/Control'
+import { Skeleton, SkeletonCard } from '@/components/Loading'
 import { CORE_SKILL_TOOLS, getToolIconFor, normalizeToolKey, shortPath, type CoreSkillTool } from '@/components/Skills'
 
 type SettingField =
@@ -237,8 +238,18 @@ export default function SettingsPage() {
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <RefreshCw style={{ width: 20, height: 20, color: 'var(--c-text-faint)' }} className="animate-spin" />
+          <div className="max-w-[960px] space-y-5">
+            <SkeletonCard rows={3} />
+            <SkeletonCard rows={4} />
+            <SkeletonCard rows={3} />
+            <div className="grid grid-cols-3 gap-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="rounded-xl p-4" style={{ background: 'var(--c-bg-card)', border: '1px solid var(--c-border)' }}>
+                  <Skeleton width="60%" height={14} style={{ marginBottom: 12 }} />
+                  <Skeleton width="100%" height={36} borderRadius={8} />
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="max-w-[960px] space-y-5">
