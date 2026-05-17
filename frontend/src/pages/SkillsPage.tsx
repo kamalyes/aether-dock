@@ -11,6 +11,7 @@ import {
   Plus,
   CheckSquare,
   Square,
+  RefreshCcw,
 } from 'lucide-react'
 import type { Skill } from '@/types'
 import ConfirmDialog, { useConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -37,6 +38,7 @@ export default function SkillsPage() {
     toggleSkillSelection, selectAllVisible, clearSelection, toggleFavorite,
     deleteSkill, enableForTool, disableForTool, pullSkill,
     batchEnableForTool, batchDelete,
+    checkAllUpdates, updateChecking,
   } = useSkillStore()
 
   const [expandedSources, setExpandedSources] = useState<Set<string>>(new Set())
@@ -320,6 +322,17 @@ export default function SkillsPage() {
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
             >
               <RefreshCw style={{ width: 14, height: 14 }} className={loading ? 'animate-spin' : ''} />
+            </button>
+
+            <button
+              className="p-1.5 rounded-lg transition-colors"
+              style={{ color: 'var(--c-amber)' }}
+              onClick={() => checkAllUpdates()}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--c-amber-soft)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+              title={t('skills.checkUpdates', 'Check for updates')}
+            >
+              <RefreshCcw style={{ width: 14, height: 14 }} className={updateChecking ? 'animate-spin' : ''} />
             </button>
 
             <button

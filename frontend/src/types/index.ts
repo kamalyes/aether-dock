@@ -90,6 +90,25 @@ export interface GitStatus {
   untrackedFiles: number
 }
 
+export interface SkillVersionDiff {
+  skillId: string
+  currentCommit: string
+  latestCommit: string
+  currentVersion: string
+  latestVersion: string
+  behindCount: number
+  aheadCount: number
+  hasUpdate: boolean
+  commits: SkillCommit[]
+}
+
+export interface SkillCommit {
+  hash: string
+  author: string
+  message: string
+  date: string
+}
+
 export interface SkillListResult {
   skills: Skill[]
   total: number

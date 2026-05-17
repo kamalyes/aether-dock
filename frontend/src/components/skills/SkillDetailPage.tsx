@@ -26,8 +26,12 @@ import {
   ChevronRight,
   RefreshCw,
   Loader2,
+  GitCommit,
+  BellDot,
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
+import SkillDiffModal from '@/components/ui/SkillDiffModal'
+import { useSkillStore } from '@/stores/skillStore'
 import { SkillIcon } from '@/components/ui/SkillIcon'
 import { TOOL_ICONS } from '@/constants/tools'
 const Markdown = ReactMarkdown as any
@@ -101,6 +105,8 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<DetailTab>('overview')
   const [copiedHash, setCopiedHash] = useState(false)
+  const [diffOpen, setDiffOpen] = useState(false)
+  const versionDiffs = useSkillStore((s) => s.versionDiffs)
 
   const loadDetail = useCallback(async () => {
     setLoading(true)
@@ -255,6 +261,18 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            {(skill.status === 'update_available' || versionDiffs[skillId]?.hasUpdate) && (
+              <button
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors"
+                style={{ color: 'var(--c-amber)', background: 'var(--c-amber-soft)', border: '1px solid rgba(245, 158, 11, 0.2)', cursor: 'pointer' }}
+                onClick={() => setDiffOpen(true)}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(245, 158, 11, 0.15)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-amber-soft)' }}
+              >
+                <BellDot style={{ width: 12, height: 12 }} className="animate-pulse" />
+                {t('detail.hasUpdate', 'Update Available')}
+              </button>
+            )}
             {skill.gitUrl && (
               <a
                 href={skill.gitUrl}
@@ -328,6 +346,12 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
           </motion.div>
         </AnimatePresence>
       </div>
+      <SkillDiffModal
+        skillId={skillId}
+        skillName={skill.name}
+        open={diffOpen}
+        onClose={() => setDiffOpen(false)}
+      />
     </div>
   )
 }

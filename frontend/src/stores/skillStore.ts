@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Skill, SkillSource, SkillViewMode, SortField, SortOrder } from '@/types'
+import type { Skill, SkillSource, SkillViewMode, SortField, SortOrder, SkillVersionDiff } from '@/types'
 import { wailsApi } from '@/services/wailsBridge'
 import { toast } from '@/stores/toastStore'
 
@@ -30,6 +30,8 @@ interface SkillState {
   favorites: Set<string>
   installStatus: 'idle' | 'installing' | 'success' | 'error'
   installLog: InstallLogEntry[]
+  versionDiffs: Record<string, SkillVersionDiff>
+  updateChecking: boolean
   fetchSkills: () => Promise<void>
   fetchSources: () => Promise<void>
   setCurrentSkill: (skill: Skill | null) => void
@@ -52,6 +54,10 @@ interface SkillState {
   batchEnableForTool: (ids: string[], toolName: string) => Promise<void>
   batchDelete: (ids: string[]) => Promise<void>
   pullSkill: (installPath: string) => Promise<boolean>
+  checkSkillUpdate: (skillId: string) => Promise<SkillVersionDiff | null>
+  checkAllUpdates: () => Promise<void>
+  getSkillVersionDiff: (skillId: string) => Promise<SkillVersionDiff | null>
+  updateSkill: (skillId: string) => Promise<boolean>
 }
 
 export const useSkillStore = create<SkillState>((set, get) => ({
@@ -75,6 +81,8 @@ export const useSkillStore = create<SkillState>((set, get) => ({
   favorites: new Set(),
   installStatus: 'idle',
   installLog: [],
+  versionDiffs: {},
+  updateChecking: false,
 
   fetchSkills: async () => {
     set({ loading: true, error: null })
@@ -244,6 +252,100 @@ export const useSkillStore = create<SkillState>((set, get) => ({
       return true
     }
     toast.error(resp.error ?? 'Pull failed')
+    return false
+  },
+
+  checkSkillUpdate: async (skillId) => {
+    const resp = await wailsApi.checkSkillUpdate(skillId)
+    if (resp.success && resp.data) {
+      const diff: SkillVersionDiff = {
+        skillId,
+        currentCommit: '',
+        latestCommit: '',
+        currentVersion: resp.data.currentVersion,
+        latestVersion: resp.data.latestVersion,
+        behindCount: resp.data.behindCount,
+        aheadCount: resp.data.aheadCount,
+        hasUpdate: resp.data.hasUpdate,
+        commits: [],
+      }
+      set((state) => ({
+        versionDiffs: { ...state.versionDiffs, [skillId]: diff },
+        skills: state.skills.map((s) =>
+          s.id === skillId ? { ...s, status: resp.data!.hasUpdate ? 'update_available' as const : s.status } : s
+        ),
+      }))
+      return diff
+    }
+    return null
+  },
+
+  checkAllUpdates: async () => {
+    set({ updateChecking: true })
+    const resp = await wailsApi.checkAllSkillUpdates()
+    if (resp.success && resp.data) {
+      const diffs: Record<string, SkillVersionDiff> = {}
+      for (const item of resp.data) {
+        diffs[item.skillId] = {
+          skillId: item.skillId,
+          currentCommit: '',
+          latestCommit: '',
+          currentVersion: item.currentVersion,
+          latestVersion: item.latestVersion,
+          behindCount: item.behindCount,
+          aheadCount: item.aheadCount,
+          hasUpdate: item.hasUpdate,
+          commits: [],
+        }
+      }
+      set((state) => ({
+        versionDiffs: { ...state.versionDiffs, ...diffs },
+        skills: state.skills.map((s) => {
+          const diff = diffs[s.id]
+          if (diff) {
+            return { ...s, status: diff.hasUpdate ? 'update_available' as const : s.status }
+          }
+          return s
+        }),
+        updateChecking: false,
+      }))
+      const updateCount = resp.data.filter((d) => d.hasUpdate).length
+      if (updateCount > 0) {
+        toast.info(`${updateCount} skill(s) have updates available`)
+      } else {
+        toast.success('All skills are up to date')
+      }
+    } else {
+      set({ updateChecking: false })
+    }
+  },
+
+  getSkillVersionDiff: async (skillId) => {
+    const resp = await wailsApi.getSkillVersionDiff(skillId)
+    if (resp.success && resp.data) {
+      set((state) => ({
+        versionDiffs: { ...state.versionDiffs, [skillId]: resp.data! },
+      }))
+      return resp.data
+    }
+    return null
+  },
+
+  updateSkill: async (skillId) => {
+    const skill = get().skills.find((s) => s.id === skillId)
+    if (!skill) return false
+    const resp = await wailsApi.gitPull(skill.installPath)
+    if (resp.success) {
+      toast.success(`Skill "${skill.name}" updated successfully`)
+      get().fetchSkills()
+      set((state) => {
+        const newDiffs = { ...state.versionDiffs }
+        delete newDiffs[skillId]
+        return { versionDiffs: newDiffs }
+      })
+      return true
+    }
+    toast.error(resp.error ?? 'Update failed')
     return false
   },
 }))

@@ -7,6 +7,7 @@ import type {
   McpTool,
   ToolConfig,
   GitStatus,
+  SkillVersionDiff,
   InstallFromGitRequest,
   InstallFromLocalRequest,
   AddMcpServerRequest,
@@ -61,6 +62,9 @@ type WailsApp = {
   SaveFile(defaultFilename: string): Promise<string>
   ListActivities(limit: number): Promise<string>
   ListGitBranches(owner: string, repo: string): Promise<string>
+  CheckSkillUpdate(skillID: string): Promise<string>
+  GetSkillVersionDiff(skillID: string): Promise<string>
+  CheckAllSkillUpdates(): Promise<string>
 }
 
 declare global {
@@ -148,7 +152,9 @@ const mockTools: ToolConfig[] = [
   { id: 't1', toolName: 'cursor', displayName: 'Cursor', configPath: '/cursor/config.json', skillDir: '/cursor/skills', mcpDir: '/cursor/mcp', isDetected: true, isEnabled: true, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
   { id: 't2', toolName: 'windsurf', displayName: 'Windsurf', configPath: '/windsurf/config.json', skillDir: '/windsurf/skills', mcpDir: '/windsurf/mcp', isDetected: true, isEnabled: true, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
   { id: 't3', toolName: 'claude-code', displayName: 'Claude Code', configPath: '/claude/config.json', skillDir: '/claude/skills', mcpDir: '/claude/mcp', isDetected: true, isEnabled: false, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
-  { id: 't4', toolName: 'cline', displayName: 'Cline', configPath: '/cline/config.json', skillDir: '/cline/skills', mcpDir: '/cline/mcp', isDetected: false, isEnabled: false, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
+  { id: 't4', toolName: 'trae', displayName: 'Trae', configPath: '/trae/config.json', skillDir: '/trae/skills', mcpDir: '/trae/mcp', isDetected: true, isEnabled: false, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
+  { id: 't5', toolName: 'github-copilot', displayName: 'GitHub Copilot', configPath: '/github/config.json', skillDir: '/github/skills', mcpDir: '/github/mcp', isDetected: false, isEnabled: false, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
+  { id: 't6', toolName: 'gemini-cli', displayName: 'Gemini CLI', configPath: '/gemini/config.json', skillDir: '/gemini/skills', mcpDir: '/gemini/mcp', isDetected: true, isEnabled: true, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' },
 ]
 
 const mockSources: SkillSource[] = [
@@ -173,6 +179,25 @@ function mockCall<T>(key: string): ApiResponse<T> {
       { id: 'a4', type: 'error', targetName: 'docker-compose', targetType: 'skill', toolName: '', detail: 'Hash mismatch detected', createdAt: '2025-04-07T09:00:00Z' },
     ],
     'getHomeDir': '/home/user',
+    'checkSkillUpdate': { skillId: 'mock-3', hasUpdate: true, currentVersion: '3.0.0', latestVersion: '3.1.0', behindCount: 3, aheadCount: 0 },
+    'checkAllSkillUpdates': [
+      { skillId: 'mock-3', hasUpdate: true, currentVersion: '3.0.0', latestVersion: '3.1.0', behindCount: 3, aheadCount: 0 },
+    ],
+    'getSkillVersionDiff': {
+      skillId: 'mock-3',
+      currentCommit: 'ghi9012',
+      latestCommit: 'xyz9999',
+      currentVersion: '3.0.0',
+      latestVersion: '3.1.0',
+      behindCount: 3,
+      aheadCount: 0,
+      hasUpdate: true,
+      commits: [
+        { hash: 'a1b2c3d', author: 'developer', message: 'feat: add new pattern matching', date: '2025-04-08T10:00:00Z' },
+        { hash: 'e4f5g6h', author: 'contributor', message: 'fix: resolve type inference issue', date: '2025-04-06T14:30:00Z' },
+        { hash: 'i7j8k9l', author: 'developer', message: 'docs: update README with examples', date: '2025-04-05T09:15:00Z' },
+      ],
+    },
   }
   const data = mockData[key]
   if (data !== undefined) {
@@ -334,4 +359,13 @@ export const wailsApi = {
   listActivities: (limit: number) => callApi<{ id: string; type: string; targetName: string; targetType: string; toolName: string; detail: string; createdAt: string }[]>(() => getApp()!.ListActivities(limit), 'listActivities'),
 
   listGitBranches: (owner: string, repo: string) => callApi<string[]>(() => getApp()!.ListGitBranches(owner, repo)),
+
+  checkSkillUpdate: (skillID: string) =>
+    callApi<{ skillId: string; hasUpdate: boolean; currentVersion: string; latestVersion: string; behindCount: number; aheadCount: number }>(() => getApp()!.CheckSkillUpdate(skillID), 'checkSkillUpdate'),
+
+  getSkillVersionDiff: (skillID: string) =>
+    callApi<SkillVersionDiff>(() => getApp()!.GetSkillVersionDiff(skillID), 'getSkillVersionDiff'),
+
+  checkAllSkillUpdates: () =>
+    callApi<{ skillId: string; hasUpdate: boolean; currentVersion: string; latestVersion: string; behindCount: number; aheadCount: number }[]>(() => getApp()!.CheckAllSkillUpdates(), 'checkAllSkillUpdates'),
 }

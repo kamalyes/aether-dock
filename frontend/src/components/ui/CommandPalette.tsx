@@ -167,16 +167,18 @@ export default function CommandPalette() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96 }}
             transition={{ duration: 0.15 }}
-            className="fixed z-[101]"
-            style={{ width: 520, left: '50%', top: '40%', transform: 'translate(-50%, -50%)' }}
+            className="fixed z-[101] flex items-start justify-center"
+            style={{ inset: 0, paddingTop: '18vh', pointerEvents: 'none' }}
           >
             <div
-              className="overflow-hidden"
               style={{
+                width: 520,
+                pointerEvents: 'auto',
                 background: 'var(--c-bg-card)',
                 border: '1px solid var(--c-border)',
                 borderRadius: 'var(--radius-lg)',
                 boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px var(--c-border)',
+                overflow: 'hidden',
               }}
             >
               <div

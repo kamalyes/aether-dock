@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Star, Download, Trash2, BellDot } from 'lucide-react'
+import { Star, Download, Trash2, BellDot, GitCommit } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { Skill } from '@/types'
 import { SkillIcon } from '@/components/ui/SkillIcon'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { StaggerItem } from '@/components/ui/motion'
+import SkillDiffModal from '@/components/ui/SkillDiffModal'
+import { useSkillStore } from '@/stores/skillStore'
 
 interface SkillCardProps {
   skill: Skill
@@ -46,7 +48,10 @@ export function SkillCard({
 }: SkillCardProps) {
   const { t } = useTranslation()
   const [isHovered, setIsHovered] = useState(false)
+  const [diffOpen, setDiffOpen] = useState(false)
+  const versionDiffs = useSkillStore((s) => s.versionDiffs)
   const visibleTags = skill.tags?.slice(0, 3) || []
+  const diffInfo = versionDiffs[skill.id]
 
   return (
     <StaggerItem>
@@ -96,6 +101,21 @@ export function SkillCard({
                 title={t('skills.quickInstall', 'Quick Install')}
               >
                 <Download style={{ width: 14, height: 14 }} />
+              </button>
+            )}
+            {(hasUpdate || diffInfo?.hasUpdate) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setDiffOpen(true)
+                }}
+                className="p-1.5 rounded-lg transition-colors"
+                style={{ color: 'var(--c-amber)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--c-amber-soft)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                title={t('skills.viewDiff', 'View version diff')}
+              >
+                <GitCommit style={{ width: 14, height: 14 }} />
               </button>
             )}
             {onToggleFavorite && (
@@ -166,6 +186,12 @@ export function SkillCard({
           </div>
         )}
       </motion.div>
+      <SkillDiffModal
+        skillId={skill.id}
+        skillName={skill.name}
+        open={diffOpen}
+        onClose={() => setDiffOpen(false)}
+      />
     </StaggerItem>
   )
 }
