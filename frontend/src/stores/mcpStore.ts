@@ -111,6 +111,7 @@ export const useMcpStore = create<McpState>((set, get) => ({
     const resp = await wailsApi.enableMcpForTool(id, toolName)
     if (resp.success) {
       toast.success(`MCP synced to ${toolName}`)
+      get().fetchServers()
       return true
     }
     toast.error(`Failed to sync to ${toolName}`)
@@ -127,6 +128,7 @@ export const useMcpStore = create<McpState>((set, get) => ({
     const resp = await wailsApi.disableMcpForTool(id, toolName)
     if (resp.success) {
       toast.info(`MCP removed from ${toolName}`)
+      get().fetchServers()
       return true
     }
     toast.error(`Failed to remove from ${toolName}`)

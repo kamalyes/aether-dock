@@ -85,6 +85,24 @@ function getApp(): WailsApp | null {
   }
 }
 
+function waitForApp(maxMs = 5000): Promise<WailsApp | null> {
+  return new Promise((resolve) => {
+    const app = getApp()
+    if (app) { resolve(app); return }
+    const start = Date.now()
+    const interval = setInterval(() => {
+      const app = getApp()
+      if (app) {
+        clearInterval(interval)
+        resolve(app)
+      } else if (Date.now() - start > maxMs) {
+        clearInterval(interval)
+        resolve(null)
+      }
+    }, 100)
+  })
+}
+
 function parseResponse<T>(raw: string): ApiResponse<T> {
   try {
     return JSON.parse(raw) as ApiResponse<T>
@@ -207,9 +225,12 @@ function mockCall<T>(key: string): ApiResponse<T> {
 }
 
 async function callApi<T>(fn: () => Promise<string>, mockKey?: string): Promise<ApiResponse<T>> {
-  const app = getApp()
+  let app = getApp()
   if (!app) {
-    if (isDev && mockKey) {
+    app = await waitForApp(3000)
+  }
+  if (!app) {
+    if (mockKey) {
       await new Promise<void>((r) => setTimeout(r, 200 + Math.random() * 300))
       return mockCall<T>(mockKey)
     }

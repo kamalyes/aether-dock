@@ -50,6 +50,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
     const resp = await wailsApi.enableTool(name)
     if (resp.success) {
       toast.success(`${name} enabled`)
+      get().fetchTools()
       return true
     }
     toast.error(`Failed to enable ${name}`)
@@ -66,6 +67,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
     const resp = await wailsApi.disableTool(name)
     if (resp.success) {
       toast.info(`${name} disabled`)
+      get().fetchTools()
       return true
     }
     toast.error(`Failed to disable ${name}`)

@@ -153,6 +153,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
       get().addInstallLog('success', `Skill "${name || url}" installed successfully`)
       toast.success(`Skill "${name || url}" installed from Git`)
       get().fetchSkills()
+      get().fetchSources()
       return true
     }
     set({ installStatus: 'error', error: resp.error })
@@ -170,6 +171,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
       get().addInstallLog('success', `Skill "${name || localPath}" imported successfully`)
       toast.success(`Skill "${name || localPath}" imported`)
       get().fetchSkills()
+      get().fetchSources()
       return true
     }
     set({ installStatus: 'error', error: resp.error })
@@ -190,6 +192,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
       if (get().currentSkill?.id === id) {
         set({ currentSkill: null })
       }
+      get().fetchSources()
       return true
     }
     toast.error(resp.error ?? 'Failed to delete skill')
@@ -207,6 +210,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     const resp = await wailsApi.enableSkillForTool(id, toolName)
     if (resp.success) {
       toast.success(`Synced to ${toolName}`)
+      get().fetchSkills()
       return true
     }
     toast.error(`Failed to sync to ${toolName}`)
@@ -223,6 +227,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     const resp = await wailsApi.disableSkillForTool(id, toolName)
     if (resp.success) {
       toast.info(`Removed from ${toolName}`)
+      get().fetchSkills()
       return true
     }
     toast.error(`Failed to remove from ${toolName}`)
@@ -338,6 +343,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     if (resp.success) {
       toast.success(`Skill "${skill.name}" updated successfully`)
       get().fetchSkills()
+      get().fetchSources()
       set((state) => {
         const newDiffs = { ...state.versionDiffs }
         delete newDiffs[skillId]
