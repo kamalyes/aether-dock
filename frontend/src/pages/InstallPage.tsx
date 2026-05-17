@@ -20,9 +20,9 @@ import {
   RefreshCw,
   AlertCircle,
 } from 'lucide-react'
-import { Input, Select, SearchInput } from '@/components/ui/Form'
-import { Upload as UploadComp } from '@/components/ui/Upload'
-import { Loading, ListLoading } from '@/components/ui/Loading'
+import { Input, SearchInput, Select } from '@/components/Input'
+import { Loading, ListLoading } from '@/components/Loading'
+import { Upload as UploadComp } from '@/components/Upload'
 
 type InstallTab = 'marketplace' | 'git' | 'local' | 'mcp' | 'import-export'
 

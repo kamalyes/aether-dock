@@ -7,6 +7,10 @@ export function BrowseFile():Promise<string>;
 
 export function BrowseFolder():Promise<string>;
 
+export function CheckAllSkillUpdates():Promise<string>;
+
+export function CheckSkillUpdate(arg1:string):Promise<string>;
+
 export function CreateSource(arg1:string):Promise<string>;
 
 export function DeleteMcpServer(arg1:string):Promise<string>;
@@ -46,6 +50,8 @@ export function GetSettings():Promise<string>;
 export function GetSkill(arg1:string):Promise<string>;
 
 export function GetSkillDetail(arg1:string):Promise<string>;
+
+export function GetSkillVersionDiff(arg1:string):Promise<string>;
 
 export function GitPull(arg1:string):Promise<string>;
 

@@ -37,6 +37,12 @@ func (s *SettingsService) InitDefaults() error {
 		"app.checkUpdates":         "true",
 		"install.autoSync":         "true",
 		"install.defaultGitBranch": "main",
+		"validation.strict":        "true",
+		"validation.import":        "true",
+		"validation.diff":          "true",
+		"scan.onStartup":           "true",
+		"scan.watch":               "false",
+		"scan.interval":            "manual",
 	}
 	for k, v := range defaults {
 		existing, err := s.repo.Setting.Get(k)
@@ -56,6 +62,12 @@ func (s *SettingsService) ResetAll() error {
 		"app.checkUpdates":         "true",
 		"install.autoSync":         "true",
 		"install.defaultGitBranch": "main",
+		"validation.strict":        "true",
+		"validation.import":        "true",
+		"validation.diff":          "true",
+		"scan.onStartup":           "true",
+		"scan.watch":               "false",
+		"scan.interval":            "manual",
 	}
 	for k, v := range defaults {
 		if err := s.repo.Setting.Set(k, v); err != nil {

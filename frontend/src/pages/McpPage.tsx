@@ -19,10 +19,16 @@ import {
   Loader2,
 } from 'lucide-react'
 import type { McpServer } from '@/types'
-import { TOOL_ICONS, SUPPORTED_TOOLS } from '@/constants/tools'
-import ConfirmDialog, { useConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { ListLoading } from '@/components/ui/Loading'
-import { SearchInput, Select } from '@/components/ui/Form'
+import { SUPPORTED_TOOLS } from '@/constants/tools'
+import { getToolIconByName } from '@/components/Skills'
+import { ConfirmDialog } from '@/components/Dialog'
+import { EntityEmptyState } from '@/components/Empty'
+import { ListLoading } from '@/components/Loading'
+import { PageHeader } from '@/components/Header'
+import { SearchInput, Select } from '@/components/Input'
+import { ToggleGrid } from '@/components/Control'
+import { useConfirmDialog } from '@/hooks/useConfirmDialog'
+import { McpStatusBadge, McpStatusDot } from '@/components/Mcp'
 
 export default function McpPage() {
   const { t } = useTranslation()
@@ -58,20 +64,42 @@ export default function McpPage() {
   return (
     <div className="flex h-full">
       <div className="flex-1 flex flex-col min-w-0">
-        <div
-          className="flex items-center justify-between px-5 py-2.5 shrink-0"
-          style={{ borderBottom: '1px solid var(--c-border)', background: 'var(--c-bg-panel)' }}
-        >
-          <div className="flex items-center gap-3">
-            <h2 style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{t('mcp.title')}</h2>
-            <span style={{ fontSize: 11, color: 'var(--c-text-faint)' }} className="tabular-nums">{total} {t('mcp.configured')}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
+        <div className="px-5 py-3 shrink-0" style={{ borderBottom: '1px solid var(--c-border)', background: 'var(--c-bg-panel)' }}>
+          <PageHeader
+            title={t('mcp.title')}
+            meta={<span style={{ fontSize: 11, color: 'var(--c-text-faint)' }} className="tabular-nums">{total} {t('mcp.configured')}</span>}
+            actions={(
+              <>
+                <button
+                  className="p-1.5 rounded-lg transition-colors"
+                  style={{ color: 'var(--c-text-faint)' }}
+                  onClick={() => fetchServers()}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(15, 23, 42, 0.04)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                  type="button"
+                >
+                  <RefreshCw style={{ width: 14, height: 14 }} className={loading ? 'animate-spin' : ''} />
+                </button>
+                <button
+                  onClick={() => window.location.hash = '/install?tab=mcp'}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors"
+                  style={{ background: 'var(--c-accent-soft)', color: 'var(--c-accent)' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(35, 99, 235, 0.12)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-accent-soft)' }}
+                  type="button"
+                >
+                  <Plus style={{ width: 12, height: 12 }} />
+                  {t('mcp.addServer')}
+                </button>
+              </>
+            )}
+            controls={(
+              <>
             <SearchInput
               value={searchQuery}
               onChange={setSearchQuery}
               placeholder={t('mcp.search')}
-              style={{ width: 176 }}
+              style={{ width: 260 }}
             />
             <Select
               value={filter.status}
@@ -84,37 +112,20 @@ export default function McpPage() {
               ]}
               selectStyle={{ width: 100 }}
             />
-            <button
-              className="p-1.5 rounded-lg transition-colors"
-              style={{ color: 'var(--c-text-faint)' }}
-              onClick={() => fetchServers()}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(15, 23, 42, 0.04)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-            >
-              <RefreshCw style={{ width: 14, height: 14 }} className={loading ? 'animate-spin' : ''} />
-            </button>
-            <button
-              onClick={() => window.location.hash = '/install?tab=mcp'}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors"
-              style={{ background: 'var(--c-accent-soft)', color: 'var(--c-accent)' }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(35, 99, 235, 0.12)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-accent-soft)' }}
-            >
-              <Plus style={{ width: 12, height: 12 }} />
-              {t('mcp.addServer')}
-            </button>
-          </div>
+              </>
+            )}
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-3">
           {loading ? (
             <ListLoading mode="skeleton" count={5} />
           ) : filteredServers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <Server style={{ width: 40, height: 40, color: 'var(--c-text-faint)', marginBottom: 12 }} />
-              <p style={{ color: 'var(--c-text-muted)', fontSize: 13, fontWeight: 500 }}>{t('mcp.noServers')}</p>
-              <p style={{ color: 'var(--c-text-faint)', fontSize: 11, marginTop: 4 }}>{t('mcp.noServersDesc')}</p>
-            </div>
+            <EntityEmptyState
+              icon={<Server style={{ width: 40, height: 40 }} />}
+              title={t('mcp.noServers')}
+              description={t('mcp.noServersDesc')}
+            />
           ) : (
             <div className="space-y-1.5">
               {filteredServers.map((server) => (
@@ -163,7 +174,7 @@ export default function McpPage() {
         description={dialogState.description}
         confirmLabel={dialogState.confirmLabel}
         variant={dialogState.variant}
-        onConfirm={dialogState.onConfirm}
+        onConfirm={dialogState.onConfirm || (() => {})}
         onCancel={cancel}
       />
 
@@ -216,7 +227,7 @@ function McpServerRow({
         <Server style={{ width: 16, height: 16, color: 'var(--c-text-faint)' }} className="shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className={`status-dot ${server.status === 'enabled' ? 'status-dot-installed' : server.status === 'error' ? 'status-dot-error' : 'status-dot-disabled'}`} />
+            <McpStatusDot status={server.status} />
             <span style={{ fontSize: 12.5, fontWeight: 500, color: 'var(--c-text)' }}>{server.name}</span>
             {server.sourceType === 'marketplace' && (
               <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 4, background: 'rgba(15, 23, 42, 0.04)', color: 'var(--c-text-muted)', fontWeight: 500 }}>marketplace</span>
@@ -247,35 +258,20 @@ function McpServerRow({
 
           <div>
             <span className="section-label">{t('skills.enabledTools')}</span>
-            <div className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-px">
-              {SUPPORTED_TOOLS.map((tool) => {
-                const enabled = server.enabledTools?.includes(tool) ?? false
-                const icon = TOOL_ICONS[tool]
-                return (
-                  <div key={tool} className="flex items-center justify-between px-2 py-[5px] rounded-md transition-colors"
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(15, 23, 42, 0.02)' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-                  >
-                    <div className="flex items-center gap-1.5">
-                      {icon ? (
-                        <img src={icon} alt={tool} style={{ width: 16, height: 16 }} className="rounded object-contain" />
-                      ) : (
-                        <div style={{ width: 16, height: 16, borderRadius: 4, background: 'rgba(15, 23, 42, 0.06)', fontSize: 7, color: 'var(--c-text-faint)' }} className="flex items-center justify-center font-medium">
-                          {tool[0]}
-                        </div>
-                      )}
-                      <span style={{ fontSize: 10.5, color: enabled ? 'var(--c-text-secondary)' : 'var(--c-text-faint)' }}>{tool}</span>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        enabled ? onDisableTool(server.id, tool) : onEnableTool(server.id, tool)
-                      }}
-                      className={enabled ? 'toggle-on' : 'toggle-off'}
-                    />
-                  </div>
-                )
-              })}
+            <div className="mt-1.5">
+              <ToggleGrid
+                columns={2}
+                stopPropagation
+                items={SUPPORTED_TOOLS.map((tool) => ({
+                  id: tool,
+                  label: tool,
+                  icon: getToolIconByName(tool),
+                  enabled: server.enabledTools?.includes(tool) ?? false,
+                }))}
+                onToggle={(tool, enabled) => {
+                  enabled ? onEnableTool(server.id, tool) : onDisableTool(server.id, tool)
+                }}
+              />
             </div>
           </div>
 
@@ -360,8 +356,8 @@ function McpDetailPanel({
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className={`status-dot ${server.status === 'enabled' ? 'status-dot-installed' : server.status === 'error' ? 'status-dot-error' : 'status-dot-disabled'}`} />
             <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{server.name}</span>
+            <McpStatusBadge status={server.status} />
           </div>
           {server.description && (
             <p style={{ fontSize: 11, color: 'var(--c-text-muted)', lineHeight: 1.5, marginTop: 4 }}>{server.description}</p>
@@ -395,7 +391,7 @@ function McpDetailPanel({
                 <div key={key} className="text-[10px] font-mono flex items-center gap-1">
                   <span style={{ color: 'var(--c-text-muted)' }}>{key}</span>
                   <span style={{ color: 'var(--c-text-faint)' }}>=</span>
-                  <span style={{ color: 'var(--c-text-faint)' }}>{'•'.repeat(Math.min(String(value).length, 16))}</span>
+                  <span style={{ color: 'var(--c-text-faint)' }}>{'*'.repeat(Math.min(String(value).length, 16))}</span>
                 </div>
               ))}
             </div>
@@ -414,32 +410,19 @@ function McpDetailPanel({
 
         <div>
           <span className="section-label">{t('skills.enabledTools')}</span>
-          <div className="mt-1.5 space-y-px">
-            {SUPPORTED_TOOLS.map((tool) => {
-              const enabled = server.enabledTools?.includes(tool) ?? false
-              const icon = TOOL_ICONS[tool]
-              return (
-                <div key={tool} className="flex items-center justify-between px-2.5 py-[6px] rounded-md transition-colors"
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(15, 23, 42, 0.02)' }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-                >
-                  <div className="flex items-center gap-2">
-                    {icon ? (
-                      <img src={icon} alt={tool} style={{ width: 16, height: 16 }} className="rounded object-contain" />
-                    ) : (
-                      <div style={{ width: 16, height: 16, borderRadius: 4, background: 'rgba(15, 23, 42, 0.06)', fontSize: 7, color: 'var(--c-text-faint)' }} className="flex items-center justify-center font-medium">
-                        {tool[0]}
-                      </div>
-                    )}
-                    <span style={{ fontSize: 11, color: enabled ? 'var(--c-text-secondary)' : 'var(--c-text-faint)' }}>{tool}</span>
-                  </div>
-                  <button
-                    onClick={() => enabled ? onDisableTool(server.id, tool) : onEnableTool(server.id, tool)}
-                    className={enabled ? 'toggle-on' : 'toggle-off'}
-                  />
-                </div>
-              )
-            })}
+          <div className="mt-1.5">
+            <ToggleGrid
+              columns={1}
+              items={SUPPORTED_TOOLS.map((tool) => ({
+                id: tool,
+                label: tool,
+                icon: getToolIconByName(tool),
+                enabled: server.enabledTools?.includes(tool) ?? false,
+              }))}
+              onToggle={(tool, enabled) => {
+                enabled ? onEnableTool(server.id, tool) : onDisableTool(server.id, tool)
+              }}
+            />
           </div>
         </div>
       </div>

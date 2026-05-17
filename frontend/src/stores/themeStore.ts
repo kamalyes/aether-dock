@@ -21,14 +21,22 @@ function resolveTheme(mode: ThemeMode): 'light' | 'dark' {
   return mode
 }
 
+let transitionTimer: ReturnType<typeof setTimeout> | null = null
+
 function applyTheme(resolved: 'light' | 'dark') {
   const root = document.documentElement
+  root.classList.add('theme-transitioning')
   root.setAttribute('data-theme', resolved)
   if (resolved === 'dark') {
     root.classList.add('dark')
   } else {
     root.classList.remove('dark')
   }
+  if (transitionTimer) clearTimeout(transitionTimer)
+  transitionTimer = setTimeout(() => {
+    root.classList.remove('theme-transitioning')
+    transitionTimer = null
+  }, 250)
 }
 
 export const useThemeStore = create<ThemeState>((set) => ({

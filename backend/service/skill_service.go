@@ -316,6 +316,165 @@ func (s *SkillService) GetSkillDetail(skillID string) (*SkillDetailResult, error
 	return result, nil
 }
 
+type SkillUpdateCheckResult struct {
+	SkillID        string `json:"skillId"`
+	HasUpdate      bool   `json:"hasUpdate"`
+	CurrentVersion string `json:"currentVersion"`
+	LatestVersion  string `json:"latestVersion"`
+	BehindCount    int    `json:"behindCount"`
+	AheadCount     int    `json:"aheadCount"`
+}
+
+type SkillVersionDiffResult struct {
+	SkillID        string          `json:"skillId"`
+	CurrentCommit  string          `json:"currentCommit"`
+	LatestCommit   string          `json:"latestCommit"`
+	CurrentVersion string          `json:"currentVersion"`
+	LatestVersion  string          `json:"latestVersion"`
+	BehindCount    int             `json:"behindCount"`
+	AheadCount     int             `json:"aheadCount"`
+	HasUpdate      bool            `json:"hasUpdate"`
+	Commits        []SkillCommit   `json:"commits"`
+}
+
+type SkillCommit struct {
+	Hash    string `json:"hash"`
+	Author  string `json:"author"`
+	Message string `json:"message"`
+	Date    string `json:"date"`
+}
+
+func (s *SkillService) CheckSkillUpdate(skillID string) (*SkillUpdateCheckResult, error) {
+	skill, err := s.repo.Skill.GetByID(skillID)
+	if err != nil {
+		return nil, errors.ErrSkillNotFound
+	}
+
+	result := &SkillUpdateCheckResult{
+		SkillID:        skillID,
+		HasUpdate:      false,
+		CurrentVersion: skill.Version,
+		LatestVersion:  skill.Version,
+		BehindCount:    0,
+		AheadCount:     0,
+	}
+
+	if skill.InstallPath == "" {
+		return result, nil
+	}
+
+	gitStatus, err := s.git.GetStatus(skill.InstallPath)
+	if err != nil {
+		return result, nil
+	}
+
+	result.CurrentVersion = gitStatus.Commit
+
+	hasUpdate, err := s.git.HasRemoteUpdates(skill.InstallPath)
+	if err != nil {
+		return result, nil
+	}
+
+	result.HasUpdate = hasUpdate
+	if hasUpdate {
+		result.BehindCount = gitStatus.BehindCount
+		if result.BehindCount == 0 {
+			result.BehindCount = 1
+		}
+	}
+
+	return result, nil
+}
+
+func (s *SkillService) CheckAllSkillUpdates() ([]SkillUpdateCheckResult, error) {
+	skills, _, err := s.repo.Skill.List(0, 1000, "", "")
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]SkillUpdateCheckResult, 0, len(skills))
+	for _, skill := range skills {
+		check, err := s.CheckSkillUpdate(skill.ID)
+		if err != nil {
+			results = append(results, SkillUpdateCheckResult{
+				SkillID:   skill.ID,
+				HasUpdate: false,
+			})
+			continue
+		}
+		results = append(results, *check)
+
+		if check.HasUpdate {
+			s.repo.Skill.UpdateStatus(skill.ID, constants.SkillStatusUpdateAvailable)
+		}
+	}
+
+	return results, nil
+}
+
+func (s *SkillService) GetSkillVersionDiff(skillID string) (*SkillVersionDiffResult, error) {
+	skill, err := s.repo.Skill.GetByID(skillID)
+	if err != nil {
+		return nil, errors.ErrSkillNotFound
+	}
+
+	result := &SkillVersionDiffResult{
+		SkillID:        skillID,
+		CurrentCommit:  skill.GitCommit,
+		LatestCommit:   "",
+		CurrentVersion: skill.Version,
+		LatestVersion:  "",
+		BehindCount:    0,
+		AheadCount:     0,
+		HasUpdate:      false,
+		Commits:        []SkillCommit{},
+	}
+
+	if skill.InstallPath == "" {
+		return result, nil
+	}
+
+	gitStatus, err := s.git.GetStatus(skill.InstallPath)
+	if err != nil {
+		return result, nil
+	}
+
+	result.CurrentCommit = gitStatus.Commit
+	result.CurrentVersion = gitStatus.Commit
+
+	hasUpdate, err := s.git.HasRemoteUpdates(skill.InstallPath)
+	if err != nil {
+		return result, nil
+	}
+	result.HasUpdate = hasUpdate
+
+	if hasUpdate {
+		result.BehindCount = gitStatus.BehindCount
+		if result.BehindCount == 0 {
+			result.BehindCount = 1
+		}
+
+		commits, err := s.git.GetCommitLog(skill.InstallPath, 20)
+		if err == nil {
+			for _, c := range commits {
+				result.Commits = append(result.Commits, SkillCommit{
+					Hash:    c["hash"],
+					Author:  c["author"],
+					Message: c["message"],
+					Date:    c["date"],
+				})
+			}
+		}
+
+		if len(result.Commits) > 0 {
+			result.LatestCommit = result.Commits[0].Hash
+			result.LatestVersion = result.Commits[0].Hash
+		}
+	}
+
+	return result, nil
+}
+
 func (s *SkillService) detectInstallLocations(skill *models.Skill) []InstallLocation {
 	homeDir, _ := os.UserHomeDir()
 	locations := []InstallLocation{}

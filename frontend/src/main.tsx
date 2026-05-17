@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import AppLayout from '@/components/layout/AppLayout'
+import AppLayout from '@/components/Shell/AppLayout'
 import DashboardPage from '@/pages/DashboardPage'
 import SkillsPage from '@/pages/SkillsPage'
 import McpPage from '@/pages/McpPage'

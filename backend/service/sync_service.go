@@ -96,8 +96,8 @@ func (s *SyncService) SyncMcpToTool(serverID string, toolName constants.ToolName
 		return err
 	}
 
-	mcpConfigPath := filepath.Join(homeDir, tool.McpConfigPath)
-	return s.writeMcpConfig(mcpConfigPath, server)
+	mcpDir := filepath.Join(homeDir, tool.McpDir)
+	return s.writeMcpConfig(mcpDir, server)
 }
 
 func (s *SyncService) UnsyncMcpFromTool(serverID string, toolName constants.ToolName) error {
@@ -116,8 +116,8 @@ func (s *SyncService) UnsyncMcpFromTool(serverID string, toolName constants.Tool
 		return err
 	}
 
-	mcpConfigPath := filepath.Join(homeDir, tool.McpConfigPath)
-	return s.removeMcpConfig(mcpConfigPath, server.Name)
+	mcpDir := filepath.Join(homeDir, tool.McpDir)
+	return s.removeMcpConfig(mcpDir, server.Name)
 }
 
 func (s *SyncService) SyncAllSkills() error {

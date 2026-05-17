@@ -238,7 +238,13 @@ async function callApi<T>(fn: () => Promise<string>, mockKey?: string): Promise<
   }
   try {
     const raw = await fn()
-    return parseResponse<T>(raw)
+    const parsed = parseResponse<T>(raw)
+    if (!parsed.success && parsed.error && parsed.error.includes('still initializing')) {
+      await new Promise<void>((r) => setTimeout(r, 500))
+      const retryRaw = await fn()
+      return parseResponse<T>(retryRaw)
+    }
+    return parsed
   } catch (e) {
     return { success: false, error: String(e) }
   }

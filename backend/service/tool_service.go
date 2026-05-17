@@ -29,13 +29,13 @@ func (s *ToolService) DetectAllTools() ([]models.ToolConfig, error) {
 		isDetected := dirExists(skillDir) || fileExists(configPath)
 
 		toolConfig := &models.ToolConfig{
-			ToolName:      toolInfo.Name,
-			DisplayName:   toolInfo.DisplayName,
-			ConfigPath:    configPath,
-			SkillDir:      skillDir,
-			McpConfigPath: configPath,
-			IsDetected:    isDetected,
-			IsEnabled:     isDetected,
+			ToolName:    toolInfo.Name,
+			DisplayName: toolInfo.DisplayName,
+			ConfigPath:  configPath,
+			SkillDir:    skillDir,
+			McpDir:      configPath,
+			IsDetected:  isDetected,
+			IsEnabled:   isDetected,
 		}
 
 		s.repo.Tool.Upsert(toolConfig)

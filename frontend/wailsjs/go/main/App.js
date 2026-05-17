@@ -14,6 +14,14 @@ export function BrowseFolder() {
   return window['go']['main']['App']['BrowseFolder']();
 }
 
+export function CheckAllSkillUpdates() {
+  return window['go']['main']['App']['CheckAllSkillUpdates']();
+}
+
+export function CheckSkillUpdate(arg1) {
+  return window['go']['main']['App']['CheckSkillUpdate'](arg1);
+}
+
 export function CreateSource(arg1) {
   return window['go']['main']['App']['CreateSource'](arg1);
 }
@@ -92,6 +100,10 @@ export function GetSkill(arg1) {
 
 export function GetSkillDetail(arg1) {
   return window['go']['main']['App']['GetSkillDetail'](arg1);
+}
+
+export function GetSkillVersionDiff(arg1) {
+  return window['go']['main']['App']['GetSkillVersionDiff'](arg1);
 }
 
 export function GitPull(arg1) {

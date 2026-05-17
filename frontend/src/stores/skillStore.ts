@@ -166,6 +166,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     set({ installStatus: 'error', error: resp.error })
     get().addInstallLog('error', resp.error ?? 'Failed to install from Git')
     toast.error(resp.error ?? 'Failed to install from Git')
+    get().fetchSkills()
     return false
   },
 
@@ -191,6 +192,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
     set({ installStatus: 'error', error: resp.error })
     get().addInstallLog('error', resp.error ?? 'Failed to import from local')
     toast.error(resp.error ?? 'Failed to import from local')
+    get().fetchSkills()
     return false
   },
 

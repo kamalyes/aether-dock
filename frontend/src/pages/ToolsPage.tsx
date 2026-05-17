@@ -11,8 +11,8 @@ import {
   ExternalLink,
   FolderLock,
 } from 'lucide-react'
-import { TOOL_ICONS } from '@/constants/tools'
-import { CardLoading } from '@/components/ui/Loading'
+import { getToolIconByName } from '@/components/Skills'
+import { CardLoading } from '@/components/Loading'
 import { useTranslation } from 'react-i18next'
 import { toast } from '@/stores/toastStore'
 
@@ -74,7 +74,7 @@ export default function ToolsPage() {
 
 function ToolCard({ tool, onToggle }: { tool: any; onToggle: () => void }) {
   const { t } = useTranslation()
-  const icon = TOOL_ICONS[tool.displayName] || TOOL_ICONS[tool.toolName]
+  const icon = getToolIconByName(tool.displayName) || getToolIconByName(tool.toolName)
   const canEnable = tool.isDetected
   const canOpenDir = tool.isEnabled && tool.isDetected
   const showToggleOn = tool.isEnabled && tool.isDetected
