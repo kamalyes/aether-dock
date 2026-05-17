@@ -61,6 +61,11 @@ func (s *McpService) AddServer(req AddMcpServerRequest) (*models.McpServer, erro
 		return nil, errors.ErrMcpConfigInvalid
 	}
 
+	existing, _ := s.repo.Mcp.GetServerByName(req.Name)
+	if existing != nil {
+		return nil, errors.ErrMcpAlreadyExists
+	}
+
 	server := &models.McpServer{
 		Name:         req.Name,
 		Description:  req.Description,

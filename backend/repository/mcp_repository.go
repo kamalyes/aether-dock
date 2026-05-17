@@ -39,6 +39,14 @@ func (r *McpRepository) GetServerByID(id string) (*models.McpServer, error) {
 	return &server, nil
 }
 
+func (r *McpRepository) GetServerByName(name string) (*models.McpServer, error) {
+	var server models.McpServer
+	if err := r.db.Preload("Tools").First(&server, "name = ?", name).Error; err != nil {
+		return nil, err
+	}
+	return &server, nil
+}
+
 func (r *McpRepository) CreateServer(server *models.McpServer) error {
 	return r.db.Create(server).Error
 }

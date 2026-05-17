@@ -9,13 +9,13 @@ import (
 
 type Skill struct {
 	BaseModel
-	Name         string                `gorm:"size:255;not null;index" json:"name"`
+	Name         string                `gorm:"size:255;not null;uniqueIndex" json:"name"`
 	Description  string                `gorm:"size:1024" json:"description"`
 	Version      string                `gorm:"size:64" json:"version"`
 	SourceID     string                `gorm:"size:32;index" json:"sourceId"`
-	InstallPath  string                `gorm:"size:1024" json:"installPath"`
-	GitURL       string                `gorm:"size:1024" json:"gitUrl"`
-	GitBranch    string                `gorm:"size:255" json:"gitBranch"`
+	InstallPath  string                `gorm:"size:1024;uniqueIndex" json:"installPath"`
+	GitURL       string                `gorm:"size:1024;index:idx_git_url_branch" json:"gitUrl"`
+	GitBranch    string                `gorm:"size:255;index:idx_git_url_branch" json:"gitBranch"`
 	GitCommit    string                `gorm:"size:64" json:"gitCommit"`
 	Status       constants.SkillStatus `gorm:"size:32;index;default:'installed'" json:"status"`
 	EnabledTools StringList            `gorm:"type:text" json:"enabledTools"`

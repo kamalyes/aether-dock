@@ -6,10 +6,10 @@ import (
 
 type McpServer struct {
 	BaseModel
-	Name         string                    `gorm:"size:255;not null;index" json:"name"`
+	Name         string                    `gorm:"size:255;not null;uniqueIndex" json:"name"`
 	Description  string                    `gorm:"size:1024" json:"description"`
-	Command      string                    `gorm:"size:1024;not null" json:"command"`
-	Args         StringList                `gorm:"type:text" json:"args"`
+	Command      string                    `gorm:"size:1024;not null;index:idx_command_args" json:"command"`
+	Args         StringList                `gorm:"type:text;index:idx_command_args" json:"args"`
 	Env          JSONMap                   `gorm:"type:text" json:"env"`
 	SourceType   constants.McpSourceType   `gorm:"size:32;index" json:"sourceType"`
 	SourceURL    string                    `gorm:"size:1024" json:"sourceUrl"`
