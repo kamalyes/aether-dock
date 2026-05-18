@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+﻿import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Bell,
@@ -125,15 +125,15 @@ export default function SettingsPage() {
 
   const settingGroups: { title: string; icon: typeof Globe; items: SettingField[] }[] = [
     {
-      title: t('settings.general', 'General'),
+      title: t('settings.general'),
       icon: Globe,
       items: [
         {
           key: 'app.language',
-          label: t('settings.language', 'Language'),
+          label: t('settings.language'),
           type: 'select',
           options: [
-            { value: 'auto', label: t('settings.langAuto', 'Auto (System)') },
+            { value: 'auto', label: t('settings.langAuto') },
             { value: 'en', label: 'English' },
             { value: 'zh', label: '简体中文' },
           ],
@@ -141,39 +141,39 @@ export default function SettingsPage() {
       ],
     },
     {
-      title: t('settings.storage', 'Storage'),
+      title: t('settings.storage'),
       icon: FolderOpen,
       items: [
         {
           key: 'app.dataDir',
-          label: t('settings.dataDir', 'Data Directory'),
+          label: t('settings.dataDir'),
           type: 'text',
           placeholder: '~/.aether-dock',
         },
         {
           key: 'app.defaultEditor',
-          label: t('settings.defaultEditor', 'Default Editor'),
+          label: t('settings.defaultEditor'),
           type: 'text',
           placeholder: 'code, vim...',
         },
       ],
     },
     {
-      title: t('settings.install', 'Install'),
+      title: t('settings.install'),
       icon: Pencil,
       items: [
         {
           key: 'install.autoSync',
-          label: t('settings.autoSync', 'Auto-sync after install'),
+          label: t('settings.autoSync'),
           type: 'select',
           options: [
-            { value: 'true', label: t('settings.yes', 'Yes') },
-            { value: 'false', label: t('settings.no', 'No') },
+            { value: 'true', label: t('settings.yes') },
+            { value: 'false', label: t('settings.no') },
           ],
         },
         {
           key: 'install.defaultGitBranch',
-          label: t('settings.defaultBranch', 'Default Git Branch'),
+          label: t('settings.defaultBranch'),
           type: 'text',
           placeholder: 'main',
         },
@@ -182,10 +182,10 @@ export default function SettingsPage() {
   ]
 
   const tabs: { key: SettingsTab; label: string; icon: typeof Globe }[] = [
-    { key: 'general', label: t('settings.tabGeneral', 'General'), icon: Globe },
-    { key: 'scan', label: t('settings.tabScan', 'Scan & Logs'), icon: ScanSearch },
-    { key: 'validation', label: t('settings.tabValidation', 'Rules'), icon: Shield },
-    { key: 'apps', label: t('settings.tabApps', 'Apps'), icon: Database },
+    { key: 'general', label: t('settings.tabGeneral'), icon: Globe },
+    { key: 'scan', label: t('settings.tabScan'), icon: ScanSearch },
+    { key: 'validation', label: t('settings.tabValidation'), icon: Shield },
+    { key: 'apps', label: t('settings.tabApps'), icon: Database },
   ]
 
   return (
@@ -195,9 +195,9 @@ export default function SettingsPage() {
         style={{ borderBottom: '1px solid var(--c-border)', background: 'var(--c-bg-panel)' }}
       >
         <div>
-          <h2 style={{ fontSize: 14, fontWeight: 650, color: 'var(--c-text)' }}>{t('settings.title', 'Settings')}</h2>
+          <h2 style={{ fontSize: 14, fontWeight: 650, color: 'var(--c-text)' }}>{t('settings.title')}</h2>
           <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 2 }}>
-            {t('settings.workbenchSubtitle', 'Configure skill scanning, logs, validation and workspace preferences.')}
+            {t('settings.workbenchSubtitle')}
           </p>
         </div>
         <button
@@ -207,7 +207,7 @@ export default function SettingsPage() {
           type="button"
         >
           <RotateCcw style={{ width: 12, height: 12 }} />
-          {t('settings.reset', 'Reset')}
+          {t('settings.reset')}
         </button>
       </div>
 
@@ -271,12 +271,12 @@ export default function SettingsPage() {
                   </SettingsSection>
                 ))}
 
-                <SettingsSection icon={<Monitor style={{ width: 14, height: 14 }} />} title={t('settings.theme', 'Theme')}>
+                <SettingsSection icon={<Monitor style={{ width: 14, height: 14 }} />} title={t('settings.theme')}>
                   <div className="grid grid-cols-3 gap-3">
                     {([
-                      { value: 'light' as ThemeMode, icon: Sun, label: t('settings.light', 'Light'), preview: { bg: '#f0f2f7', card: '#fff', accent: '#2363eb' } },
-                      { value: 'dark' as ThemeMode, icon: Moon, label: t('settings.dark', 'Dark'), preview: { bg: '#0f1117', card: '#1a1d2e', accent: '#34d399' } },
-                      { value: 'system' as ThemeMode, icon: MonitorSmartphone, label: t('settings.system', 'System'), preview: { bg: 'linear-gradient(135deg, #f0f2f7 50%, #0f1117 50%)', card: 'linear-gradient(135deg, #fff 50%, #1a1d2e 50%)', accent: 'linear-gradient(135deg, #2363eb 50%, #34d399 50%)' } },
+                      { value: 'light' as ThemeMode, icon: Sun, label: t('settings.light'), preview: { bg: '#f0f2f7', card: '#fff', accent: '#2363eb' } },
+                      { value: 'dark' as ThemeMode, icon: Moon, label: t('settings.dark'), preview: { bg: '#0f1117', card: '#1a1d2e', accent: '#34d399' } },
+                      { value: 'system' as ThemeMode, icon: MonitorSmartphone, label: t('settings.system'), preview: { bg: 'linear-gradient(135deg, #f0f2f7 50%, #0f1117 50%)', card: 'linear-gradient(135deg, #fff 50%, #1a1d2e 50%)', accent: 'linear-gradient(135deg, #2363eb 50%, #34d399 50%)' } },
                     ]).map((opt) => (
                       <ThemeButton
                         key={opt.value}
@@ -296,8 +296,8 @@ export default function SettingsPage() {
               <>
                 <SettingsSection
                   icon={<ScanSearch style={{ width: 14, height: 14 }} />}
-                  title={t('settings.scanDirectories', 'Skill scan directories')}
-                  description={t('settings.scanDirectoriesDesc', 'Review and override where each core AI app stores SKILL.md folders.')}
+                  title={t('settings.scanDirectories')}
+                  description={t('settings.scanDirectoriesDesc')}
                 >
                   <div className="glass-card overflow-hidden" style={{ borderRadius: 'var(--radius-md)' }}>
                     {coreRows.map((row, index) => (
@@ -313,8 +313,8 @@ export default function SettingsPage() {
 
                 <SettingsSection
                   icon={<FileSearch style={{ width: 14, height: 14 }} />}
-                  title={t('settings.activityLogs', 'Session log parsing')}
-                  description={t('settings.activityLogsDesc', 'Control which local app logs are used for usage statistics and recent activity.')}
+                  title={t('settings.activityLogs')}
+                  description={t('settings.activityLogsDesc')}
                 >
                   <div className="glass-card overflow-hidden" style={{ borderRadius: 'var(--radius-md)' }}>
                     {coreRows.map((row, index) => (
@@ -335,28 +335,28 @@ export default function SettingsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <SettingsSection
                   icon={<Shield style={{ width: 14, height: 14 }} />}
-                  title={t('settings.validation', 'Validation')}
-                  description={t('settings.validationDesc', 'Keep imported skills readable and inspectable before syncing them.')}
+                  title={t('settings.validation')}
+                  description={t('settings.validationDesc')}
                 >
                   <div className="glass-card overflow-hidden" style={{ borderRadius: 'var(--radius-md)' }}>
                     <ToggleRow
                       icon={<Shield style={{ width: 14, height: 14 }} />}
-                      title={t('settings.strictValidation', 'Strict SKILL.md validation')}
-                      description={t('settings.strictValidationDesc', 'Require front matter, title and readable markdown content.')}
+                      title={t('settings.strictValidation')}
+                      description={t('settings.strictValidationDesc')}
                       checked={(settings['validation.strict'] ?? 'true') === 'true'}
                       onToggle={() => toggleSetting('validation.strict', 'true')}
                     />
                     <ToggleRow
                       icon={<FolderCheck style={{ width: 14, height: 14 }} />}
-                      title={t('settings.validateOnImport', 'Validate on import')}
-                      description={t('settings.validateOnImportDesc', 'Run validation when importing folders or ZIP archives.')}
+                      title={t('settings.validateOnImport')}
+                      description={t('settings.validateOnImportDesc')}
                       checked={(settings['validation.import'] ?? 'true') === 'true'}
                       onToggle={() => toggleSetting('validation.import', 'true')}
                     />
                     <ToggleRow
                       icon={<Eye style={{ width: 14, height: 14 }} />}
-                      title={t('settings.showDiffs', 'Show content diffs')}
-                      description={t('settings.showDiffsDesc', 'Keep version diff previews available in skill detail.')}
+                      title={t('settings.showDiffs')}
+                      description={t('settings.showDiffsDesc')}
                       checked={(settings['validation.diff'] ?? 'true') === 'true'}
                       onToggle={() => toggleSetting('validation.diff', 'true')}
                       isLast
@@ -366,21 +366,21 @@ export default function SettingsPage() {
 
                 <SettingsSection
                   icon={<SlidersHorizontal style={{ width: 14, height: 14 }} />}
-                  title={t('settings.automation', 'Automation')}
-                  description={t('settings.automationDesc', 'Tune the background refresh behavior for local skill state.')}
+                  title={t('settings.automation')}
+                  description={t('settings.automationDesc')}
                 >
                   <div className="glass-card overflow-hidden" style={{ borderRadius: 'var(--radius-md)' }}>
                     <ToggleRow
                       icon={<RefreshCw style={{ width: 14, height: 14 }} />}
-                      title={t('settings.scanOnStartup', 'Scan on startup')}
-                      description={t('settings.scanOnStartupDesc', 'Refresh skills, tools and sources when AetherDock opens.')}
+                      title={t('settings.scanOnStartup')}
+                      description={t('settings.scanOnStartupDesc')}
                       checked={(settings['scan.onStartup'] ?? 'true') === 'true'}
                       onToggle={() => toggleSetting('scan.onStartup', 'true')}
                     />
                     <ToggleRow
                       icon={<Bell style={{ width: 14, height: 14 }} />}
-                      title={t('settings.watchSkillDirs', 'Watch skill folders')}
-                      description={t('settings.watchSkillDirsDesc', 'Detect local changes after edits from another editor.')}
+                      title={t('settings.watchSkillDirs')}
+                      description={t('settings.watchSkillDirsDesc')}
                       checked={(settings['scan.watch'] ?? 'false') === 'true'}
                       onToggle={() => toggleSetting('scan.watch')}
                     />
@@ -391,10 +391,10 @@ export default function SettingsPage() {
                         </span>
                         <div className="min-w-0">
                           <p style={{ fontSize: 12, color: 'var(--c-text-secondary)', fontWeight: 650 }}>
-                            {t('settings.scanInterval', 'Scan interval')}
+                            {t('settings.scanInterval')}
                           </p>
                           <p style={{ fontSize: 10, color: 'var(--c-text-faint)', marginTop: 2 }}>
-                            {t('settings.scanIntervalDesc', 'Used when folder watching is enabled.')}
+                            {t('settings.scanIntervalDesc')}
                           </p>
                         </div>
                       </div>
@@ -403,10 +403,10 @@ export default function SettingsPage() {
                         onChange={(event) => updateSetting('scan.interval', event.target.value)}
                         style={selectStyle}
                       >
-                        <option value="manual">{t('settings.manualOnly', 'Manual only')}</option>
-                        <option value="5m">{t('settings.fiveMinutes', 'Every 5 minutes')}</option>
-                        <option value="15m">{t('settings.fifteenMinutes', 'Every 15 minutes')}</option>
-                        <option value="1h">{t('settings.hourly', 'Hourly')}</option>
+                        <option value="manual">{t('settings.manualOnly')}</option>
+                        <option value="5m">{t('settings.fiveMinutes')}</option>
+                        <option value="15m">{t('settings.fifteenMinutes')}</option>
+                        <option value="1h">{t('settings.hourly')}</option>
                       </select>
                     </div>
                   </div>
@@ -418,8 +418,8 @@ export default function SettingsPage() {
               <>
                 <SettingsSection
                   icon={<Database style={{ width: 14, height: 14 }} />}
-                  title={t('settings.coreApps', 'Core apps')}
-                  description={t('settings.coreAppsDesc', 'Primary apps used by the Skills workbench matrix.')}
+                  title={t('settings.coreApps')}
+                  description={t('settings.coreAppsDesc')}
                 >
                   <div className="grid grid-cols-3 gap-2">
                     {CORE_SKILL_TOOLS.map((tool) => (
@@ -428,11 +428,11 @@ export default function SettingsPage() {
                   </div>
                 </SettingsSection>
 
-                <SettingsSection icon={<Monitor style={{ width: 14, height: 14 }} />} title={t('settings.about', 'About')}>
+                <SettingsSection icon={<Monitor style={{ width: 14, height: 14 }} />} title={t('settings.about')}>
                   <div className="glass-card p-4 space-y-3">
-                    <InfoLine label={t('settings.version', 'Version')} value={APP_VERSION} />
-                    <InfoLine label="Build" value="dev" />
-                    <InfoLine label="Runtime" value="Wails v2" />
+                    <InfoLine label={t('settings.version')} value={APP_VERSION} />
+                    <InfoLine label={t('settings.build')} value="dev" />
+                    <InfoLine label={t('settings.runtime')} value="Wails v2" />
                   </div>
                 </SettingsSection>
               </>
@@ -481,10 +481,10 @@ function ToolDirectoryRow({
     >
       <ToolLabel tool={row.tool} icon={icon} config={row.config} />
       <span className="truncate" style={{ fontSize: 11, color: row.skillDir ? 'var(--c-text-secondary)' : 'var(--c-text-faint)', fontFamily: 'monospace' }}>
-        {row.skillDir ? shortPath(row.skillDir) : t('settings.notConfigured', 'Not configured')}
+        {row.skillDir ? shortPath(row.skillDir) : t('settings.notConfigured')}
       </span>
       <button className="rounded-md px-2.5 py-1.5 text-[10px] font-semibold" style={smallButtonStyle} onClick={onBrowse} type="button">
-        {t('settings.browse', 'Browse')}
+        {t('settings.browse')}
       </button>
     </div>
   )
@@ -511,10 +511,10 @@ function LogSourceRow({
       <ToolLabel tool={row.tool} icon={icon} config={row.config} />
       <Switch checked={row.logEnabled} onClick={onToggle} />
       <span className="truncate" style={{ fontSize: 11, color: row.logPath ? 'var(--c-text-secondary)' : 'var(--c-text-faint)', fontFamily: 'monospace' }}>
-        {row.logPath ? shortPath(row.logPath) : t('settings.notConfigured', 'Not configured')}
+        {row.logPath ? shortPath(row.logPath) : t('settings.notConfigured')}
       </span>
       <button className="rounded-md px-2.5 py-1.5 text-[10px] font-semibold" style={smallButtonStyle} onClick={onBrowse} type="button">
-        {t('settings.browse', 'Browse')}
+        {t('settings.browse')}
       </button>
     </div>
   )
@@ -536,7 +536,7 @@ function ToolLabel({ tool, icon, config }: { tool: CoreSkillTool; icon?: string;
       <div className="min-w-0">
         <p className="truncate" style={{ fontSize: 12, color: 'var(--c-text-secondary)', fontWeight: 650 }}>{tool.label}</p>
         <p style={{ fontSize: 10, color: detected ? 'var(--c-green)' : 'var(--c-text-faint)', marginTop: 1 }}>
-          {detected ? (enabled ? t('settings.enabled', 'Enabled') : t('settings.detected', 'Detected')) : t('settings.notDetected', 'Not detected')}
+          {detected ? (enabled ? t('settings.enabled') : t('settings.detected')) : t('settings.notDetected')}
         </p>
       </div>
     </div>

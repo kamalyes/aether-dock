@@ -1,4 +1,4 @@
-import { AlertCircle, Download, ExternalLink, Loader2, RefreshCw, Star, Store } from 'lucide-react'
+﻿import { AlertCircle, Download, ExternalLink, Loader2, RefreshCw, Star, Store } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { wailsApi } from '@/services/wailsBridge'
@@ -40,7 +40,7 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
         const data = skillResp.data as { skills?: MarketplaceItem[] } | MarketplaceItem[] | undefined
         setSkills(Array.isArray(data) ? data : data?.skills ?? [])
       } else {
-        setError(skillResp.error || t('install.searchFailed', 'Search failed'))
+        setError(skillResp.error || t('install.searchFailed'))
       }
     } catch (err) {
       setError(String(err))
@@ -76,13 +76,13 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
                 className="inline-flex items-center rounded-full px-2 py-1 text-[10px] font-semibold"
                 style={{ color: 'var(--c-accent)', background: 'var(--c-accent-soft)' }}
               >
-                {t('skills.marketFeatured', 'Featured')}
+                {t('skills.marketFeatured')}
               </span>
               <h2 style={{ fontSize: 20, fontWeight: 750, color: 'var(--c-text)', marginTop: 10 }}>
-                {t('skills.marketTitle', 'Discover skills for your AI apps')}
+                {t('skills.marketTitle')}
               </h2>
               <p style={{ fontSize: 12, color: 'var(--c-text-muted)', marginTop: 5, maxWidth: 560 }}>
-                {t('skills.marketDesc', 'Search marketplace skills and install them through AetherDock without leaving the Skills workspace.')}
+                {t('skills.marketDesc')}
               </p>
             </div>
             <Store style={{ width: 58, height: 58, color: 'var(--c-accent)', opacity: 0.24 }} />
@@ -94,7 +94,7 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
             className="flex-1"
             value={query}
             onChange={setQuery}
-            placeholder={t('install.searchMarket', 'Search marketplace...')}
+            placeholder={t('install.searchMarket')}
           />
           <button
             className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-medium"
@@ -103,7 +103,7 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
             type="button"
           >
             <RefreshCw style={{ width: 14, height: 14 }} className={loading ? 'animate-spin' : ''} />
-            {t('install.retry', 'Retry')}
+            {t('install.retry')}
           </button>
         </div>
 
@@ -120,7 +120,7 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
               }}
               type="button"
             >
-              {item === 'all' ? t('install.all', 'All') : item}
+              {item === 'all' ? t('install.all') : item}
             </button>
           ))}
         </div>
@@ -155,16 +155,16 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
 
       <aside className="space-y-4 min-w-0">
         <section className="glass-card p-4">
-          <h3 style={{ fontSize: 13, color: 'var(--c-text)', fontWeight: 700 }}>{t('skills.marketStats', 'Market stats')}</h3>
+          <h3 style={{ fontSize: 13, color: 'var(--c-text)', fontWeight: 700 }}>{t('skills.marketStats')}</h3>
           <div className="grid gap-2 mt-3">
-            <MetricTile label={t('skills.marketSkills', 'Skills')} value={skills.length} />
-            <MetricTile label={t('install.installed', 'Installed')} value={skills.filter((item) => installedSkillNames.has(item.name.toLowerCase())).length} />
-            <MetricTile label={t('skills.marketSources', 'Sources')} value={new Set(skills.map((item) => item.author)).size} />
+            <MetricTile label={t('skills.marketSkills')} value={skills.length} />
+            <MetricTile label={t('install.installed')} value={skills.filter((item) => installedSkillNames.has(item.name.toLowerCase())).length} />
+            <MetricTile label={t('skills.marketSources')} value={new Set(skills.map((item) => item.author)).size} />
           </div>
         </section>
 
         <section className="glass-card p-4">
-          <h3 style={{ fontSize: 13, color: 'var(--c-text)', fontWeight: 700 }}>{t('skills.marketFeatured', 'Featured')}</h3>
+          <h3 style={{ fontSize: 13, color: 'var(--c-text)', fontWeight: 700 }}>{t('skills.marketFeatured')}</h3>
           <div className="space-y-2 mt-3">
             {filteredSkills.slice(0, 5).map((item) => (
               <div key={item.id} className="rounded-lg p-2" style={{ background: 'var(--c-bg-input)' }}>
@@ -213,10 +213,10 @@ function MarketSkillCard({
             ) : null}
           </div>
           <p style={{ fontSize: 11, color: 'var(--c-text-muted)', marginTop: 4, minHeight: 34 }} className="line-clamp-2">
-            {item.description || t('skills.noDesc', 'No description')}
+            {item.description || t('skills.noDesc')}
           </p>
           <div className="flex items-center gap-3 mt-3">
-            {item.author ? <span style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>by {item.author}</span> : null}
+            {item.author ? <span style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>{t('install.byAuthor', { author: item.author })}</span> : null}
             {item.stars ? (
               <span className="flex items-center gap-1" style={{ fontSize: 10, color: 'var(--c-amber)' }}>
                 <Star style={{ width: 11, height: 11, fill: 'currentColor' }} />
@@ -235,7 +235,7 @@ function MarketSkillCard({
           type="button"
         >
           {installing ? <Loader2 style={{ width: 13, height: 13 }} className="animate-spin" /> : <Download style={{ width: 13, height: 13 }} />}
-          {installed ? t('install.installed', 'Installed') : installing ? t('install.installing', 'Installing...') : t('install.installBtn', 'Install')}
+          {installed ? t('install.installed') : installing ? t('install.installing') : t('install.installBtn')}
         </button>
         {item.url ? (
           <a

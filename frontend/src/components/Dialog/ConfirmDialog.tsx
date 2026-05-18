@@ -1,5 +1,6 @@
-import { AnimatePresence, motion } from 'framer-motion'
+﻿import { AnimatePresence, motion } from 'framer-motion'
 import { AlertTriangle, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { ConfirmDialogProps } from './typings'
 
 const TONE_COLORS: Record<string, { bg: string; color: string }> = {
@@ -9,10 +10,11 @@ const TONE_COLORS: Record<string, { bg: string; color: string }> = {
 }
 
 export function ConfirmDialog({ open, title, description, confirmText, confirmLabel, cancelText, cancelLabel, tone, variant, icon, onConfirm, onCancel }: ConfirmDialogProps) {
+  const { t } = useTranslation()
   const effectiveTone = tone || variant || 'default'
   const c = TONE_COLORS[effectiveTone]
-  const confirmBtnText = confirmLabel || confirmText || '确认'
-  const cancelBtnText = cancelLabel || cancelText || '取消'
+  const confirmBtnText = confirmLabel || confirmText || t('dialog.confirm')
+  const cancelBtnText = cancelLabel || cancelText || t('dialog.cancel')
 
   return (
     <AnimatePresence>

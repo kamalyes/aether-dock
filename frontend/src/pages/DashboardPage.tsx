@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+﻿import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -33,6 +33,7 @@ import { FadeIn, StaggerContainer, StaggerItem } from '@/components/Motion'
 import { EntityEmptyState } from '@/components/Empty'
 import { QuickAction, StatsCard } from '@/components/Card'
 import { Skeleton, SkeletonCard } from '@/components/Loading'
+import { getToolIconByName } from '@/components/Skills/utils'
 import {
   CORE_SKILL_TOOLS,
   formatSkillDate,
@@ -101,14 +102,18 @@ export default function DashboardPage() {
     const enabledMcp = servers.filter((server) => server.status === 'enabled').length
     const detectedTools = tools.filter((tool) => tool.isDetected).length
     const enabledTools = tools.filter((tool) => tool.isEnabled).length
-    const appStats = CORE_SKILL_TOOLS.map((tool) => {
-      const detected = tools.some((item) => normalizeToolKey(item.toolName) === tool.id || normalizeToolKey(item.displayName) === tool.id)
+    const appStats = [...CORE_SKILL_TOOLS.map((tool) => {
+      const matchedTool = tools.find((item) => normalizeToolKey(item.toolName) === tool.id || normalizeToolKey(item.displayName) === tool.id)
+      const detected = !!matchedTool
       return {
         tool,
         detected,
         count: skills.filter((skill) => isSkillEnabledForTool(skill, tool)).length,
+        configPath: matchedTool?.configPath ?? '',
+        skillDir: matchedTool?.skillDir ?? '',
+        mcpDir: matchedTool?.mcpDir ?? '',
       }
-    })
+    })].sort((a, b) => (a.detected === b.detected ? 0 : a.detected ? -1 : 1))
     const totalAppInstalls = appStats.reduce((sum, item) => sum + item.count, 0)
     const totalCalls = skills.reduce((sum, skill) => sum + getSkillUsage(skill), 0)
     const topSkills = [...skills]
@@ -146,10 +151,17 @@ export default function DashboardPage() {
     return (
       <div className="h-full overflow-y-auto">
         <div className="max-w-[1320px] mx-auto px-5 py-5 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <Skeleton width={160} height={20} />
-              <Skeleton width={260} height={12} style={{ marginTop: 6 }} />
+              <div className="flex items-center gap-2">
+                <span className="icon-box icon-box-accent" style={{ width: 32, height: 32 }}>
+                  <Sparkles style={{ width: 16, height: 16 }} />
+                </span>
+                <div>
+                  <h1 style={{ color: 'var(--c-text)', fontSize: 18, fontWeight: 750 }}>{t('dashboard.title')}</h1>
+                  <p style={{ color: 'var(--c-text-muted)', fontSize: 12, marginTop: 2 }}>{t('dashboard.workbenchSubtitle')}</p>
+                </div>
+              </div>
             </div>
             <Skeleton width={92} height={34} />
           </div>
@@ -180,10 +192,10 @@ export default function DashboardPage() {
         <div className="text-center" style={{ maxWidth: 340 }}>
           <AlertCircle style={{ width: 48, height: 48, color: 'var(--c-amber)', margin: '0 auto 16px' }} />
           <p style={{ color: 'var(--c-text)', fontSize: 15, fontWeight: 650, marginBottom: 6 }}>
-            {t('dashboard.loadFailed', 'Failed to load data')}
+            {t('dashboard.loadFailed')}
           </p>
           <p style={{ color: 'var(--c-text-muted)', fontSize: 12, marginBottom: 20, lineHeight: 1.6 }}>
-            {skillError || mcpError || toolError || t('dashboard.runtimeUnavailable', 'Wails runtime not available')}
+            {skillError || mcpError || toolError || t('dashboard.runtimeUnavailable')}
           </p>
           <button
             onClick={init}
@@ -192,7 +204,7 @@ export default function DashboardPage() {
             type="button"
           >
             <RefreshCw style={{ width: 14, height: 14 }} />
-            {t('dashboard.retry', 'Retry')}
+            {t('dashboard.retry')}
           </button>
         </div>
       </div>
@@ -211,10 +223,10 @@ export default function DashboardPage() {
                 </span>
                 <div>
                   <h1 style={{ color: 'var(--c-text)', fontSize: 18, fontWeight: 750 }}>
-                    {t('dashboard.title', 'Dashboard')}
+                    {t('dashboard.title')}
                   </h1>
                   <p style={{ color: 'var(--c-text-muted)', fontSize: 12, marginTop: 2 }}>
-                    {t('dashboard.workbenchSubtitle', 'A control room for skill health, app coverage and usage signals.')}
+                    {t('dashboard.workbenchSubtitle')}
                   </p>
                 </div>
               </div>
@@ -226,7 +238,7 @@ export default function DashboardPage() {
               type="button"
             >
               {refreshing ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <RefreshCw style={{ width: 14, height: 14 }} />}
-              {t('dashboard.refresh', 'Refresh')}
+              {t('dashboard.refresh')}
             </button>
           </div>
         </FadeIn>
@@ -235,9 +247,9 @@ export default function DashboardPage() {
           <StaggerItem>
             <StatsCard
               icon={<Zap style={{ width: 17, height: 17 }} />}
-              label={t('dashboard.skills', 'Skills')}
+              label={t('dashboard.skills')}
               value={skillTotal || skills.length}
-              subtitle={t('dashboard.skillsSub', '{{installed}} installed', { installed: dashboard.installedCount })}
+              subtitle={t('dashboard.skillsSub', { installed: dashboard.installedCount })}
               color="accent"
               onClick={() => navigate('/skills')}
             />
@@ -245,9 +257,9 @@ export default function DashboardPage() {
           <StaggerItem>
             <StatsCard
               icon={<Server style={{ width: 17, height: 17 }} />}
-              label={t('dashboard.mcp', 'MCP Servers')}
+              label={t('dashboard.mcp')}
               value={mcpTotal || servers.length}
-              subtitle={t('dashboard.mcpSub', '{{enabled}} enabled', { enabled: dashboard.enabledMcp })}
+              subtitle={t('dashboard.mcpSub', { enabled: dashboard.enabledMcp })}
               color="violet"
               onClick={() => navigate('/mcp')}
             />
@@ -255,9 +267,9 @@ export default function DashboardPage() {
           <StaggerItem>
             <StatsCard
               icon={<Archive style={{ width: 17, height: 17 }} />}
-              label={t('dashboard.sources', 'Sources')}
+              label={t('dashboard.sources')}
               value={sources.length}
-              subtitle={t('dashboard.sourcesSub', 'configured')}
+              subtitle={t('dashboard.sourcesSub')}
               color="green"
               onClick={() => navigate('/skills')}
             />
@@ -265,9 +277,9 @@ export default function DashboardPage() {
           <StaggerItem>
             <StatsCard
               icon={<Wrench style={{ width: 17, height: 17 }} />}
-              label={t('dashboard.tools', 'Tools')}
+              label={t('dashboard.tools')}
               value={dashboard.detectedTools}
-              subtitle={t('dashboard.toolsDetectedSub', '{{enabled}} enabled', { enabled: dashboard.enabledTools })}
+              subtitle={t('dashboard.toolsDetectedSub', { enabled: dashboard.enabledTools })}
               color="amber"
               onClick={() => navigate('/tools')}
             />
@@ -275,9 +287,9 @@ export default function DashboardPage() {
           <StaggerItem>
             <StatsCard
               icon={<BarChart3 style={{ width: 17, height: 17 }} />}
-              label={t('dashboard.appInstalls', 'App installs')}
+              label={t('dashboard.appInstalls')}
               value={dashboard.totalAppInstalls}
-              subtitle={t('dashboard.coreApps', 'Core apps')}
+              subtitle={t('dashboard.coreApps')}
               color="cyan"
               onClick={() => navigate('/skills')}
             />
@@ -285,69 +297,122 @@ export default function DashboardPage() {
           <StaggerItem>
             <StatsCard
               icon={<TrendingUp style={{ width: 17, height: 17 }} />}
-              label={t('dashboard.skillCalls', 'Skill calls')}
+              label={t('dashboard.skillCalls')}
               value={dashboard.totalCalls}
-              subtitle={t('dashboard.estimated', 'Estimated')}
+              subtitle={t('dashboard.estimated')}
               color="green"
               onClick={() => navigate('/skills?view=usage')}
             />
           </StaggerItem>
         </StaggerContainer>
 
+        <FadeIn delay={0.08}>
+          <div className="glass-card flex flex-wrap items-center gap-1.5 px-3 py-2">
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--c-text-faint)', marginRight: 2 }}>
+              {t('dashboard.coreApps')}
+            </span>
+            {dashboard.appStats.map(({ tool, count }) => {
+              const icon = getToolIconByName(tool.toolName)
+              return (
+                <div
+                  key={tool.id}
+                  className="flex items-center gap-1.5 rounded-md px-2 py-1"
+                  style={{ background: tool.soft, color: tool.color, border: `1px solid ${tool.color}1F` }}
+                >
+                  {icon ? <img src={icon} alt="" style={{ width: 13, height: 13 }} /> : null}
+                  <span style={{ fontSize: 10, fontWeight: 700 }}>{tool.label}</span>
+                  <span style={{ fontSize: 10, fontVariantNumeric: 'tabular-nums' }}>{count}</span>
+                </div>
+              )
+            })}
+          </div>
+        </FadeIn>
+
         <div className="grid gap-4" style={{ gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 0.8fr)', alignItems: 'stretch' }}>
           <FadeIn delay={0.1} style={{ display: 'flex' }}>
-            <section className="glass-card p-4 flex flex-col flex-1">
-              <div className="flex items-center justify-between mb-4">
+            <section className="glass-card p-3 flex flex-col flex-1">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="icon-box icon-box-green" style={{ width: 30, height: 30 }}>
-                    <ScanSearch style={{ width: 15, height: 15 }} />
+                  <span className="icon-box icon-box-green" style={{ width: 26, height: 26 }}>
+                    <ScanSearch style={{ width: 13, height: 13 }} />
                   </span>
                   <div>
-                    <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700 }}>
-                      {t('dashboard.scanStatus', 'Scan status')}
+                    <h2 style={{ color: 'var(--c-text)', fontSize: 12, fontWeight: 700 }}>
+                      {t('dashboard.scanStatus')}
                     </h2>
-                    <p style={{ color: 'var(--c-text-faint)', fontSize: 11, marginTop: 2 }}>
-                      {dashboard.lastScan ? t('dashboard.lastScanAt', 'Last scan {{time}}', { time: formatSkillDate(dashboard.lastScan) }) : t('dashboard.notScannedYet', 'Not scanned yet')}
+                    <p style={{ color: 'var(--c-text-faint)', fontSize: 10, marginTop: 1 }}>
+                      {dashboard.lastScan ? t('dashboard.lastScanAt', { time: formatSkillDate(dashboard.lastScan) }) : t('dashboard.notScannedYet')}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => navigate('/skills')}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-semibold"
+                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-semibold"
                   style={{ background: 'var(--c-accent-soft)', color: 'var(--c-accent)', border: 'none' }}
                   type="button"
                 >
-                  {t('dashboard.openSkills', 'Open Skills')}
-                  <ArrowRight style={{ width: 12, height: 12 }} />
+                  {t('dashboard.openSkills')}
+                  <ArrowRight style={{ width: 10, height: 10 }} />
                 </button>
               </div>
 
-              <div className="space-y-3 flex-1">
-                {dashboard.appStats.map(({ tool, count, detected }) => (
-                  <div key={tool.id}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className="flex items-center justify-center rounded-md" style={{ width: 22, height: 22, background: tool.soft, color: tool.color, fontSize: 10, fontWeight: 750 }}>
-                          {tool.label.slice(0, 1)}
-                        </span>
-                        <span style={{ color: 'var(--c-text-secondary)', fontSize: 12, fontWeight: 650 }}>{tool.label}</span>
-                        <span style={{ color: detected ? 'var(--c-green)' : 'var(--c-text-faint)', fontSize: 10 }}>
-                          {detected ? t('dashboard.detected', 'Detected') : t('dashboard.notDetected', 'Not detected')}
-                        </span>
+              <div className="space-y-1.5 flex-1">
+                {dashboard.appStats.map(({ tool, detected, configPath, skillDir, mcpDir }) => {
+                  const icon = getToolIconByName(tool.toolName)
+                  return (
+                    <div
+                      key={tool.id}
+                      className="rounded-md px-2.5 py-1.5"
+                      style={{ background: 'var(--c-bg-input)', border: '1px solid var(--c-border)' }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          {icon ? (
+                            <img src={icon} alt={tool.label} style={{ width: 14, height: 14, borderRadius: 2 }} />
+                          ) : (
+                            <span className="flex items-center justify-center rounded" style={{ width: 14, height: 14, background: tool.soft, color: tool.color, fontSize: 8, fontWeight: 750 }}>
+                              {tool.label.slice(0, 1)}
+                            </span>
+                          )}
+                          <span style={{ color: 'var(--c-text-secondary)', fontSize: 11, fontWeight: 650 }}>{tool.label}</span>
+                          <span
+                            className="inline-flex items-center gap-0.5 rounded px-1 py-px"
+                            style={{
+                              color: detected ? 'var(--c-green)' : 'var(--c-text-faint)',
+                              background: detected ? 'var(--c-green-soft)' : 'var(--c-bg-input)',
+                              fontSize: 9,
+                              fontWeight: 700,
+                            }}
+                          >
+                            {detected ? t('dashboard.detected') : t('dashboard.notDetected')}
+                          </span>
+                        </div>
                       </div>
-                      <span style={{ color: 'var(--c-text-muted)', fontSize: 11 }}>{count}</span>
+                      {detected && (
+                        <div className="space-y-px mt-1">
+                          {configPath && (
+                            <div className="flex items-center gap-1.5" style={{ fontSize: 9, color: 'var(--c-text-faint)' }}>
+                              <span style={{ color: 'var(--c-text-muted)', fontWeight: 600, minWidth: 24 }}>{t('dashboard.pathConfig')}</span>
+                              <span className="truncate" title={configPath}>{configPath}</span>
+                            </div>
+                          )}
+                          {skillDir && (
+                            <div className="flex items-center gap-1.5" style={{ fontSize: 9, color: 'var(--c-text-faint)' }}>
+                              <span style={{ color: 'var(--c-text-muted)', fontWeight: 600, minWidth: 24 }}>{t('dashboard.pathSkills')}</span>
+                              <span className="truncate" title={skillDir}>{skillDir}</span>
+                            </div>
+                          )}
+                          {mcpDir && (
+                            <div className="flex items-center gap-1.5" style={{ fontSize: 9, color: 'var(--c-text-faint)' }}>
+                              <span style={{ color: 'var(--c-text-muted)', fontWeight: 600, minWidth: 24 }}>{t('dashboard.pathMcp')}</span>
+                              <span className="truncate" title={mcpDir}>{mcpDir}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <div className="rounded-full overflow-hidden" style={{ height: 7, background: 'var(--c-bg-input)' }}>
-                      <div
-                        className="h-full rounded-full"
-                        style={{
-                          width: `${skills.length > 0 ? Math.max(5, (count / skills.length) * 100) : 0}%`,
-                          background: tool.color,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </section>
           </FadeIn>
@@ -356,12 +421,12 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-4 flex-1">
               <section className="glass-card p-4">
                 <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
-                  {t('dashboard.appInstallChart', 'App install matrix')}
+                  {t('dashboard.appInstallChart')}
                 </h2>
                 {dashboard.totalAppInstalls === 0 ? (
                   <div className="flex flex-col items-center justify-center" style={{ height: 220 }}>
                     <BarChart3 style={{ width: 28, height: 28, color: 'var(--c-text-faint)', marginBottom: 8 }} />
-                    <p style={{ fontSize: 12, color: 'var(--c-text-faint)' }}>{t('dashboard.noData', 'No data')}</p>
+                    <p style={{ fontSize: 12, color: 'var(--c-text-faint)' }}>{t('dashboard.noData')}</p>
                   </div>
                 ) : (
                 <ReactECharts
@@ -397,14 +462,14 @@ export default function DashboardPage() {
               <section className="glass-card p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700 }}>
-                    {t('dashboard.usageTrend7d', '7-day usage trend')}
+                    {t('dashboard.usageTrend7d')}
                   </h2>
-                  <span style={{ color: 'var(--c-text-faint)', fontSize: 10 }}>{t('dashboard.localActivity', 'Local activity')}</span>
+                  <span style={{ color: 'var(--c-text-faint)', fontSize: 10 }}>{t('dashboard.localActivity')}</span>
                 </div>
                 {trend.every((item) => item.count === 0) ? (
                   <div className="flex flex-col items-center justify-center" style={{ height: 230 }}>
                     <TrendingUp style={{ width: 28, height: 28, color: 'var(--c-text-faint)', marginBottom: 8 }} />
-                    <p style={{ fontSize: 12, color: 'var(--c-text-faint)' }}>{t('dashboard.noData', 'No data')}</p>
+                    <p style={{ fontSize: 12, color: 'var(--c-text-faint)' }}>{t('dashboard.noData')}</p>
                   </div>
                 ) : (
                 <ReactECharts
@@ -446,7 +511,7 @@ export default function DashboardPage() {
             <section className="glass-card overflow-hidden flex flex-col flex-1">
               <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid var(--c-border)' }}>
                 <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700 }}>
-                  {t('dashboard.topSkills', 'Top skills')}
+                  {t('dashboard.topSkills')}
                 </h2>
                 <button
                   onClick={() => navigate('/skills?view=usage')}
@@ -454,14 +519,14 @@ export default function DashboardPage() {
                   style={{ color: 'var(--c-accent)' }}
                   type="button"
                 >
-                  {t('dashboard.view', 'View')}
+                  {t('dashboard.view')}
                   <ArrowRight style={{ width: 12, height: 12 }} />
                 </button>
               </div>
               <div className="overflow-y-auto flex-1 px-4 py-3">
                 <div className="space-y-3">
                   {dashboard.topSkills.length === 0 ? (
-                    <EntityEmptyState icon={<Zap style={{ width: 24, height: 24 }} />} title={t('dashboard.noSkills', 'No skills yet')} />
+                    <EntityEmptyState icon={<Zap style={{ width: 24, height: 24 }} />} title={t('dashboard.noSkills')} />
                   ) : dashboard.topSkills.map(({ skill, calls }, index) => (
                     <TopSkillRow key={skill.id} skill={skill} value={calls} index={index} />
                   ))}
@@ -474,7 +539,7 @@ export default function DashboardPage() {
             <section className="glass-card overflow-hidden flex flex-col flex-1">
               <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid var(--c-border)' }}>
                 <h2 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 700 }}>
-                  {t('dashboard.recentChanges', 'Recent changes')}
+                  {t('dashboard.recentChanges')}
                 </h2>
                 <button
                   onClick={() => navigate('/skills')}
@@ -482,7 +547,7 @@ export default function DashboardPage() {
                   style={{ color: 'var(--c-accent)' }}
                   type="button"
                 >
-                  {t('dashboard.view', 'View')}
+                  {t('dashboard.view')}
                   <ArrowRight style={{ width: 12, height: 12 }} />
                 </button>
               </div>
@@ -494,7 +559,7 @@ export default function DashboardPage() {
                 ))}
                 {activities.length === 0 && dashboard.recentSkills.length === 0 ? (
                   <div className="p-8">
-                    <EntityEmptyState icon={<Clock3 style={{ width: 24, height: 24 }} />} title={t('dashboard.noActivity', 'No recent activity')} />
+                    <EntityEmptyState icon={<Clock3 style={{ width: 24, height: 24 }} />} title={t('dashboard.noActivity')} />
                   </div>
                 ) : null}
               </div>
@@ -506,48 +571,48 @@ export default function DashboardPage() {
           <FadeIn delay={0.35}>
             <section>
               <h2 style={{ color: 'var(--c-text-secondary)', fontSize: 13, fontWeight: 700, marginBottom: 10 }}>
-                {t('dashboard.quickActions', 'Quick Actions')}
+                {t('dashboard.quickActions')}
               </h2>
               <div className="grid grid-cols-3 gap-3">
                 <QuickAction
                   icon={<Upload style={{ width: 16, height: 16 }} />}
-                  label={t('dashboard.importZip', 'Import ZIP')}
-                  description={t('dashboard.importZipDesc', 'Bring skills from an archive')}
+                  label={t('dashboard.importZip')}
+                  description={t('dashboard.importZipDesc')}
                   color="green"
                   onClick={() => navigate('/skills?view=transfer')}
                 />
                 <QuickAction
                   icon={<Download style={{ width: 16, height: 16 }} />}
-                  label={t('dashboard.exportZip', 'Export ZIP')}
-                  description={t('dashboard.exportZipDesc', 'Package selected skills')}
+                  label={t('dashboard.exportZip')}
+                  description={t('dashboard.exportZipDesc')}
                   color="accent"
                   onClick={() => navigate('/skills?view=transfer')}
                 />
                 <QuickAction
                   icon={<FolderPlus style={{ width: 16, height: 16 }} />}
-                  label={t('dashboard.addSkillFolder', 'Add skill folder')}
-                  description={t('dashboard.addSkillFolderDesc', 'Import a local folder')}
+                  label={t('dashboard.addSkillFolder')}
+                  description={t('dashboard.addSkillFolderDesc')}
                   color="amber"
                   onClick={() => navigate('/skills')}
                 />
                 <QuickAction
                   icon={<Globe style={{ width: 16, height: 16 }} />}
-                  label={t('dashboard.marketplace', 'Marketplace')}
-                  description={t('dashboard.marketplaceDesc', 'Browse skill marketplace')}
+                  label={t('dashboard.marketplace')}
+                  description={t('dashboard.marketplaceDesc')}
                   color="violet"
                   onClick={() => navigate('/skills?view=market')}
                 />
                 <QuickAction
                   icon={<Activity style={{ width: 16, height: 16 }} />}
-                  label={t('dashboard.openUsage', 'Usage')}
-                  description={t('dashboard.openUsageDesc', 'Review calls and rankings')}
+                  label={t('dashboard.openUsage')}
+                  description={t('dashboard.openUsageDesc')}
                   color="green"
                   onClick={() => navigate('/skills?view=usage')}
                 />
                 <QuickAction
                   icon={<Search style={{ width: 16, height: 16 }} />}
-                  label={t('dashboard.scanLocal', 'Scan Local')}
-                  description={t('dashboard.scanLocalDesc', 'Discover local SKILL.md files')}
+                  label={t('dashboard.scanLocal')}
+                  description={t('dashboard.scanLocalDesc')}
                   color="accent"
                   onClick={refreshAll}
                 />
@@ -562,16 +627,16 @@ export default function DashboardPage() {
               {dashboard.updateCount > 0 ? (
                 <NoticeCard
                   tone="amber"
-                  title={t('dashboard.updates', 'Updates')}
-                  description={t('dashboard.updatesAvailable', '{{count}} skills have updates available', { count: dashboard.updateCount })}
+                  title={t('dashboard.updates')}
+                  description={t('dashboard.updatesAvailable', { count: dashboard.updateCount })}
                   onClick={() => navigate('/skills')}
                 />
               ) : null}
               {dashboard.errorCount > 0 ? (
                 <NoticeCard
                   tone="red"
-                  title={t('dashboard.errors', 'Errors')}
-                  description={t('dashboard.errorsFound', '{{count}} skills have errors', { count: dashboard.errorCount })}
+                  title={t('dashboard.errors')}
+                  description={t('dashboard.errorsFound', { count: dashboard.errorCount })}
                   onClick={() => navigate('/skills')}
                 />
               ) : null}

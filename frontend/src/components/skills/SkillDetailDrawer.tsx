@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next'
+﻿import { useTranslation } from 'react-i18next'
 import type { Skill } from '@/types'
 import { CopyableField } from '@/components/Field'
 import { TagList } from '@/components/Field'
@@ -73,7 +73,7 @@ export function SkillDetailDrawer({
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5" style={{ color: 'var(--c-text-faint)' }}>
             <Tag style={{ width: 12, height: 12 }} />
-            <span style={{ fontSize: 11, fontWeight: 500 }}>{t('skills.tags', 'Tags')}</span>
+            <span style={{ fontSize: 11, fontWeight: 500 }}>{t('skills.tags')}</span>
           </div>
           <TagList tags={skill.tags} />
         </div>
@@ -82,7 +82,7 @@ export function SkillDetailDrawer({
       <div className="space-y-2">
         <div className="flex items-center gap-2" style={{ color: 'var(--c-text-faint)' }}>
           <FolderOpen style={{ width: 12, height: 12 }} />
-          <span style={{ fontSize: 11, fontWeight: 500 }}>{t('skills.path', 'Path')}</span>
+          <span style={{ fontSize: 11, fontWeight: 500 }}>{t('skills.path')}</span>
         </div>
         <CopyableField value={skill.installPath} />
       </div>
@@ -91,7 +91,7 @@ export function SkillDetailDrawer({
         <div className="space-y-2">
           <div className="flex items-center gap-2" style={{ color: 'var(--c-text-faint)' }}>
             <GitBranch style={{ width: 12, height: 12 }} />
-            <span style={{ fontSize: 11, fontWeight: 500 }}>{t('skills.gitInfo', 'Git')}</span>
+            <span style={{ fontSize: 11, fontWeight: 500 }}>{t('skills.gitInfo')}</span>
           </div>
           <div className="rounded-lg px-3 py-2 space-y-1" style={{ background: 'var(--c-bg-input)' }}>
             <div className="flex items-center gap-2">
@@ -102,7 +102,7 @@ export function SkillDetailDrawer({
             </div>
             {skill.gitBranch && (
               <div style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>
-                {t('skills.branch', 'Branch')}: {skill.gitBranch}
+                {t('skills.branch')}: {skill.gitBranch}
                 {skill.gitCommit && ` @ ${skill.gitCommit.slice(0, 7)}`}
               </div>
             )}
@@ -114,7 +114,7 @@ export function SkillDetailDrawer({
               onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(15, 23, 42, 0.04)' }}
             >
               <ArrowUpFromLine style={{ width: 12, height: 12 }} />
-              {t('skills.pull', 'Pull')}
+              {t('skills.pull')}
             </button>
           </div>
         </div>
@@ -122,7 +122,7 @@ export function SkillDetailDrawer({
 
       <div className="space-y-2">
         <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--c-text-faint)' }}>
-          {t('skills.enabledTools', 'Enabled Tools')}
+          {t('skills.enabledTools')}
         </span>
         <div className="space-y-1.5">
           {CORE_SKILL_TOOLS.map((tool) => {
@@ -164,7 +164,7 @@ export function SkillDetailDrawer({
       <div className="flex items-center gap-2 pt-2" style={{ color: 'var(--c-text-faint)' }}>
         <Clock style={{ width: 12, height: 12 }} />
         <span style={{ fontSize: 10 }}>
-          {t('skills.updatedAt', 'Updated')}: {new Date(skill.updatedAt).toLocaleString()}
+          {t('skills.updatedAt')}: {new Date(skill.updatedAt).toLocaleString()}
         </span>
       </div>
     </div>

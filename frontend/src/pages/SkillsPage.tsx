@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -17,7 +17,6 @@ import {
   SkillImportExportPanel,
   SkillMarketplacePanel,
   SkillMatrixTable,
-  SkillStatsPanel,
   SkillWorkbenchPreview,
   SkillUsagePanel,
   type CoreSkillTool,
@@ -63,6 +62,7 @@ export default function SkillsPage() {
   const [previewSkill, setPreviewSkill] = useState<Skill | null>(null)
   const [detailSkill, setDetailSkill] = useState<Skill | null>(null)
   const [marketInstallingId, setMarketInstallingId] = useState<string | null>(null)
+  const [initialLoading, setInitialLoading] = useState(true)
   const { dialogState, confirm, cancel } = useConfirmDialog()
 
   const refreshAll = async () => {
@@ -76,7 +76,10 @@ export default function SkillsPage() {
 
   useEffect(() => {
     setFilter({ status: '', sourceId: '', page: 1, pageSize: 200 })
-    void refreshAll()
+    void (async () => {
+      await refreshAll()
+      setInitialLoading(false)
+    })()
   }, [])
 
   useEffect(() => {
@@ -164,9 +167,9 @@ export default function SkillsPage() {
   const handleBatchDelete = async () => {
     const ids = Array.from(selectedSkillIds)
     const ok = await confirm({
-      title: t('skills.batchDelete', 'Batch Delete'),
-      description: t('skills.batchDeleteConfirm', 'Delete {{count}} skills?', { count: ids.length }),
-      confirmLabel: t('confirm.delete', 'Delete'),
+      title: t('skills.batchDelete'),
+      description: t('skills.batchDeleteConfirm', { count: ids.length }),
+      confirmLabel: t('confirm.delete'),
     })
     if (ok) {
       await batchDelete(ids)
@@ -194,21 +197,21 @@ export default function SkillsPage() {
     const ok = await installFromGit(item.url, 'main', '', item.author || 'Marketplace')
     setMarketInstallingId(null)
     if (ok) {
-      toast.success(t('skills.marketInstallSuccess', '{{name}} installed', { name: item.name }))
+      toast.success(t('skills.marketInstallSuccess', { name: item.name }))
       await refreshAll()
     }
   }
 
   const activeTool = CORE_SKILL_TOOLS.find((tool) => tool.id === (toolFilter as CoreSkillToolId))
 
-  if (loading && skills.length === 0) {
+  if (initialLoading) {
     return (
       <div className="h-full overflow-y-auto px-5 py-5">
         <div className="max-w-[1320px] mx-auto space-y-5">
           <div className="flex items-start justify-between">
-            <div className="space-y-2">
-              <Skeleton width={120} height={22} />
-              <Skeleton width={420} height={12} />
+            <div>
+              <h1 style={{ fontSize: 18, fontWeight: 750, color: 'var(--c-text)' }}>{t('skills.title')}</h1>
+              <p style={{ fontSize: 12, color: 'var(--c-text-muted)', marginTop: 2 }}>{t('skills.workbenchSubtitle')}</p>
             </div>
             <div className="flex items-center gap-2">
               <Skeleton width={92} height={34} borderRadius={8} />
@@ -248,10 +251,6 @@ export default function SkillsPage() {
           />
 
           {activeView === 'library' ? (
-            <SkillStatsPanel skills={skills} visibleCount={filteredSkills.length} />
-          ) : null}
-
-          {activeView === 'library' ? (
             <div className="space-y-2.5">
               <BatchActionBar
                 selectedCount={selectedSkillIds.size}
@@ -266,10 +265,10 @@ export default function SkillsPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span style={{ fontSize: 12, color: 'var(--c-text-secondary)', fontWeight: 650 }}>
-                    {t('skills.libraryTitle', 'Skill library')}
+                    {t('skills.libraryTitle')}
                   </span>
                   <span style={{ fontSize: 11, color: 'var(--c-text-faint)' }}>
-                    {t('skills.libraryCount', '{{visible}} of {{total}} skills', {
+                    {t('skills.libraryCount', {
                       visible: filteredSkills.length,
                       total: total || skills.length,
                     })}
@@ -277,7 +276,7 @@ export default function SkillsPage() {
                 </div>
                 {activeTool ? (
                   <span style={{ fontSize: 11, color: 'var(--c-accent)', background: 'var(--c-accent-soft)', padding: '4px 8px', borderRadius: 8 }}>
-                    {t('skills.filteredByApp', 'Filtered by {{app}}', { app: activeTool.label })}
+                    {t('skills.filteredByApp', { app: activeTool.label })}
                   </span>
                 ) : null}
               </div>

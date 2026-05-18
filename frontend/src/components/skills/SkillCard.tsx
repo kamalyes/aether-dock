@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Download, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -56,7 +56,7 @@ export function SkillCard({
             }}
             className="absolute top-0 right-0 z-10"
             style={{ width: 0, height: 0, borderStyle: 'solid', borderWidth: '0 28px 28px 0', borderColor: 'transparent var(--c-amber) transparent transparent', cursor: 'pointer' }}
-            title={t('skills.viewDiff', 'View version diff')}
+            title={t('skills.viewDiff')}
           >
             <span
               className="absolute flex items-center justify-center"
@@ -93,7 +93,7 @@ export function SkillCard({
                 style={{ color: 'var(--c-text-faint)' }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--c-green)'; e.currentTarget.style.background = 'var(--c-green-soft)' }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--c-text-faint)'; e.currentTarget.style.background = 'transparent' }}
-                title={t('skills.quickInstall', 'Quick Install')}
+                title={t('skills.quickInstall')}
               >
                 <Download style={{ width: 14, height: 14 }} />
               </button>
@@ -108,7 +108,7 @@ export function SkillCard({
                 style={{ color: isFavorite ? 'var(--c-amber)' : 'var(--c-text-faint)' }}
                 onMouseEnter={(e) => { if (!isFavorite) { e.currentTarget.style.color = 'var(--c-amber)'; e.currentTarget.style.background = 'var(--c-amber-soft)' } }}
                 onMouseLeave={(e) => { if (!isFavorite) { e.currentTarget.style.color = 'var(--c-text-faint)'; e.currentTarget.style.background = 'transparent' } }}
-                title={t('skills.favorite', 'Favorite')}
+                title={t('skills.favorite')}
               >
                 <Star style={{ width: 14, height: 14 }} className={isFavorite ? 'fill-current' : ''} />
               </button>
@@ -123,7 +123,7 @@ export function SkillCard({
                 style={{ color: 'var(--c-text-faint)' }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--c-red)'; e.currentTarget.style.background = 'var(--c-red-soft)' }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--c-text-faint)'; e.currentTarget.style.background = 'transparent' }}
-                title={t('skills.delete', 'Delete')}
+                title={t('skills.delete')}
               >
                 <Trash2 style={{ width: 14, height: 14 }} />
               </button>

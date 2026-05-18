@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useToolStore } from '@/stores/toolStore'
 import { wailsApi } from '@/services/wailsBridge'
 import {
@@ -19,9 +19,13 @@ import { toast } from '@/stores/toastStore'
 export default function ToolsPage() {
   const { t } = useTranslation()
   const { tools, loading, fetchTools, detectTools, enableTool, disableTool } = useToolStore()
+  const [initialLoading, setInitialLoading] = useState(true)
 
   useEffect(() => {
-    fetchTools()
+    void (async () => {
+      await fetchTools()
+      setInitialLoading(false)
+    })()
   }, [])
 
   const detectedCount = tools.filter((t) => t.isDetected).length
@@ -52,7 +56,7 @@ export default function ToolsPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        {loading && tools.length === 0 ? (
+        {initialLoading ? (
           <CardLoading mode="skeleton" count={8} rows={2} />
         ) : tools.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
@@ -81,7 +85,7 @@ function ToolCard({ tool, onToggle }: { tool: any; onToggle: () => void }) {
 
   const handleOpenDir = (path: string) => {
     if (!canOpenDir) {
-      toast.warning(t('tools.enableFirst', 'Enable this tool first to access its directory'))
+      toast.warning(t('tools.enableFirst'))
       return
     }
     wailsApi.openInExplorer(path)
@@ -89,7 +93,7 @@ function ToolCard({ tool, onToggle }: { tool: any; onToggle: () => void }) {
 
   const handleIconClick = () => {
     if (!canOpenDir) {
-      toast.warning(t('tools.enableFirst', 'Enable this tool first to access its directory'))
+      toast.warning(t('tools.enableFirst'))
       return
     }
     if (tool.skillDir) {
@@ -101,7 +105,7 @@ function ToolCard({ tool, onToggle }: { tool: any; onToggle: () => void }) {
 
   const handleToggle = () => {
     if (!canEnable) {
-      toast.warning(t('tools.detectFirst', 'Detect this tool first before enabling'))
+      toast.warning(t('tools.detectFirst'))
       return
     }
     onToggle()
@@ -128,7 +132,7 @@ function ToolCard({ tool, onToggle }: { tool: any; onToggle: () => void }) {
               cursor: canOpenDir ? 'pointer' : 'not-allowed',
               position: 'relative',
             }}
-            title={canOpenDir ? t('tools.openDir', 'Open directory') : t('tools.enableFirst', 'Enable first')}
+            title={canOpenDir ? t('tools.openDir') : t('tools.enableFirst')}
           >
             {icon ? (
               <img src={icon} alt={tool.displayName || tool.toolName} style={{ width: 24, height: 24 }} className="rounded object-contain" />
@@ -173,7 +177,7 @@ function ToolCard({ tool, onToggle }: { tool: any; onToggle: () => void }) {
           onClick={handleToggle}
           className={showToggleOn ? 'toggle-on' : 'toggle-off'}
           style={!canEnable ? { opacity: 0.35, cursor: 'not-allowed', pointerEvents: 'auto' } : undefined}
-          title={!canEnable ? t('tools.detectFirst', 'Detect first') : undefined}
+          title={!canEnable ? t('tools.detectFirst') : undefined}
         />
       </div>
 

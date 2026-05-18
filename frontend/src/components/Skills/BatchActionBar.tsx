@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { CheckSquare, Square, Download, Trash2, X, MinusCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { CORE_SKILL_TOOLS } from './utils'
@@ -32,7 +32,7 @@ export function BatchActionBar({
       className="glass-card flex items-center gap-3 px-3 py-2"
     >
       <span style={{ fontSize: 11, color: 'var(--c-text-secondary)', fontWeight: 700 }}>
-        {selectedCount} {t('skills.selected', 'selected')}
+        {selectedCount} {t('skills.selected')}
       </span>
 
       <div className="flex items-center gap-1.5 ml-2">
@@ -46,7 +46,7 @@ export function BatchActionBar({
           ) : (
             <Square style={{ width: 12, height: 12 }} />
           )}
-          {t('skills.selectAll', 'Select All')}
+          {t('skills.selectAll')}
         </button>
 
         <div className="relative">
@@ -56,7 +56,7 @@ export function BatchActionBar({
             style={{ color: 'var(--c-text-muted)' }}
           >
             <Download style={{ width: 12, height: 12 }} />
-            {t('skills.batchInstall', 'Batch Install')}
+            {t('skills.batchInstall')}
           </button>
           {activeMenu === 'install' && (
             <div
@@ -66,7 +66,7 @@ export function BatchActionBar({
               {CORE_SKILL_TOOLS.map((tool) => (
                 <button
                   key={tool.id}
-                  title={`${t('skills.installTo', 'Install to')} ${tool.label}`}
+                  title={`${t('skills.installTo')} ${tool.label}`}
                   onClick={() => {
                     onBatchEnable(tool.toolName)
                     setActiveMenu(null)
@@ -76,7 +76,7 @@ export function BatchActionBar({
                   onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--c-text)'; e.currentTarget.style.background = 'rgba(15, 23, 42, 0.03)' }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--c-text-muted)'; e.currentTarget.style.background = 'transparent' }}
                 >
-                  {t('skills.installTo', 'Install to')} {tool.label}
+                  {t('skills.installTo')} {tool.label}
                 </button>
               ))}
             </div>
@@ -90,7 +90,7 @@ export function BatchActionBar({
             style={{ color: 'var(--c-text-muted)' }}
           >
             <MinusCircle style={{ width: 12, height: 12 }} />
-            {t('skills.batchRemove', 'Batch Remove')}
+            {t('skills.batchRemove')}
           </button>
           {activeMenu === 'remove' && (
             <div
@@ -100,7 +100,7 @@ export function BatchActionBar({
               {CORE_SKILL_TOOLS.map((tool) => (
                 <button
                   key={tool.id}
-                  title={`${t('skills.removeFrom', 'Remove from')} ${tool.label}`}
+                  title={`${t('skills.removeFrom')} ${tool.label}`}
                   onClick={() => {
                     onBatchDisable(tool.toolName)
                     setActiveMenu(null)
@@ -110,7 +110,7 @@ export function BatchActionBar({
                   onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--c-text)'; e.currentTarget.style.background = 'rgba(15, 23, 42, 0.03)' }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--c-text-muted)'; e.currentTarget.style.background = 'transparent' }}
                 >
-                  {t('skills.removeFrom', 'Remove from')} {tool.label}
+                  {t('skills.removeFrom')} {tool.label}
                 </button>
               ))}
             </div>
@@ -123,7 +123,7 @@ export function BatchActionBar({
           style={{ color: 'var(--c-red)' }}
         >
           <Trash2 style={{ width: 12, height: 12 }} />
-          {t('skills.batchDelete', 'Delete')}
+          {t('skills.batchDelete')}
         </button>
       </div>
 

@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
+﻿import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useEffect } from 'react'
 import { APP_VERSION } from '@/constants/app'
@@ -38,17 +38,17 @@ export default function AppLayout() {
   }, [initTheme])
 
   const mainNav: NavItem[] = [
-    { to: '/', icon: LayoutDashboard, label: t('nav.dashboard', 'Dashboard'), end: true },
-    { to: '/skills', icon: Zap, label: t('nav.skills', 'Skills') },
-    { to: '/skills?view=market', icon: Store, label: t('skills.viewMarket', 'Market') },
-    { to: '/skills?view=transfer', icon: Upload, label: t('skills.viewTransfer', 'Import / Export') },
-    { to: '/skills?view=usage', icon: Activity, label: t('skills.viewUsage', 'Usage') },
-    { to: '/mcp', icon: Server, label: t('nav.mcp', 'MCP') },
+    { to: '/', icon: LayoutDashboard, label: t('nav.dashboard'), end: true },
+    { to: '/skills', icon: Zap, label: t('nav.skills') },
+    { to: '/skills?view=market', icon: Store, label: t('skills.viewMarket') },
+    { to: '/skills?view=transfer', icon: Upload, label: t('skills.viewTransfer') },
+    { to: '/skills?view=usage', icon: Activity, label: t('skills.viewUsage') },
+    { to: '/mcp', icon: Server, label: t('nav.mcp') },
   ]
 
   const workspaceNav: NavItem[] = [
-    { to: '/tools', icon: Wrench, label: t('nav.tools', 'Tools') },
-    { to: '/install', icon: Download, label: t('nav.install', 'Install') },
+    { to: '/tools', icon: Wrench, label: t('nav.tools') },
+    { to: '/install', icon: Download, label: t('nav.install') },
   ]
 
   const isActive = (item: NavItem) => {
@@ -104,7 +104,7 @@ export default function AppLayout() {
 
         <nav className="grid gap-1 px-3 pb-2">
           <SideNavLink
-            item={{ to: '/settings', icon: Settings, label: t('nav.settings', 'Settings') }}
+            item={{ to: '/settings', icon: Settings, label: t('nav.settings') }}
             active={location.pathname === '/settings'}
           />
         </nav>

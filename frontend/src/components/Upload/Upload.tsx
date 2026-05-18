@@ -1,8 +1,10 @@
-import { Upload as UploadIcon, FolderOpen } from 'lucide-react'
+﻿import { Upload as UploadIcon, FolderOpen } from 'lucide-react'
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { UploadProps } from './typings'
 
 export function Upload({ accept, multiple = false, onFiles, children, className = '', style, label, icon, value, onChange, onBrowse, placeholder, hint }: UploadProps) {
+  const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +50,7 @@ export function Upload({ accept, multiple = false, onFiles, children, className 
         {children || (
           <>
             <UploadIcon style={{ width: 24, height: 24, color: 'var(--c-text-faint)' }} />
-            <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>点击上传文件</span>
+            <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('upload.clickToUpload')}</span>
           </>
         )}
       </div>

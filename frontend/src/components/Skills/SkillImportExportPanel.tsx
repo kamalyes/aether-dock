@@ -1,4 +1,4 @@
-import { Download, FolderOpen, Loader2, Upload as UploadIcon } from 'lucide-react'
+﻿import { Download, FolderOpen, Loader2, Upload as UploadIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Skill } from '@/types'
@@ -45,11 +45,11 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
     const resp = await wailsApi.importSkillsZip({ zipPath, targetRoot })
     setBusy(null)
     if (resp.success) {
-      toast.success(t('skills.importSuccess', 'Skills imported'))
+      toast.success(t('skills.importSuccess'))
       onImported()
       return
     }
-    toast.error(resp.error ?? t('skills.importFailed', 'Import failed'))
+    toast.error(resp.error ?? t('skills.importFailed'))
   }
 
   const exportSelected = async () => {
@@ -73,10 +73,10 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
     })
     setBusy(null)
     if (resp.success) {
-      toast.success(t('skills.exportSuccess', 'Skills exported'))
+      toast.success(t('skills.exportSuccess'))
       return
     }
-    toast.error(resp.error ?? t('skills.exportFailed', 'Export failed'))
+    toast.error(resp.error ?? t('skills.exportFailed'))
   }
 
   return (
@@ -88,10 +88,10 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
           </span>
           <div>
             <h2 style={{ fontSize: 14, color: 'var(--c-text)', fontWeight: 700 }}>
-              {t('skills.importZipTitle', 'Import skills from ZIP')}
+              {t('skills.importZipTitle')}
             </h2>
             <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 2 }}>
-              {t('skills.importZipDesc', 'Import one or more skill folders from a ZIP archive.')}
+              {t('skills.importZipDesc')}
             </p>
           </div>
         </div>
@@ -104,8 +104,8 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
             if (!value) setZipPath('')
           }}
           onBrowse={chooseZip}
-          placeholder={t('skills.chooseZipHint', 'Choose a ZIP file to import')}
-          hint={t('skills.zipFormatHint', 'The archive can contain one or more folders with SKILL.md files.')}
+          placeholder={t('skills.chooseZipHint')}
+          hint={t('skills.zipFormatHint')}
         />
 
         <div className="mt-4 grid gap-3">
@@ -115,7 +115,7 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
           >
             <FolderOpen style={{ width: 14, height: 14, color: 'var(--c-text-faint)' }} />
             <span style={{ fontSize: 11, color: targetRoot ? 'var(--c-text-secondary)' : 'var(--c-text-faint)' }} className="truncate flex-1">
-              {targetRoot || t('skills.defaultImportTarget', 'Default import target')}
+              {targetRoot || t('skills.defaultImportTarget')}
             </span>
             <button
               className="px-2 py-1 rounded-md text-[10px]"
@@ -123,7 +123,7 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
               style={{ color: 'var(--c-accent)', background: 'var(--c-accent-soft)', border: 'none' }}
               type="button"
             >
-              {t('settings.change', 'Change')}
+              {t('settings.change')}
             </button>
           </div>
 
@@ -135,7 +135,7 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
             type="button"
           >
             {busy === 'import' ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <UploadIcon style={{ width: 14, height: 14 }} />}
-            {busy === 'import' ? t('install.importing', 'Importing...') : t('skills.importAndScan', 'Import and rescan')}
+            {busy === 'import' ? t('install.importing') : t('skills.importAndScan')}
           </button>
         </div>
       </section>
@@ -147,10 +147,10 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
           </span>
           <div>
             <h2 style={{ fontSize: 14, color: 'var(--c-text)', fontWeight: 700 }}>
-              {t('skills.exportSelectedTitle', 'Export selected skills')}
+              {t('skills.exportSelectedTitle')}
             </h2>
             <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 2 }}>
-              {t('skills.exportSelectedDesc', 'Back up or migrate the selected skills as one ZIP archive.')}
+              {t('skills.exportSelectedDesc')}
             </p>
           </div>
         </div>
@@ -159,10 +159,10 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
           {selectedSkills.length === 0 ? (
             <div className="rounded-xl p-5 text-center" style={{ background: 'var(--c-bg-input)' }}>
               <p style={{ fontSize: 12, color: 'var(--c-text-muted)', fontWeight: 600 }}>
-                {t('skills.noExportSelection', 'Select skills in the library first')}
+                {t('skills.noExportSelection')}
               </p>
               <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 4 }}>
-                {t('skills.noExportSelectionDesc', 'Only selected skills with local paths can be exported.')}
+                {t('skills.noExportSelectionDesc')}
               </p>
             </div>
           ) : (
@@ -183,7 +183,7 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
           )}
           {selectedSkills.length > 6 ? (
             <p style={{ fontSize: 11, color: 'var(--c-text-faint)' }}>
-              {t('skills.moreSelected', '+ {{count}} more', { count: selectedSkills.length - 6 })}
+              {t('skills.moreSelected', { count: selectedSkills.length - 6 })}
             </p>
           ) : null}
         </div>
@@ -192,9 +192,9 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
           className="grid grid-cols-3 gap-2 my-4 rounded-xl p-3"
           style={{ background: 'var(--c-bg-input)', border: '1px solid var(--c-border)' }}
         >
-          <MetricTile label={t('skills.summarySkills', 'Skills')} value={selectedSkills.length} />
-          <MetricTile label={t('skills.summaryFiles', 'Files')} value={selectedSkills.length ? selectedSkills.length * 4 : 0} />
-          <MetricTile label={t('skills.summaryFormat', 'Format')} value="ZIP" />
+          <MetricTile label={t('skills.summarySkills')} value={selectedSkills.length} />
+          <MetricTile label={t('skills.summaryFiles')} value={selectedSkills.length ? selectedSkills.length * 4 : 0} />
+          <MetricTile label={t('skills.summaryFormat')} value="ZIP" />
         </div>
 
         <button
@@ -205,7 +205,7 @@ export function SkillImportExportPanel({ skills, selectedSkillIds, onImported }:
           type="button"
         >
           {busy === 'export' ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <Download style={{ width: 14, height: 14 }} />}
-          {busy === 'export' ? t('skills.exporting', 'Exporting...') : t('skills.exportZip', 'Export ZIP')}
+          {busy === 'export' ? t('skills.exporting') : t('skills.exportZip')}
         </button>
       </section>
     </div>

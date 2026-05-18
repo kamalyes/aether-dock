@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, Layers, RefreshCw, TrendingUp } from 'lucide-react'
+﻿import { AlertTriangle, CheckCircle2, Layers, RefreshCw, TrendingUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { Skill } from '@/types'
 import { CORE_SKILL_TOOLS, getToolIconFor, isSkillEnabledForTool } from './utils'
@@ -17,48 +17,48 @@ export function SkillStatsPanel({ skills, visibleCount }: SkillStatsPanelProps) 
   const cards = [
     {
       key: 'total',
-      label: t('skills.statsTotal', 'Skills'),
+      label: t('skills.statsTotal'),
       value: skills.length,
-      helper: t('skills.statsVisible', '{{count}} visible', { count: visibleCount }),
+      helper: t('skills.statsVisible', { count: visibleCount }),
       icon: Layers,
       color: 'var(--c-accent)',
       bg: 'var(--c-accent-soft)',
     },
     {
       key: 'installed',
-      label: t('skills.statsInstalled', 'Installed'),
+      label: t('skills.statsInstalled'),
       value: installed,
-      helper: t('skills.statsReady', 'Ready to use'),
+      helper: t('skills.statsReady'),
       icon: CheckCircle2,
       color: 'var(--c-green)',
       bg: 'var(--c-green-soft)',
     },
     {
       key: 'updates',
-      label: t('skills.statsUpdates', 'Updates'),
+      label: t('skills.statsUpdates'),
       value: updates,
-      helper: updates > 0 ? t('skills.statsNeedsPull', 'Needs pull') : t('skills.statsNoUpdates', 'No pending updates'),
+      helper: updates > 0 ? t('skills.statsNeedsPull') : t('skills.statsNoUpdates'),
       icon: RefreshCw,
       color: 'var(--c-amber)',
       bg: 'var(--c-amber-soft)',
     },
     {
       key: 'errors',
-      label: t('skills.statsErrors', 'Errors'),
+      label: t('skills.statsErrors'),
       value: errors,
-      helper: errors > 0 ? t('skills.statsNeedsReview', 'Needs review') : t('skills.statsHealthy', 'Healthy'),
+      helper: errors > 0 ? t('skills.statsNeedsReview') : t('skills.statsHealthy'),
       icon: AlertTriangle,
       color: errors > 0 ? 'var(--c-red)' : 'var(--c-green)',
       bg: errors > 0 ? 'var(--c-red-soft)' : 'var(--c-green-soft)',
     },
     {
       key: 'usage',
-      label: t('skills.statsUsage', 'App installs'),
+      label: t('skills.statsUsage'),
       value: CORE_SKILL_TOOLS.reduce(
         (sum, tool) => sum + skills.filter((skill) => isSkillEnabledForTool(skill, tool)).length,
         0,
       ),
-      helper: t('skills.statsMatrix', 'Across core apps'),
+      helper: t('skills.statsMatrix'),
       icon: TrendingUp,
       color: 'var(--c-violet)',
       bg: 'var(--c-violet-soft)',
@@ -95,7 +95,7 @@ export function SkillStatsPanel({ skills, visibleCount }: SkillStatsPanelProps) 
 
       <div className="flex flex-wrap items-center gap-1.5">
         <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--c-text-faint)', marginRight: 2 }}>
-          {t('skills.coreApps', 'Core apps')}
+          {t('skills.coreApps')}
         </span>
         {CORE_SKILL_TOOLS.map((tool) => {
           const icon = getToolIconFor(tool)

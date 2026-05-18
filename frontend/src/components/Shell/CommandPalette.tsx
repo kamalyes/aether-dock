@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+﻿import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -69,18 +69,18 @@ export default function CommandPalette() {
   }, [open])
 
   const commands: CommandItem[] = [
-    { id: 'nav-dashboard', label: t('nav.dashboard', 'Dashboard'), icon: LayoutDashboard, category: 'nav', action: () => { navigate('/'); setOpen(false) } },
-    { id: 'nav-skills', label: t('nav.skills', 'Skills'), icon: Zap, category: 'nav', action: () => { navigate('/skills'); setOpen(false) } },
-    { id: 'nav-mcp', label: t('nav.mcp', 'MCP Servers'), icon: Server, category: 'nav', action: () => { navigate('/mcp'); setOpen(false) } },
-    { id: 'nav-tools', label: t('nav.tools', 'Tools'), icon: Wrench, category: 'nav', action: () => { navigate('/tools'); setOpen(false) } },
-    { id: 'nav-install', label: t('nav.install', 'Install'), icon: Download, category: 'nav', action: () => { navigate('/install'); setOpen(false) } },
-    { id: 'nav-settings', label: t('nav.settings', 'Settings'), icon: Settings, category: 'nav', action: () => { navigate('/settings'); setOpen(false) } },
-    { id: 'action-refresh', label: t('cmd.refreshData', 'Refresh All Data'), description: t('cmd.refreshDataDesc', 'Reload skills, MCP servers and tools'), icon: RefreshCw, category: 'action', action: async () => { await Promise.all([fetchSkills(), fetchServers()]); setOpen(false) } },
-    { id: 'action-install-git', label: t('cmd.installGit', 'Install Skill from Git'), icon: FolderOpen, category: 'action', action: () => { navigate('/install?tab=git'); setOpen(false) } },
-    { id: 'action-install-local', label: t('cmd.installLocal', 'Import Skill from Local'), icon: FolderOpen, category: 'action', action: () => { navigate('/install?tab=local'); setOpen(false) } },
-    { id: 'action-add-mcp', label: t('cmd.addMcp', 'Add MCP Server'), icon: Server, category: 'action', action: () => { navigate('/install?tab=mcp'); setOpen(false) } },
-    { id: 'theme-light', label: t('cmd.themeLight', 'Switch to Light Theme'), icon: Sun, category: 'theme', action: () => { setThemeMode('light'); setOpen(false) } },
-    { id: 'theme-dark', label: t('cmd.themeDark', 'Switch to Dark Theme'), icon: Moon, category: 'theme', action: () => { setThemeMode('dark'); setOpen(false) } },
+    { id: 'nav-dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, category: 'nav', action: () => { navigate('/'); setOpen(false) } },
+    { id: 'nav-skills', label: t('nav.skills'), icon: Zap, category: 'nav', action: () => { navigate('/skills'); setOpen(false) } },
+    { id: 'nav-mcp', label: t('nav.mcp'), icon: Server, category: 'nav', action: () => { navigate('/mcp'); setOpen(false) } },
+    { id: 'nav-tools', label: t('nav.tools'), icon: Wrench, category: 'nav', action: () => { navigate('/tools'); setOpen(false) } },
+    { id: 'nav-install', label: t('nav.install'), icon: Download, category: 'nav', action: () => { navigate('/install'); setOpen(false) } },
+    { id: 'nav-settings', label: t('nav.settings'), icon: Settings, category: 'nav', action: () => { navigate('/settings'); setOpen(false) } },
+    { id: 'action-refresh', label: t('cmd.refreshData'), description: t('cmd.refreshDataDesc'), icon: RefreshCw, category: 'action', action: async () => { await Promise.all([fetchSkills(), fetchServers()]); setOpen(false) } },
+    { id: 'action-install-git', label: t('cmd.installGit'), icon: FolderOpen, category: 'action', action: () => { navigate('/install?tab=git'); setOpen(false) } },
+    { id: 'action-install-local', label: t('cmd.installLocal'), icon: FolderOpen, category: 'action', action: () => { navigate('/install?tab=local'); setOpen(false) } },
+    { id: 'action-add-mcp', label: t('cmd.addMcp'), icon: Server, category: 'action', action: () => { navigate('/install?tab=mcp'); setOpen(false) } },
+    { id: 'theme-light', label: t('cmd.themeLight'), icon: Sun, category: 'theme', action: () => { setThemeMode('light'); setOpen(false) } },
+    { id: 'theme-dark', label: t('cmd.themeDark'), icon: Moon, category: 'theme', action: () => { setThemeMode('dark'); setOpen(false) } },
     ...skills.map((skill) => ({
       id: `skill-${skill.id}`,
       label: skill.name,
@@ -117,11 +117,11 @@ export default function CommandPalette() {
 
   const categoryOrder = ['nav', 'action', 'theme', 'skill', 'mcp']
   const categoryLabels: Record<string, string> = {
-    nav: t('cmd.catNav', 'Navigation'),
-    action: t('cmd.catAction', 'Actions'),
-    theme: t('cmd.catTheme', 'Theme'),
-    skill: t('cmd.catSkill', 'Skills'),
-    mcp: t('cmd.catMcp', 'MCP Servers'),
+    nav: t('cmd.catNav'),
+    action: t('cmd.catAction'),
+    theme: t('cmd.catTheme'),
+    skill: t('cmd.catSkill'),
+    mcp: t('cmd.catMcp'),
   }
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -192,7 +192,7 @@ export default function CommandPalette() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={t('cmd.placeholder', 'Type a command or search...')}
+                  placeholder={t('cmd.placeholder')}
                   style={{
                     flex: 1,
                     background: 'transparent',
@@ -225,7 +225,7 @@ export default function CommandPalette() {
                 {filtered.length === 0 ? (
                   <div className="flex flex-col items-center py-8">
                     <Search style={{ width: 24, height: 24, color: 'var(--c-text-faint)', marginBottom: 8 }} />
-                    <p style={{ color: 'var(--c-text-muted)', fontSize: 12 }}>{t('cmd.noResults', 'No results found')}</p>
+                    <p style={{ color: 'var(--c-text-muted)', fontSize: 12 }}>{t('cmd.noResults')}</p>
                   </div>
                 ) : (
                   categoryOrder.map((cat) => {
@@ -288,15 +288,15 @@ export default function CommandPalette() {
               >
                 <span className="flex items-center gap-1" style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>
                   <kbd style={{ fontSize: 9, padding: '1px 4px', borderRadius: 3, background: 'var(--c-bg-input)', border: '1px solid var(--c-border)' }}>↑↓</kbd>
-                  {t('cmd.navigate', 'Navigate')}
+                  {t('cmd.navigate')}
                 </span>
                 <span className="flex items-center gap-1" style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>
                   <kbd style={{ fontSize: 9, padding: '1px 4px', borderRadius: 3, background: 'var(--c-bg-input)', border: '1px solid var(--c-border)' }}>↵</kbd>
-                  {t('cmd.select', 'Select')}
+                  {t('cmd.select')}
                 </span>
                 <span className="flex items-center gap-1" style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>
                   <kbd style={{ fontSize: 9, padding: '1px 4px', borderRadius: 3, background: 'var(--c-bg-input)', border: '1px solid var(--c-border)' }}>esc</kbd>
-                  {t('cmd.close', 'Close')}
+                  {t('cmd.close')}
                 </span>
               </div>
             </div>

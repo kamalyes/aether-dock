@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+﻿import { useEffect, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { wailsApi } from '@/services/wailsBridge'
 import { CopyableField } from '@/components/Field'
@@ -189,7 +189,7 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3">
         <XCircle style={{ width: 40, height: 40, color: 'var(--c-red)' }} />
-        <p style={{ color: 'var(--c-text-muted)', fontSize: 13, fontWeight: 600 }}>{t('detail.loadFailed', 'Failed to load skill detail')}</p>
+        <p style={{ color: 'var(--c-text-muted)', fontSize: 13, fontWeight: 600 }}>{t('detail.loadFailed')}</p>
         {error && (
           <p style={{ color: 'var(--c-text-faint)', fontSize: 11, maxWidth: 400, textAlign: 'center', lineHeight: 1.5 }}>{error}</p>
         )}
@@ -200,14 +200,14 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
             style={{ color: 'var(--c-accent)', fontSize: 12, padding: '6px 14px', borderRadius: 6, cursor: 'pointer', background: 'var(--c-accent-soft)', border: '1px solid var(--c-border)' }}
           >
             <RefreshCw style={{ width: 12, height: 12, marginRight: 4 }} />
-            {t('detail.retry', 'Retry')}
+            {t('detail.retry')}
           </button>
           <button
             className="ghost-button"
             onClick={onBack}
             style={{ color: 'var(--c-text-muted)', fontSize: 12, padding: '6px 14px', borderRadius: 6, cursor: 'pointer', background: 'transparent', border: '1px solid var(--c-border)' }}
           >
-            ‹ {t('detail.back', 'Back')}
+            ‹ {t('detail.back')}
           </button>
         </div>
       </div>
@@ -231,7 +231,7 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
             onClick={loadDetail}
             style={{ fontSize: 10, color: 'var(--c-red)', background: 'transparent', border: '1px solid rgba(220, 38, 38, 0.3)', borderRadius: 4, padding: '2px 8px', cursor: 'pointer' }}
           >
-            {t('detail.retry', 'Retry')}
+            {t('detail.retry')}
           </button>
         </div>
       )}
@@ -249,7 +249,7 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
             onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--c-text-muted)' }}
           >
             <ArrowLeft style={{ width: 14, height: 14 }} />
-            {t('detail.back', 'Back')}
+            {t('detail.back')}
           </button>
         </div>
 
@@ -276,7 +276,7 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
               <SkillStatusBadge status={skill.status} />
             </div>
             <p style={{ fontSize: 12, color: 'var(--c-text-muted)', marginTop: 4, lineHeight: 1.5, margin: '4px 0 0' }}>
-              {skill.description || gitInfo?.description || t('detail.noDesc', 'No description')}
+              {skill.description || gitInfo?.description || t('detail.noDesc')}
             </p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <TagList tags={skill.tags || []} size="xs" />
@@ -315,7 +315,7 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-amber-soft)' }}
               >
                 <BellDot style={{ width: 12, height: 12 }} className="animate-pulse" />
-                {t('detail.hasUpdate', 'Update Available')}
+                {t('detail.hasUpdate')}
               </button>
             )}
             {skill.gitUrl && (
@@ -340,7 +340,7 @@ export default function SkillDetailPage({ skillId, onBack }: SkillDetailPageProp
               onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
             >
               <FolderOpen style={{ width: 12, height: 12 }} />
-              {t('detail.openFolder', 'Open folder')}
+              {t('detail.openFolder')}
             </button>
           </div>
         </div>
@@ -417,32 +417,32 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
       <div className="space-y-4">
         {/* Summary Card */}
         <div className="glass-card p-4">
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.overview', 'Overview')}</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.overview')}</h3>
           <div className="space-y-4">
             <div>
-              <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.useCases', 'Use Cases')}</strong>
+              <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.useCases')}</strong>
               <p style={{ fontSize: 12, color: 'var(--c-text-secondary)', lineHeight: 1.6, margin: 0 }}>
-                {skill.description || gitInfo?.description || t('detail.enhanceAI', 'Enhance specific capabilities of AI coding assistants.')}
+                {skill.description || gitInfo?.description || t('detail.enhanceAI')}
               </p>
             </div>
             <div>
-              <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.howToUse', 'How to Use')}</strong>
+              <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.howToUse')}</strong>
               <ul style={{ fontSize: 12, color: 'var(--c-text-secondary)', lineHeight: 1.8, margin: 0, paddingLeft: 18 }}>
-                <li>{t('detail.howTo1', 'View the full content and verification info.')}</li>
-                <li>{t('detail.howTo2', 'Manage installation locations across platforms.')}</li>
-                <li>{t('detail.howTo3', 'Check which apps it has been synced to.')}</li>
-                <li>{t('detail.howTo4', 'View source code and updates on GitHub.')}</li>
+                <li>{t('detail.howTo1')}</li>
+                <li>{t('detail.howTo2')}</li>
+                <li>{t('detail.howTo3')}</li>
+                <li>{t('detail.howTo4')}</li>
               </ul>
             </div>
             {skill.tags && skill.tags.length > 0 && (
               <div>
-                <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.tags', 'Tags')}</strong>
+                <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.tags')}</strong>
                 <TagList tags={skill.tags} />
               </div>
             )}
             {skill.enabledTools && skill.enabledTools.length > 0 && (
               <div>
-                <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.enabledPlatforms', 'Enabled Platforms')}</strong>
+                <strong style={{ display: 'block', fontSize: 12, color: 'var(--c-text)', marginBottom: 6 }}>{t('detail.enabledPlatforms')}</strong>
                 <div className="flex flex-wrap gap-2">
                   {skill.enabledTools.map((tool) => {
                     const info = toolIcons[tool] || { color: '#6B7280', label: tool }
@@ -472,9 +472,9 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
         {relatedFiles && relatedFiles.length > 0 && (
           <div className="glass-card p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: 0 }}>{t('detail.relatedFiles', 'Related Files')}</h3>
+              <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: 0 }}>{t('detail.relatedFiles')}</h3>
               <span style={{ fontSize: 11, color: 'var(--c-text-faint)', background: 'var(--c-bg-input)', padding: '2px 8px', borderRadius: 6 }}>
-                {relatedFiles.length} {t('detail.files', 'files')}
+                {relatedFiles.length} {t('detail.files')}
               </span>
             </div>
             <div className="space-y-1">
@@ -497,21 +497,21 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
       <div className="space-y-4">
         {/* Status Card */}
         <div className="glass-card p-4">
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.currentStatus', 'Current Status')}</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.currentStatus')}</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.installStatus', 'Install Status')}</span>
+              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.installStatus')}</span>
               <SkillStatusBadge status={skill.status} />
             </div>
             <div className="flex items-center justify-between">
-              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.locations', 'Locations')}</span>
+              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.locations')}</span>
               <span style={{ fontSize: 12, color: 'var(--c-text-secondary)' }}>
                 {installedCount}/{totalLocations}
               </span>
             </div>
             {skill.gitBranch && (
               <div className="flex items-center justify-between">
-                <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.gitBranch', 'Git branch')}</span>
+                <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.gitBranch')}</span>
                 <span style={{ fontSize: 12, color: 'var(--c-text-secondary)', fontFamily: 'monospace' }}>{skill.gitBranch}</span>
               </div>
             )}
@@ -527,7 +527,7 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
         {/* GitHub Info */}
         {gitInfo && (
           <div className="glass-card p-4">
-            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.githubRepo', 'GitHub Repository')}</h3>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.githubRepo')}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-1.5" style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>
@@ -558,7 +558,7 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
               )}
               {gitInfo.lastUpdated && (
                 <div className="flex items-center justify-between">
-                  <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.lastUpdated', 'Last updated')}</span>
+                  <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.lastUpdated')}</span>
                   <span style={{ fontSize: 12, color: 'var(--c-text-secondary)' }}>{formatDate(gitInfo.lastUpdated)}</span>
                 </div>
               )}
@@ -568,30 +568,30 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
 
         {/* Basic Info */}
         <div className="glass-card p-4">
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.basicInfo', 'Basic Info')}</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.basicInfo')}</h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.sourceType', 'Source type')}</span>
+              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.sourceType')}</span>
               <span style={{ fontSize: 12, color: 'var(--c-text-secondary)' }}>
-                {skill.gitUrl ? t('detail.gitRepository', 'Git repository') : t('detail.localInstall', 'Local install')}
+                {skill.gitUrl ? t('detail.gitRepository') : t('detail.localInstall')}
               </span>
             </div>
             {skill.version && (
               <div className="flex items-center justify-between">
-                <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.version', 'Version')}</span>
+                <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.version')}</span>
                 <span style={{ fontSize: 12, color: 'var(--c-text-secondary)' }}>v{skill.version}</span>
               </div>
             )}
             <div className="flex items-center justify-between">
-              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.installedAt', 'Installed at')}</span>
+              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.installedAt')}</span>
               <span style={{ fontSize: 12, color: 'var(--c-text-secondary)' }}>{formatDate(skill.createdAt)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.updatedAt', 'Updated at')}</span>
+              <span style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>{t('detail.updatedAt')}</span>
               <span style={{ fontSize: 12, color: 'var(--c-text-secondary)' }}>{formatDate(skill.updatedAt)}</span>
             </div>
             <div>
-              <span style={{ fontSize: 12, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('detail.installDir', 'Install directory')}</span>
+              <span style={{ fontSize: 12, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('detail.installDir')}</span>
               <div
                 className="flex items-center gap-2 px-2.5 py-2 rounded-lg cursor-pointer transition-colors"
                 style={{ background: 'var(--c-bg-input)' }}
@@ -609,7 +609,7 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
 
         {/* Compatible Apps */}
         <div className="glass-card p-4">
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.compatibleApps', 'Compatible apps')}</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.compatibleApps')}</h3>
           <div className="flex items-center gap-2 flex-wrap">
             {installLocations.map((loc) => {
               const info = toolIcons[loc.icon] || toolIcons[loc.toolName] || { color: '#6B7280', label: loc.toolName }
@@ -631,7 +631,7 @@ function OverviewTab({ detail, formatDate, formatNumber, installedCount, totalLo
             })}
           </div>
           <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 8 }}>
-            {t('detail.compatibleAppsCount', '{{count}} apps installed', { count: installedCount })}
+            {t('detail.compatibleAppsCount', { count: installedCount })}
           </p>
         </div>
       </div>
@@ -646,7 +646,7 @@ function ReadmeTab({ content }: { content: string }) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
         <FileText style={{ width: 40, height: 40, color: 'var(--c-text-faint)' }} />
-        <p style={{ color: 'var(--c-text-muted)', fontSize: 13 }}>{t('detail.noReadme', 'No README content')}</p>
+        <p style={{ color: 'var(--c-text-muted)', fontSize: 13 }}>{t('detail.noReadme')}</p>
       </div>
     )
   }
@@ -683,13 +683,13 @@ function LocationsTab({ locations, skillPath, skillId, onRefresh }: { locations:
     <div className="max-w-2xl space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: 0 }}>{t('detail.locationManager', 'Installation locations')}</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: 0 }}>{t('detail.locationManager')}</h3>
           <p style={{ fontSize: 11, color: 'var(--c-text-faint)', margin: '4px 0 0' }}>
-            {t('detail.locationManagerDesc', 'Manage this skill across apps. Click an installed path to open its folder.')}
+            {t('detail.locationManagerDesc')}
           </p>
         </div>
         <span style={{ fontSize: 11, color: 'var(--c-accent)', background: 'rgba(99, 102, 241, 0.1)', padding: '3px 10px', borderRadius: 999, fontWeight: 600 }}>
-          {t('detail.locationInstalledCount', '{{installed}}/{{total}} installed', { installed: installedCount, total: locations.length })}
+          {t('detail.locationInstalledCount', { installed: installedCount, total: locations.length })}
         </span>
       </div>
 
@@ -722,18 +722,18 @@ function LocationsTab({ locations, skillPath, skillId, onRefresh }: { locations:
                   <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{info.label}</span>
                   {isPrimary && (
                     <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--c-accent)', background: 'rgba(99, 102, 241, 0.1)', padding: '1px 6px', borderRadius: 4 }}>
-                      {t('detail.primaryInstall', 'Primary')}
+                      {t('detail.primaryInstall')}
                     </span>
                   )}
                   {loc.installed ? (
                     <span className="flex items-center gap-1" style={{ fontSize: 10, color: 'var(--c-green)' }}>
                       <CheckCircle2 style={{ width: 11, height: 11 }} />
-                      {t('detail.installed', 'Installed')}
+                      {t('detail.installed')}
                     </span>
                   ) : (
                     <span className="flex items-center gap-1" style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>
                       <XCircle style={{ width: 11, height: 11 }} />
-                      {t('detail.notInstalled', 'Not installed')}
+                      {t('detail.notInstalled')}
                     </span>
                   )}
                 </div>
@@ -760,7 +760,7 @@ function LocationsTab({ locations, skillPath, skillId, onRefresh }: { locations:
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(220, 38, 38, 0.06)' }}
                   >
                     {syncing === loc.toolName ? <Loader2 style={{ width: 11, height: 11 }} className="animate-spin" /> : <Trash2 style={{ width: 11, height: 11 }} />}
-                    {t('detail.remove', 'Remove')}
+                    {t('detail.remove')}
                   </button>
                 ) : (
                   <button
@@ -772,7 +772,7 @@ function LocationsTab({ locations, skillPath, skillId, onRefresh }: { locations:
                     onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
                   >
                     {syncing === loc.toolName ? <Loader2 style={{ width: 11, height: 11 }} className="animate-spin" /> : <Download style={{ width: 11, height: 11 }} />}
-                    {t('detail.install', 'Install')}
+                    {t('detail.install')}
                   </button>
                 )}
               </div>
@@ -799,25 +799,25 @@ function VerifyTab({ contentHash, relatedFiles, installLocations }: {
       {/* Content Hash */}
       <div className="glass-card p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: 0 }}>{t('detail.contentVerify', 'Content verification')}</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: 0 }}>{t('detail.contentVerify')}</h3>
           <span className="flex items-center gap-1.5" style={{ fontSize: 11, color: 'var(--c-green)' }}>
             <Shield style={{ width: 13, height: 13 }} />
-            {t('detail.md5Verify', 'MD5 verification')}
+            {t('detail.md5Verify')}
           </span>
         </div>
         <div className="space-y-3">
           <div>
-            <span style={{ fontSize: 11, color: 'var(--c-text-faint)', display: 'block', marginBottom: 4 }}>{t('detail.contentHash', 'SKILL.md content hash (MD5)')}</span>
+            <span style={{ fontSize: 11, color: 'var(--c-text-faint)', display: 'block', marginBottom: 4 }}>{t('detail.contentHash')}</span>
             <CopyableField
               value={contentHash}
-              displayValue={contentHash || t('detail.hashUnavailable', 'Unable to calculate')}
+              displayValue={contentHash || t('detail.hashUnavailable')}
               icon={<Hash style={{ width: 13, height: 13, color: 'var(--c-accent)', flexShrink: 0 }} />}
             />
           </div>
 
           {installedLocations.length > 0 && (
             <div>
-              <span style={{ fontSize: 11, color: 'var(--c-text-faint)', display: 'block', marginBottom: 6 }}>{t('detail.locationHashCompare', 'Install location hash comparison')}</span>
+              <span style={{ fontSize: 11, color: 'var(--c-text-faint)', display: 'block', marginBottom: 6 }}>{t('detail.locationHashCompare')}</span>
               <div className="space-y-1.5">
                 {installedLocations.map((loc) => {
                   const info = toolIcons[loc.icon] || toolIcons[loc.toolName] || { color: '#6B7280', label: loc.toolName }
@@ -839,7 +839,7 @@ function VerifyTab({ contentHash, relatedFiles, installLocations }: {
                       {hashMatch ? (
                         <CheckCircle2 style={{ width: 13, height: 13, color: 'var(--c-green)', flexShrink: 0 }} />
                       ) : (
-                        <span style={{ fontSize: 10, color: '#DC2626', fontWeight: 600, flexShrink: 0 }}>{t('detail.hashMismatch', 'Mismatch')}</span>
+                        <span style={{ fontSize: 10, color: '#DC2626', fontWeight: 600, flexShrink: 0 }}>{t('detail.hashMismatch')}</span>
                       )}
                     </div>
                   )
@@ -852,7 +852,7 @@ function VerifyTab({ contentHash, relatedFiles, installLocations }: {
 
       {/* File Integrity */}
       <div className="glass-card p-4">
-        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.fileIntegrity', 'File integrity')}</h3>
+        <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: '0 0 12px' }}>{t('detail.fileIntegrity')}</h3>
         <div className="space-y-2">
           <div className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: 'var(--c-bg-input)' }}>
             <span className="flex items-center gap-2" style={{ fontSize: 12, color: 'var(--c-text-secondary)' }}>
@@ -861,7 +861,7 @@ function VerifyTab({ contentHash, relatedFiles, installLocations }: {
             </span>
             <span className="flex items-center gap-1.5" style={{ fontSize: 11, color: 'var(--c-green)' }}>
               <CheckCircle2 style={{ width: 12, height: 12 }} />
-              {t('detail.exists', 'Exists')}
+              {t('detail.exists')}
             </span>
           </div>
           {safeFiles.map((file) => (
@@ -872,7 +872,7 @@ function VerifyTab({ contentHash, relatedFiles, installLocations }: {
               </span>
               <span className="flex items-center gap-1.5" style={{ fontSize: 11, color: 'var(--c-green)' }}>
                 <CheckCircle2 style={{ width: 12, height: 12 }} />
-                {t('detail.exists', 'Exists')}
+                {t('detail.exists')}
               </span>
             </div>
           ))}

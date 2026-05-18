@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+﻿import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useSkillStore } from '@/stores/skillStore'
@@ -67,13 +67,13 @@ export default function InstallPage() {
   const [categoryFilter, setCategoryFilter] = useState('all')
 
   const categories = [
-    { key: 'all', label: t('install.all', 'All') },
-    { key: 'coding', label: 'Coding' },
-    { key: 'writing', label: 'Writing' },
-    { key: 'analysis', label: 'Analysis' },
-    { key: 'automation', label: 'Automation' },
-    { key: 'devops', label: 'DevOps' },
-    { key: 'data', label: 'Data' },
+    { key: 'all', label: t('install.all') },
+    { key: 'coding', label: t('install.coding') },
+    { key: 'writing', label: t('install.writing') },
+    { key: 'analysis', label: t('install.analysis') },
+    { key: 'automation', label: t('install.automation') },
+    { key: 'devops', label: t('install.devops') },
+    { key: 'data', label: t('install.data') },
   ]
 
   const [importZipPath, setImportZipPath] = useState('')
@@ -87,11 +87,11 @@ export default function InstallPage() {
   const { addServer } = useMcpStore()
 
   const tabs: { key: InstallTab; icon: typeof GitBranch; label: string }[] = [
-    { key: 'marketplace', icon: ShoppingBag, label: t('install.fromMarket', 'Marketplace') },
-    { key: 'git', icon: GitBranch, label: t('install.fromGit', 'From Git') },
-    { key: 'local', icon: FolderOpen, label: t('install.fromLocal', 'From Local') },
-    { key: 'mcp', icon: Server, label: 'MCP Server' },
-    { key: 'import-export', icon: FolderSync, label: t('install.importExport', 'Import / Export') },
+    { key: 'marketplace', icon: ShoppingBag, label: t('install.fromMarket') },
+    { key: 'git', icon: GitBranch, label: t('install.fromGit') },
+    { key: 'local', icon: FolderOpen, label: t('install.fromLocal') },
+    { key: 'mcp', icon: Server, label: t('install.mcpServer') },
+    { key: 'import-export', icon: FolderSync, label: t('install.importExport') },
   ]
 
   const parseGitUrl = (url: string) => {
@@ -168,7 +168,7 @@ export default function InstallPage() {
         setMarketMcp(mcpResp.data.skills)
       }
       if (!skillResp.success && !mcpResp.success) {
-        setMarketError(skillResp.error || mcpResp.error || t('install.searchFailed', 'Search failed'))
+        setMarketError(skillResp.error || mcpResp.error || t('install.searchFailed'))
       }
     } catch (e) {
       setMarketError(String(e))
@@ -207,7 +207,7 @@ export default function InstallPage() {
     if (ok) {
       navigate('/')
     } else {
-      setInstallError(t('install.gitFailed', 'Failed to clone repository. Check the URL and try again.'))
+      setInstallError(t('install.gitFailed'))
     }
   }
 
@@ -220,7 +220,7 @@ export default function InstallPage() {
     if (ok) {
       navigate('/')
     } else {
-      setInstallError(t('install.localFailed', 'Failed to import from local folder. Check the path and try again.'))
+      setInstallError(t('install.localFailed'))
     }
   }
 
@@ -285,8 +285,8 @@ export default function InstallPage() {
         style={{ borderBottom: '1px solid var(--c-border)', background: 'var(--c-bg-panel)' }}
       >
         <div>
-          <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)' }}>{t('install.title', 'Install')}</h2>
-          <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 2 }}>{t('install.subtitle', 'Install skills from marketplace, Git, local folder, or add MCP servers')}</p>
+          <h2 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)' }}>{t('install.title')}</h2>
+          <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 2 }}>{t('install.subtitle')}</p>
         </div>
       </div>
 
@@ -320,7 +320,7 @@ export default function InstallPage() {
               <SearchInput
                 value={marketQuery}
                 onChange={setMarketQuery}
-                placeholder={t('install.searchMarket', 'Search GitHub for skills and MCP servers...')}
+                placeholder={t('install.searchMarket')}
               />
             </div>
 
@@ -346,9 +346,9 @@ export default function InstallPage() {
             {!marketLoading && marketSkills.length > 0 && (
               <div className="mb-5">
                 <div className="flex items-center gap-2 mb-2 px-0.5">
-                  <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em' }} className="uppercase">Skills</span>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em' }} className="uppercase">{t('install.skills')}</span>
                   <div className="flex-1 h-px" style={{ background: 'var(--c-border)' }} />
-                  <span style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>{marketSkills.filter(s => categoryFilter === 'all' || s.category === categoryFilter).length} results</span>
+                  <span style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>{marketSkills.filter(s => categoryFilter === 'all' || s.category === categoryFilter).length} {t('install.results')}</span>
                 </div>
                 <div className="space-y-1.5">
                   {marketSkills
@@ -369,9 +369,9 @@ export default function InstallPage() {
             {!marketLoading && marketMcp.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-2 px-0.5">
-                  <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em' }} className="uppercase">MCP Servers</span>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em' }} className="uppercase">{t('install.mcpServers')}</span>
                   <div className="flex-1 h-px" style={{ background: 'var(--c-border)' }} />
-                  <span style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>{marketMcp.length} results</span>
+                  <span style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>{marketMcp.length} {t('install.results')}</span>
                 </div>
                 <div className="space-y-1.5">
                   {marketMcp.map((item) => (
@@ -390,7 +390,7 @@ export default function InstallPage() {
             {!marketLoading && marketError && (
               <div className="flex flex-col items-center justify-center py-16">
                 <AlertCircle style={{ width: 36, height: 36, color: 'var(--c-red)', marginBottom: 12 }} />
-                <p style={{ color: 'var(--c-text-muted)', fontSize: 13, fontWeight: 500 }}>{t('install.searchFailed', 'Search failed')}</p>
+                <p style={{ color: 'var(--c-text-muted)', fontSize: 13, fontWeight: 500 }}>{t('install.searchFailed')}</p>
                 <p style={{ color: 'var(--c-text-faint)', fontSize: 11, marginTop: 4, maxWidth: 300, textAlign: 'center' }}>{marketError}</p>
                 <button
                   className="mt-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors"
@@ -400,7 +400,7 @@ export default function InstallPage() {
                   onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-accent-soft)' }}
                 >
                   <RefreshCw style={{ width: 12, height: 12 }} />
-                  {t('install.retry', 'Retry')}
+                  {t('install.retry')}
                 </button>
               </div>
             )}
@@ -420,22 +420,22 @@ export default function InstallPage() {
             <div className="glass-card p-5">
               <div className="flex items-center gap-2 mb-4">
                 <GitBranch style={{ width: 16, height: 16, color: 'var(--c-text-muted)' }} />
-                <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{t('install.fromGit', 'Install from Git Repository')}</h3>
+                <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{t('install.fromGit')}</h3>
               </div>
               <div className="space-y-3">
                 <Input
-                  label={t('install.gitUrl', 'Repository URL')}
+                  label={t('install.gitUrl')}
                   value={gitUrl}
                   onChange={(e) => setGitUrl(e.target.value)}
                   placeholder="https://github.com/user/skill-repo"
                   monospace
-                  hint={owner && repo ? `→ ${owner}/${repo}` : t('install.urlHint', 'Supports HTTPS, SSH (git@host:owner/repo), and shorthand (owner/repo)')}
+                  hint={owner && repo ? `→ ${owner}/${repo}` : t('install.urlHint')}
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     {branches.length > 0 ? (
                       <Select
-                        label={t('install.branch', 'Branch')}
+                        label={t('install.branch')}
                         value={gitBranch}
                         onChange={(e) => setGitBranch(e.target.value)}
                         options={branches.map(b => ({ value: b, label: b }))}
@@ -443,7 +443,7 @@ export default function InstallPage() {
                       />
                     ) : (
                       <Input
-                        label={t('install.branch', 'Branch')}
+                        label={t('install.branch')}
                         value={gitBranch}
                         onChange={(e) => setGitBranch(e.target.value)}
                         placeholder="main"
@@ -452,7 +452,7 @@ export default function InstallPage() {
                     )}
                   </div>
                   <Input
-                    label={t('install.skillName', 'Name (optional)')}
+                    label={t('install.skillName')}
                     value={gitName}
                     onChange={(e) => setGitName(e.target.value)}
                     placeholder={repo || 'Auto-detect'}
@@ -471,7 +471,7 @@ export default function InstallPage() {
                   ) : (
                     <GitBranch style={{ width: 14, height: 14 }} />
                   )}
-                  {installing ? t('install.installing', 'Cloning...') : t('install.cloneInstall', 'Clone & Install')}
+                  {installing ? t('install.installing') : t('install.cloneInstall')}
                 </button>
 
                 {installError && activeTab === 'git' && (
@@ -481,7 +481,7 @@ export default function InstallPage() {
                   >
                     <AlertCircle style={{ width: 14, height: 14, color: 'var(--c-red)', flexShrink: 0, marginTop: 1 }} />
                     <div>
-                      <p style={{ fontSize: 11, color: 'var(--c-red)', fontWeight: 500 }}>{t('install.failed', 'Installation Failed')}</p>
+                      <p style={{ fontSize: 11, color: 'var(--c-red)', fontWeight: 500 }}>{t('install.failed')}</p>
                       <p style={{ fontSize: 10, color: 'var(--c-text-faint)', marginTop: 2 }}>{installError}</p>
                     </div>
                   </div>
@@ -492,7 +492,7 @@ export default function InstallPage() {
             {installLog.length > 0 && activeTab === 'git' && (
               <div className="mt-4 glass-card p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em' }} className="uppercase">{t('install.log', 'Install Log')}</h4>
+                  <h4 style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em' }} className="uppercase">{t('install.log')}</h4>
                   <button
                     className="text-[10px] transition-colors"
                     style={{ color: 'var(--c-text-faint)' }}
@@ -500,7 +500,7 @@ export default function InstallPage() {
                     onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--c-text-muted)' }}
                     onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--c-text-faint)' }}
                   >
-                    {t('install.clearLog', 'Clear')}
+                    {t('install.clearLog')}
                   </button>
                 </div>
                 <div className="space-y-1 max-h-40 overflow-y-auto">
@@ -523,7 +523,7 @@ export default function InstallPage() {
             )
           }
             <div className="mt-4 glass-card p-4">
-              <h4 style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em', marginBottom: 10 }} className="uppercase">{t('install.supportedHosts', 'Supported URL Formats')}</h4>
+              <h4 style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em', marginBottom: 10 }} className="uppercase">{t('install.supportedHosts')}</h4>
               <div className="space-y-1.5">
                 {[
                   { format: 'HTTPS', example: 'https://github.com/user/repo' },
@@ -545,11 +545,11 @@ export default function InstallPage() {
             <div className="glass-card p-5">
               <div className="flex items-center gap-2 mb-4">
                 <FolderOpen style={{ width: 16, height: 16, color: 'var(--c-amber)' }} />
-                <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{t('install.fromLocal', 'Import from Local Folder')}</h3>
+                <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{t('install.fromLocal')}</h3>
               </div>
               <div className="space-y-3">
                 <Input
-                  label={t('install.localPath', 'Local Path')}
+                  label={t('install.localPath')}
                   value={localPath}
                   onChange={(e) => setLocalPath(e.target.value)}
                   placeholder="/path/to/skill-folder"
@@ -567,7 +567,7 @@ export default function InstallPage() {
                   }
                 />
                 <Input
-                  label={t('install.skillName', 'Skill Name')}
+                  label={t('install.skillName')}
                   value={localName}
                   onChange={(e) => setLocalName(e.target.value)}
                   placeholder="my-skill"
@@ -581,7 +581,7 @@ export default function InstallPage() {
                   onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-accent-soft)' }}
                 >
                   {installing ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <FolderOpen style={{ width: 14, height: 14 }} />}
-                  {installing ? t('install.importing', 'Importing...') : t('install.importInstall', 'Import & Install')}
+                  {installing ? t('install.importing') : t('install.importInstall')}
                 </button>
 
                 {installError && activeTab === 'local' && (
@@ -591,7 +591,7 @@ export default function InstallPage() {
                   >
                     <AlertCircle style={{ width: 14, height: 14, color: 'var(--c-red)', flexShrink: 0, marginTop: 1 }} />
                     <div>
-                      <p style={{ fontSize: 11, color: 'var(--c-red)', fontWeight: 500 }}>{t('install.failed', 'Import Failed')}</p>
+                      <p style={{ fontSize: 11, color: 'var(--c-red)', fontWeight: 500 }}>{t('install.failed')}</p>
                       <p style={{ fontSize: 10, color: 'var(--c-text-faint)', marginTop: 2 }}>{installError}</p>
                     </div>
                   </div>
@@ -606,7 +606,7 @@ export default function InstallPage() {
             <div className="glass-card p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Server style={{ width: 16, height: 16, color: 'var(--c-text-muted)' }} />
-                <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>Add MCP Server</h3>
+                <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{t('install.addMcpServer')}</h3>
               </div>
               <div className="space-y-3">
                 <Input
@@ -645,7 +645,7 @@ export default function InstallPage() {
                   onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-accent-soft)' }}
                 >
                   {installing ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <Plus style={{ width: 14, height: 14 }} />}
-                  {installing ? 'Adding...' : 'Add Server'}
+                  {installing ? t('install.adding') : t('install.addServer')}
                 </button>
 
                 {installError && activeTab === 'mcp' && (
@@ -655,7 +655,7 @@ export default function InstallPage() {
                   >
                     <AlertCircle style={{ width: 14, height: 14, color: 'var(--c-red)', flexShrink: 0, marginTop: 1 }} />
                     <div>
-                      <p style={{ fontSize: 11, color: 'var(--c-red)', fontWeight: 500 }}>{t('install.failed', 'Add Server Failed')}</p>
+                      <p style={{ fontSize: 11, color: 'var(--c-red)', fontWeight: 500 }}>{t('install.failed')}</p>
                       <p style={{ fontSize: 10, color: 'var(--c-text-faint)', marginTop: 2 }}>{installError}</p>
                     </div>
                   </div>
@@ -665,7 +665,7 @@ export default function InstallPage() {
 
             <div className="mt-4 glass-card p-4">
               <div className="flex items-center justify-between mb-2.5">
-                <h4 style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em' }} className="uppercase">MCP Marketplace</h4>
+                <h4 style={{ fontSize: 10, fontWeight: 600, color: 'var(--c-text-faint)', letterSpacing: '0.1em' }} className="uppercase">{t('install.mcpMarketplace')}</h4>
                 <a
                   href="https://mcpmarket.com"
                   target="_blank"
@@ -679,7 +679,7 @@ export default function InstallPage() {
                 </a>
               </div>
               <p style={{ fontSize: 11, color: 'var(--c-text-faint)', lineHeight: 1.5 }}>
-                Visit the MCP Marketplace to discover and install community MCP servers.
+                {t('install.mcpMarketplaceDesc')}
               </p>
             </div>
           </div>
@@ -690,7 +690,7 @@ export default function InstallPage() {
             <div className="glass-card p-5">
               <div className="flex items-center gap-2 mb-4">
                 <UploadIcon style={{ width: 16, height: 16, color: 'var(--c-green)' }} />
-                <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{t('install.importZip', 'Import from ZIP')}</h3>
+                <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{t('install.importZip')}</h3>
               </div>
               <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginBottom: 12, lineHeight: 1.5 }}>
                 Import skills from a ZIP archive. Each skill folder should contain a SKILL.md file.
@@ -720,7 +720,7 @@ export default function InstallPage() {
                   onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-green-soft)' }}
                 >
                   {importing ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <UploadIcon style={{ width: 14, height: 14 }} />}
-                  {importing ? t('install.importing', 'Importing...') : t('install.import', 'Import ZIP')}
+                  {importing ? t('install.importing') : t('install.import')}
                 </button>
               </div>
             </div>
@@ -728,7 +728,7 @@ export default function InstallPage() {
             <div className="glass-card p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Download style={{ width: 16, height: 16, color: 'var(--c-accent)' }} />
-                <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{t('install.exportSkills', 'Export Skills')}</h3>
+                <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{t('install.exportSkills')}</h3>
               </div>
               <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginBottom: 12, lineHeight: 1.5 }}>
                 Export all installed skills as a ZIP archive for backup or migration.
@@ -747,7 +747,7 @@ export default function InstallPage() {
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-accent-soft)' }}
               >
                 {exporting ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <Download style={{ width: 14, height: 14 }} />}
-                {exporting ? 'Exporting...' : 'Export All Skills'}
+                {exporting ? t('install.exporting') : t('install.exportAllSkills')}
               </button>
             </div>
           </div>
@@ -796,11 +796,11 @@ export default function InstallPage() {
                         color: detailItem.type === 'mcp' ? '#8B5CF6' : '#2563EB',
                       }}
                     >
-                      {detailItem.type === 'mcp' ? 'MCP' : 'Skill'}
+                      {detailItem.type === 'mcp' ? t('install.typeMcp') : t('install.typeSkill')}
                     </span>
                   </div>
                   {detailItem.author && (
-                    <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 2 }}>by {detailItem.author}</p>
+                    <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 2 }}>{t('install.byAuthor', { author: detailItem.author })}</p>
                   )}
                 </div>
                 <button
@@ -828,14 +828,14 @@ export default function InstallPage() {
                 )}
                 {detailItem.stars > 0 && (
                   <span style={{ fontSize: 10, fontWeight: 500, padding: '3px 10px', borderRadius: 6, background: 'rgba(245, 158, 11, 0.08)', color: '#D97706' }}>
-                    ⭐ {detailItem.stars} stars
+                    ⭐ {detailItem.stars} {t('install.stars')}
                   </span>
                 )}
               </div>
 
               <div className="space-y-2 mb-5">
                 <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg" style={{ background: 'var(--c-bg-input)' }}>
-                  <span style={{ fontSize: 10, color: 'var(--c-text-faint)', fontWeight: 600, width: 50 }}>URL</span>
+                  <span style={{ fontSize: 10, color: 'var(--c-text-faint)', fontWeight: 600, width: 50 }}>{t('install.url')}</span>
                   <a
                     href={detailItem.url}
                     target="_blank"
@@ -858,7 +858,7 @@ export default function InstallPage() {
                   onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-accent-soft)' }}
                 >
                   {installingId === detailItem.id ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <Download style={{ width: 14, height: 14 }} />}
-                  {installingId === detailItem.id ? 'Installing...' : 'Install'}
+                  {installingId === detailItem.id ? t('install.installing') : t('install.installBtn')}
                 </button>
                 <a
                   href={detailItem.url}
@@ -870,7 +870,7 @@ export default function InstallPage() {
                   onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(15, 23, 42, 0.04)' }}
                 >
                   <ExternalLink style={{ width: 12, height: 12 }} />
-                  Open in Browser
+                  {t('install.openInBrowser')}
                 </a>
               </div>
             </div>
@@ -892,6 +892,7 @@ function MarketplaceCard({
   onInstall: () => void
   onViewDetail: () => void
 }) {
+  const { t } = useTranslation()
   return (
     <div
       className="glass-card-hover flex items-center gap-3 px-4 py-3 cursor-pointer"
@@ -919,7 +920,7 @@ function MarketplaceCard({
             </span>
           )}
           {item.author && (
-            <span style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>by {item.author}</span>
+            <span style={{ fontSize: 10, color: 'var(--c-text-faint)' }}>{t('install.byAuthor', { author: item.author })}</span>
           )}
         </div>
         {item.description && (
@@ -954,7 +955,7 @@ function MarketplaceCard({
           onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--c-accent-soft)' }}
         >
           {installing ? <Loader2 style={{ width: 10, height: 10 }} className="animate-spin" /> : <Download style={{ width: 10, height: 10 }} />}
-          {installing ? 'Installing' : 'Install'}
+          {installing ? t('install.installingBtn') : t('install.installBtn')}
         </button>
       </div>
     </div>

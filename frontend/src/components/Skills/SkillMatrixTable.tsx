@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react'
+﻿import { useMemo, useState, type ReactNode } from 'react'
 import { Check, CircleMinus, Columns3, MoreHorizontal } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { Skill, SkillSource } from '@/types'
@@ -57,11 +57,11 @@ export function SkillMatrixTable({
 
   const columnDefs = useMemo(
     () => [
-      { key: 'description' as ColumnKey, label: t('skills.description', 'Description') },
-      { key: 'status' as ColumnKey, label: t('skills.status', 'Status'), disabled: true },
-      { key: 'matrix' as ColumnKey, label: t('skills.toolMatrix', 'Tool Matrix'), disabled: true },
-      { key: 'calls' as ColumnKey, label: t('skills.calls', 'Calls') },
-      { key: 'updated' as ColumnKey, label: t('skills.updatedAt', 'Updated') },
+      { key: 'description' as ColumnKey, label: t('skills.description') },
+      { key: 'status' as ColumnKey, label: t('skills.status'), disabled: true },
+      { key: 'matrix' as ColumnKey, label: t('skills.toolMatrix'), disabled: true },
+      { key: 'calls' as ColumnKey, label: t('skills.calls') },
+      { key: 'updated' as ColumnKey, label: t('skills.updatedAt') },
     ],
     [t],
   )
@@ -94,7 +94,7 @@ export function SkillMatrixTable({
   if (loading) {
     return (
       <div className="glass-card p-8 text-center">
-        <p style={{ color: 'var(--c-text-muted)', fontSize: 12 }}>{t('skills.loading', 'Loading skills...')}</p>
+        <p style={{ color: 'var(--c-text-muted)', fontSize: 12 }}>{t('skills.loading')}</p>
       </div>
     )
   }
@@ -102,9 +102,9 @@ export function SkillMatrixTable({
   if (skills.length === 0) {
     return (
       <div className="glass-card p-12 text-center">
-        <p style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 600 }}>{t('skills.noSkills', 'No skills')}</p>
+        <p style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 600 }}>{t('skills.noSkills')}</p>
         <p style={{ color: 'var(--c-text-faint)', fontSize: 11, marginTop: 4 }}>
-          {t('skills.noSkillsDesc', 'Install your first skill to get started')}
+          {t('skills.noSkillsDesc')}
         </p>
       </div>
     )
@@ -117,7 +117,7 @@ export function SkillMatrixTable({
         style={{ borderBottom: '1px solid var(--c-border)', background: 'var(--c-bg-elevated)', height: 34 }}
       >
         <span style={{ fontSize: 11, color: 'var(--c-text-faint)', fontWeight: 600 }}>
-          {skills.length} {t('skills.countLabel', 'skills')}
+          {skills.length} {t('skills.countLabel')}
         </span>
         <ColumnVisibilityControl
           columns={columnDefs}
@@ -138,7 +138,7 @@ export function SkillMatrixTable({
           >
             <div className="flex items-center justify-center">
               <input
-                aria-label={t('skills.selectAll', 'Select All')}
+                aria-label={t('skills.selectAll')}
                 checked={allSelected}
                 ref={(input) => {
                   if (input) input.indeterminate = someSelected && !allSelected
@@ -147,9 +147,9 @@ export function SkillMatrixTable({
                 type="checkbox"
               />
             </div>
-            <HeaderCell>{t('skills.tableSkillName', 'Skill name')}</HeaderCell>
-            {showDescription && <HeaderCell>{t('skills.description', 'Description')}</HeaderCell>}
-            {showStatus && <HeaderCell>{t('skills.status', 'Status')}</HeaderCell>}
+            <HeaderCell>{t('skills.tableSkillName')}</HeaderCell>
+            {showDescription && <HeaderCell>{t('skills.description')}</HeaderCell>}
+            {showStatus && <HeaderCell>{t('skills.status')}</HeaderCell>}
             {showMatrix && (
               <div
                 className="grid h-full"
@@ -176,8 +176,8 @@ export function SkillMatrixTable({
                 ))}
               </div>
             )}
-            {showCalls && <HeaderCell align="center">{t('skills.calls', 'Calls')}</HeaderCell>}
-            {showUpdated && <HeaderCell>{t('skills.updatedAt', 'Updated')}</HeaderCell>}
+            {showCalls && <HeaderCell align="center">{t('skills.calls')}</HeaderCell>}
+            {showUpdated && <HeaderCell>{t('skills.updatedAt')}</HeaderCell>}
             <div />
           </div>
 
@@ -195,7 +195,7 @@ export function SkillMatrixTable({
               >
                 <div className="flex items-center justify-center">
                   <input
-                    aria-label={t('skills.selectSkill', 'Select {{name}}', { name: skill.name })}
+                    aria-label={t('skills.selectSkill', { name: skill.name })}
                     checked={selectedSkillIds.has(skill.id)}
                     onChange={() => onToggleSelection(skill.id)}
                     onClick={(event) => event.stopPropagation()}
@@ -229,7 +229,7 @@ export function SkillMatrixTable({
                 {showDescription && (
                   <div className="flex flex-col justify-center min-w-0 px-2">
                     <span style={{ fontSize: 11, color: 'var(--c-text-secondary)' }} className="truncate">
-                      {skill.description || t('skills.noDesc', 'No description')}
+                      {skill.description || t('skills.noDesc')}
                     </span>
                     {skill.tags?.length ? (
                       <span style={{ fontSize: 10, color: 'var(--c-text-faint)', marginTop: 3 }} className="truncate">
@@ -264,7 +264,7 @@ export function SkillMatrixTable({
                           style={{ borderRight: toolIndex < CORE_SKILL_TOOLS.length - 1 ? '1px solid var(--c-border)' : undefined }}
                         >
                           <button
-                            aria-label={enabled ? t('skills.removeFrom', 'Remove from') + ` ${tool.label}` : t('skills.installTo', 'Install to') + ` ${tool.label}`}
+                            aria-label={enabled ? t('skills.removeFrom') + ` ${tool.label}` : t('skills.installTo') + ` ${tool.label}`}
                             className="flex items-center justify-center rounded-lg transition-all"
                             onClick={() => onToggleTool(skill, tool, !enabled)}
                             style={{
@@ -275,7 +275,7 @@ export function SkillMatrixTable({
                               color: enabled ? tool.color : 'var(--c-text-faint)',
                               cursor: 'pointer',
                             }}
-                            title={enabled ? t('skills.installed', 'Installed') : t('skills.notInstalled', 'Not installed')}
+                            title={enabled ? t('skills.installed') : t('skills.notInstalled')}
                             type="button"
                           >
                             {enabled ? (

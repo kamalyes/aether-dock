@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, ChevronRight, ExternalLink, FileText, FolderOpen, ShieldCheck } from 'lucide-react'
+﻿import { AlertTriangle, CheckCircle2, ChevronRight, ExternalLink, FileText, FolderOpen, ShieldCheck } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Skill } from '@/types'
@@ -7,7 +7,6 @@ import {
   CORE_SKILL_TOOLS,
   formatSkillDate,
   getSkillUsage,
-  getToolIconFor,
   isSkillEnabledForTool,
   shortPath,
 } from './utils'
@@ -25,10 +24,10 @@ export function SkillWorkbenchPreview({ skill, onOpenDetail }: SkillWorkbenchPre
       <div className="grid gap-3" style={{ gridTemplateColumns: 'minmax(0, 1fr) 420px 420px' }}>
         <section className="glass-card p-5">
           <p style={{ color: 'var(--c-text-muted)', fontSize: 12, fontWeight: 650 }}>
-            {t('skills.previewEmptyTitle', 'Select a skill to preview')}
+            {t('skills.previewEmptyTitle')}
           </p>
           <p style={{ color: 'var(--c-text-faint)', fontSize: 11, marginTop: 4 }}>
-            {t('skills.previewEmptyDesc', 'The workbench preview will show SKILL.md content, install locations and validation notes.')}
+            {t('skills.previewEmptyDesc')}
           </p>
         </section>
       </div>
@@ -56,7 +55,7 @@ export function SkillWorkbenchPreview({ skill, onOpenDetail }: SkillWorkbenchPre
             type="button"
           >
             <ExternalLink style={{ width: 12, height: 12 }} />
-            {t('skills.openDetail', 'Detail')}
+            {t('skills.openDetail')}
           </button>
         </div>
         <div className="p-4">
@@ -84,59 +83,8 @@ export function SkillWorkbenchPreview({ skill, onOpenDetail }: SkillWorkbenchPre
             </pre>
           </div>
           <p style={{ color: 'var(--c-text-faint)', fontSize: 10, marginTop: 9 }}>
-            Markdown - {skill.version ? `v${skill.version}` : t('skills.noVersion', 'No version')}
+            Markdown - {skill.version ? `v${skill.version}` : t('skills.noVersion')}
           </p>
-        </div>
-      </section>
-
-      <section className="glass-card overflow-hidden">
-        <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--c-border)' }}>
-          <h3 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 750 }}>
-            {t('skills.installLocations', 'Install locations')}
-          </h3>
-        </div>
-        <div className="max-h-[360px] overflow-y-auto">
-          {CORE_SKILL_TOOLS.map((tool, index) => {
-            const enabled = isSkillEnabledForTool(skill, tool)
-            const icon = getToolIconFor(tool)
-            return (
-              <div
-                key={tool.id}
-                className="grid items-center gap-3 px-4 py-3"
-                style={{
-                  gridTemplateColumns: '30px minmax(0,1fr) auto',
-                  borderBottom: index < CORE_SKILL_TOOLS.length - 1 ? '1px solid var(--c-border)' : undefined,
-                }}
-              >
-                <span
-                  className="flex items-center justify-center rounded-md"
-                  style={{ width: 30, height: 30, background: tool.soft, color: tool.color }}
-                >
-                  {icon ? <img src={icon} alt="" style={{ width: 17, height: 17 }} /> : tool.label.slice(0, 1)}
-                </span>
-                <span className="min-w-0">
-                  <strong className="block truncate" style={{ color: 'var(--c-text-secondary)', fontSize: 12 }}>
-                    {tool.label}
-                  </strong>
-                  <span className="block truncate" style={{ color: 'var(--c-text-faint)', fontSize: 10, marginTop: 2 }}>
-                    {shortPath(`${tool.toolName}/skills/${skill.name}`)}
-                  </span>
-                </span>
-                <span
-                  className="inline-flex items-center gap-1 rounded-md px-2 py-1"
-                  style={{
-                    color: enabled ? 'var(--c-green)' : 'var(--c-text-faint)',
-                    background: enabled ? 'var(--c-green-soft)' : 'var(--c-bg-input)',
-                    fontSize: 10,
-                    fontWeight: 700,
-                  }}
-                >
-                  <span className={`status-dot ${enabled ? 'status-dot-installed' : 'status-dot-disabled'}`} />
-                  {enabled ? t('skills.installed', 'Installed') : t('skills.notInstalled', 'Not installed')}
-                </span>
-              </div>
-            )
-          })}
         </div>
       </section>
 
@@ -144,28 +92,28 @@ export function SkillWorkbenchPreview({ skill, onOpenDetail }: SkillWorkbenchPre
         <div className="glass-card overflow-hidden">
           <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--c-border)' }}>
             <h3 style={{ color: 'var(--c-text)', fontSize: 13, fontWeight: 750 }}>
-              {t('skills.validationResults', 'Validation results')}
+              {t('skills.validationResults')}
             </h3>
           </div>
           <div className="p-4 space-y-3">
             <ValidationLine
               icon={<FileText style={{ width: 13, height: 13 }} />}
-              label={t('skills.fileIntegrity', 'File integrity')}
+              label={t('skills.fileIntegrity')}
               ok={skill.status !== 'error'}
             />
             <ValidationLine
               icon={<ShieldCheck style={{ width: 13, height: 13 }} />}
-              label={t('skills.schemaCheck', 'Schema check')}
+              label={t('skills.schemaCheck')}
               ok={skill.status !== 'error'}
             />
             <ValidationLine
               icon={<FolderOpen style={{ width: 13, height: 13 }} />}
-              label={t('skills.referenceCheck', 'Reference files')}
+              label={t('skills.referenceCheck')}
               ok={!hasIssue}
               warning={hasIssue}
             />
             <button className="inline-flex items-center gap-1 text-[11px] font-semibold" style={{ color: 'var(--c-accent)' }} type="button">
-              {t('skills.viewDetails', 'View details')}
+              {t('skills.viewDetails')}
               <ChevronRight style={{ width: 12, height: 12 }} />
             </button>
           </div>
@@ -173,12 +121,12 @@ export function SkillWorkbenchPreview({ skill, onOpenDetail }: SkillWorkbenchPre
 
         <div className="grid grid-cols-2 gap-3">
           <MetricCard
-            label={t('skills.compatibleApps', 'Compatible apps')}
+            label={t('skills.compatibleApps')}
             value={`${enabledTools.length}`}
-            helper={enabledTools.map((tool) => tool.label).join(' / ') || t('skills.none', 'None')}
+            helper={enabledTools.map((tool) => tool.label).join(' / ') || t('skills.none')}
           />
           <MetricCard
-            label={t('skills.recentCalls', 'Recent calls')}
+            label={t('skills.recentCalls')}
             value={`${getSkillUsage(skill)}`}
             helper={formatSkillDate(skill.updatedAt)}
           />

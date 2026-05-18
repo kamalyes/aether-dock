@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMcpStore } from '@/stores/mcpStore'
 import {
@@ -45,7 +45,15 @@ export default function McpPage() {
   const [selectedServer, setSelectedServer] = useState<McpServer | null>(null)
   const [editingServer, setEditingServer] = useState<McpServer | null>(null)
   const [addingServer, setAddingServer] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
   const { dialogState, confirm, cancel } = useConfirmDialog()
+
+  useEffect(() => {
+    void (async () => {
+      await fetchServers()
+      setInitialLoading(false)
+    })()
+  }, [])
 
   useEffect(() => {
     fetchServers()
@@ -119,7 +127,7 @@ export default function McpPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-3">
-          {loading ? (
+          {initialLoading ? (
             <ListLoading mode="skeleton" count={5} />
           ) : filteredServers.length === 0 ? (
             <EntityEmptyState
@@ -525,19 +533,19 @@ function McpFormDialog({
 
         <div className="space-y-3">
           <div>
-            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.nameLabel', 'Name')}</label>
+            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.nameLabel')}</label>
             <input
               type="text"
               style={inputStyle}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder={t('mcp.namePlaceholder', 'e.g. filesystem-server')}
+              placeholder={t('mcp.namePlaceholder')}
               onFocus={(e) => { e.target.style.borderColor = 'var(--c-border-accent)' }}
               onBlur={(e) => { e.target.style.borderColor = 'var(--c-border)' }}
             />
           </div>
           <div>
-            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.commandLabel', 'Command')}</label>
+            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.commandLabel')}</label>
             <input
               type="text"
               style={{ ...inputStyle, fontFamily: 'monospace' }}
@@ -549,7 +557,7 @@ function McpFormDialog({
             />
           </div>
           <div>
-            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.argsLabel', 'Arguments (space-separated)')}</label>
+            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.argsLabel')}</label>
             <input
               type="text"
               style={{ ...inputStyle, fontFamily: 'monospace' }}
@@ -561,13 +569,13 @@ function McpFormDialog({
             />
           </div>
           <div>
-            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.descLabel', 'Description')}</label>
+            <label style={{ fontSize: 11, color: 'var(--c-text-muted)', display: 'block', marginBottom: 4 }}>{t('mcp.descLabel')}</label>
             <input
               type="text"
               style={inputStyle}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={t('mcp.descPlaceholder', 'Optional description')}
+              placeholder={t('mcp.descPlaceholder')}
               onFocus={(e) => { e.target.style.borderColor = 'var(--c-border-accent)' }}
               onBlur={(e) => { e.target.style.borderColor = 'var(--c-border)' }}
             />
@@ -582,7 +590,7 @@ function McpFormDialog({
             onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(15, 23, 42, 0.08)' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(15, 23, 42, 0.04)' }}
           >
-            {t('mcp.cancel', 'Cancel')}
+            {t('mcp.cancel')}
           </button>
           <button
             onClick={handleSave}
@@ -593,7 +601,7 @@ function McpFormDialog({
             onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
           >
             {saving ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : <Check style={{ width: 14, height: 14 }} />}
-            {isEdit ? t('mcp.save', 'Save') : t('mcp.add', 'Add')}
+            {isEdit ? t('mcp.save') : t('mcp.add')}
           </button>
         </div>
       </div>

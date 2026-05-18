@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -53,9 +53,9 @@ export default function SkillDiffModal({ skillId, skillName, open, onClose }: Sk
       const now = new Date()
       const diffMs = now.getTime() - d.getTime()
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-      if (diffDays === 0) return t('diff.today', 'Today')
-      if (diffDays === 1) return t('diff.yesterday', 'Yesterday')
-      if (diffDays < 7) return t('diff.daysAgo', '{{count}} days ago', { count: diffDays })
+      if (diffDays === 0) return t('diff.today')
+      if (diffDays === 1) return t('diff.yesterday')
+      if (diffDays < 7) return t('diff.daysAgo', { count: diffDays })
       return d.toLocaleDateString()
     } catch {
       return dateStr
@@ -118,7 +118,7 @@ export default function SkillDiffModal({ skillId, skillName, open, onClose }: Sk
                   </div>
                   <div>
                     <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-text)', margin: 0 }}>
-                      {t('diff.title', 'Version Diff')}
+                      {t('diff.title')}
                     </h3>
                     <p style={{ fontSize: 11, color: 'var(--c-text-faint)', margin: 0 }}>
                       {skillName}
@@ -159,7 +159,7 @@ export default function SkillDiffModal({ skillId, skillName, open, onClose }: Sk
                         <div className="flex items-center gap-2 mb-3">
                           <ArrowDown style={{ width: 14, height: 14, color: 'var(--c-amber)' }} />
                           <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--c-text)' }}>
-                            {t('diff.newCommits', '{{count}} new commits', { count: diff.behindCount })}
+                            {t('diff.newCommits', { count: diff.behindCount })}
                           </span>
                         </div>
                         <div className="space-y-2">
@@ -174,10 +174,10 @@ export default function SkillDiffModal({ skillId, skillName, open, onClose }: Sk
                       <div className="flex flex-col items-center py-8">
                         <FileCode style={{ width: 32, height: 32, color: 'var(--c-green)', marginBottom: 8 }} />
                         <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--c-text)' }}>
-                          {t('diff.upToDate', 'Already up to date')}
+                          {t('diff.upToDate')}
                         </p>
                         <p style={{ fontSize: 11, color: 'var(--c-text-faint)', marginTop: 4 }}>
-                          {t('diff.upToDateDesc', 'This skill is at the latest version')}
+                          {t('diff.upToDateDesc')}
                         </p>
                       </div>
                     )}
@@ -186,7 +186,7 @@ export default function SkillDiffModal({ skillId, skillName, open, onClose }: Sk
                   <div className="flex flex-col items-center py-8">
                     <AlertCircle style={{ width: 32, height: 32, color: 'var(--c-text-faint)', marginBottom: 8 }} />
                     <p style={{ fontSize: 12, color: 'var(--c-text-muted)' }}>
-                      {t('diff.failedToLoad', 'Failed to load version diff')}
+                      {t('diff.failedToLoad')}
                     </p>
                   </div>
                 )}
@@ -198,7 +198,7 @@ export default function SkillDiffModal({ skillId, skillName, open, onClose }: Sk
                   style={{ borderTop: '1px solid var(--c-border)', background: 'var(--c-bg-elevated)' }}
                 >
                   <span style={{ fontSize: 11, color: 'var(--c-text-faint)' }}>
-                    {t('diff.updateHint', 'Update to get the latest features and fixes')}
+                    {t('diff.updateHint')}
                   </span>
                   <button
                     onClick={handleUpdate}
@@ -216,7 +216,7 @@ export default function SkillDiffModal({ skillId, skillName, open, onClose }: Sk
                     ) : (
                       <Download style={{ width: 13, height: 13 }} />
                     )}
-                    {updating ? t('diff.updating', 'Updating...') : t('diff.updateNow', 'Update Now')}
+                    {updating ? t('diff.updating') : t('diff.updateNow')}
                   </button>
                 </div>
               )}
@@ -238,7 +238,7 @@ function VersionComparison({ diff }: { diff: SkillVersionDiff }) {
     >
       <div className="flex-1 text-center">
         <span style={{ fontSize: 10, color: 'var(--c-text-faint)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          {t('diff.current', 'Current')}
+          {t('diff.current')}
         </span>
         <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--c-text)', fontFamily: 'monospace', margin: '4px 0 0' }}>
           {diff.currentVersion || diff.currentCommit.slice(0, 8)}
@@ -270,7 +270,7 @@ function VersionComparison({ diff }: { diff: SkillVersionDiff }) {
 
       <div className="flex-1 text-center">
         <span style={{ fontSize: 10, color: 'var(--c-text-faint)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          {t('diff.latest', 'Latest')}
+          {t('diff.latest')}
         </span>
         <p style={{ fontSize: 16, fontWeight: 700, color: diff.hasUpdate ? 'var(--c-amber)' : 'var(--c-green)', fontFamily: 'monospace', margin: '4px 0 0' }}>
           {diff.latestVersion || diff.latestCommit.slice(0, 8)}

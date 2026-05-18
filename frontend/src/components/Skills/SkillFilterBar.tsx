@@ -1,4 +1,4 @@
-import { FolderPlus, RefreshCcw, RefreshCw, Search } from 'lucide-react'
+﻿import { FolderPlus, RefreshCcw, RefreshCw, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { SkillSource } from '@/types'
 import { PageHeader } from '@/components/Header'
@@ -47,18 +47,18 @@ export function SkillFilterBar({
   const { t } = useTranslation()
 
   const headerTitle = activeView === 'library'
-    ? t('skills.libraryTitle', 'Skill library')
+    ? t('skills.libraryTitle')
     : activeView === 'transfer'
-      ? t('skills.viewTransfer', 'Import / Export')
+      ? t('skills.viewTransfer')
       : activeView === 'market'
-        ? t('skills.viewMarket', 'Market')
-        : t('skills.viewUsage', 'Usage')
+        ? t('skills.viewMarket')
+        : t('skills.viewUsage')
 
   return (
     <div className="space-y-3">
       <PageHeader
         title={headerTitle}
-        subtitle={t('skills.workbenchSubtitle', 'Manage skill files, app installs, import/export and usage from one place.')}
+        subtitle={t('skills.workbenchSubtitle')}
         actions={(
           <>
           <button
@@ -67,7 +67,7 @@ export function SkillFilterBar({
             type="button"
           >
             <RefreshCw style={{ width: 14, height: 14 }} className={loading ? 'animate-spin' : ''} />
-            {t('skills.rescan', 'Rescan')}
+            {t('skills.rescan')}
           </button>
           {activeView === 'library' ? (
             <>
@@ -77,7 +77,7 @@ export function SkillFilterBar({
             type="button"
           >
             <RefreshCcw style={{ width: 14, height: 14 }} className={updateChecking ? 'animate-spin' : ''} />
-            {t('skills.checkUpdates', 'Check for updates')}
+            {t('skills.checkUpdates')}
           </button>
           <button
             className="toolbar-button toolbar-button-primary"
@@ -85,7 +85,7 @@ export function SkillFilterBar({
             type="button"
           >
             <FolderPlus style={{ width: 14, height: 14 }} />
-            {t('skills.addFolder', 'Add skill folder')}
+            {t('skills.addFolder')}
           </button>
             </>
           ) : null}
@@ -101,7 +101,7 @@ export function SkillFilterBar({
           <input
             value={searchQuery}
             onChange={(event) => onSearchChange(event.currentTarget.value)}
-            placeholder={t('skills.search', 'Search skills...')}
+            placeholder={t('skills.search')}
             style={{
               width: '100%',
               background: 'transparent',
@@ -117,25 +117,25 @@ export function SkillFilterBar({
           value={statusFilter}
           onChange={(event) => onStatusFilterChange(event.currentTarget.value)}
           options={[
-            { value: 'all', label: t('skills.allStatuses', 'All statuses') },
-            { value: 'installed', label: t('skills.installed', 'Installed') },
-            { value: 'update_available', label: t('skills.updateAvailable', 'Update available') },
-            { value: 'modified', label: t('skills.modified', 'Modified') },
-            { value: 'error', label: t('skills.error', 'Error') },
+            { value: 'all', label: t('skills.allStatuses') },
+            { value: 'installed', label: t('skills.installed') },
+            { value: 'update_available', label: t('skills.updateAvailable') },
+            { value: 'modified', label: t('skills.modified') },
+            { value: 'error', label: t('skills.error') },
           ]}
           selectStyle={{ width: 118, height: 32, background: 'var(--c-bg-input)', paddingTop: 6, paddingBottom: 6 }}
         />
         <Select
           value={sourceFilter}
           onChange={(event) => onSourceFilterChange(event.currentTarget.value)}
-          options={[{ value: 'all', label: t('skills.allSources', 'All sources') }, ...uniqueSourceOptions(sources)]}
+          options={[{ value: 'all', label: t('skills.allSources') }, ...uniqueSourceOptions(sources)]}
           selectStyle={{ width: 128, height: 32, background: 'var(--c-bg-input)', paddingTop: 6, paddingBottom: 6 }}
         />
         <Select
           value={toolFilter}
           onChange={(event) => onToolFilterChange(event.currentTarget.value)}
           options={[
-            { value: 'all', label: t('skills.allApps', 'All apps') },
+            { value: 'all', label: t('skills.allApps') },
             ...CORE_SKILL_TOOLS.map((tool) => ({ value: tool.id, label: tool.label })),
           ]}
           selectStyle={{ width: 116, height: 32, background: 'var(--c-bg-input)', paddingTop: 6, paddingBottom: 6 }}
