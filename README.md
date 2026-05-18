@@ -46,6 +46,8 @@
 
 ### 🎨 UI & UX
 - **Glass morphism design** — Clean, modern interface with subtle depth
+- **Theme system** — Light/dark/system mode, accent color presets, corner radius and base font size controls
+- **Command palette** — Keyboard-first navigation and quick actions
 - **Skeleton & Spinner loading** — Dual loading modes for smooth UX
 - **Framer Motion animations** — Stagger, fade, slide, scale transitions
 - **i18n** — English & Chinese (extensible)
@@ -59,23 +61,45 @@
 
 ## 🏗️ Architecture
 
+AetherDock is a local-first Wails desktop app. The frontend owns the interactive workspace and presentation state, while the Go backend owns persistence, filesystem integration, Git operations, marketplace access, tool detection, and MCP/skill synchronization.
+
 ```
 AetherDock
-├── 🖥️ Frontend (React + TypeScript + Vite)
+├── Desktop shell
+│   ├── Wails v2 window, embedded Vite assets, and Go method bindings
+│   └── IPC boundary through app.go and frontend/src/services/wailsBridge.ts
+│
+├── Frontend workspace (React + TypeScript)
+│   ├── App shell: sidebar navigation, scan widget, command palette, toasts
 │   ├── Pages: Dashboard / Skills / MCP / Tools / Install / Settings
-│   ├── Components: UI Library / Motion / Skills / Dashboard / Layout
-│   ├── State: Zustand Stores
-│   └── i18n: react-i18next
+│   ├── Domain components: Skills, MCP, Theme, Loading, Table, Dialog, Control
+│   ├── State stores: skillStore, mcpStore, toolStore, themeStore, toastStore
+│   ├── Theme system: light/dark/system mode, accent presets, radius, base font size
+│   └── i18n: English and Chinese locale dictionaries
 │
-├── ⚙️ Backend (Go + Wails v2)
-│   ├── Bootstrap: App initialization, DB migration
-│   ├── Services: Skill / MCP / Git / Sync / Marketplace / Tools / Settings / Activity / ImportExport
-│   ├── Repository: GORM + SQLite (WAL mode)
-│   └── Models: Skill / MCP / Tool / Source / Activity / Settings / Sync
+├── Backend core (Go)
+│   ├── bootstrap.AppBootstrap initializes data directories, SQLite, migrations, services
+│   ├── RepositoryFactory provides GORM repositories over SQLite WAL mode
+│   ├── Services coordinate skills, MCP servers, sync, Git, marketplace, tools, settings, activity, import/export
+│   └── Models persist Skill, MCP, Tool, Source, Activity, Settings, and Sync records
 │
-└── 🔗 Bridge (Wails IPC)
-    └── Type-safe API bindings between Go and TypeScript
+├── Local data and integrations
+│   ├── Data lives under ~/.aether-dock with skills/, mcp/, and aether-dock.db
+│   ├── Tool detection reads known config locations for Claude Code, Cursor, Windsurf, Trae, Kiro, Gemini CLI, Codex, and others
+│   └── Sync services write skills and MCP configs into each enabled tool target
+│
+└── CI and release
+    ├── GitHub Actions builds Windows amd64 and macOS universal artifacts
+    └── Tag pushes publish releases; manual runs can build artifacts or publish a typed version
 ```
+
+### Runtime flow
+
+1. `main.go` starts the Wails window and binds `App`.
+2. `App.startup` calls `backend/bootstrap`, creates `~/.aether-dock`, opens SQLite in WAL mode, migrates models, initializes settings, and detects installed tools.
+3. React starts through `frontend/src/main.tsx`, initializes theme and settings, then routes into the app shell.
+4. Stores call `wailsBridge`, which parses Go JSON responses into typed `ApiResponse<T>` objects and falls back to mock data when the Wails runtime is unavailable during browser development.
+5. Backend services record activity and keep database state aligned with filesystem/Git/tool sync side effects.
 
 ---
 
@@ -83,55 +107,50 @@ AetherDock
 
 ```
 aether-dock/
-├── app.go                          # Wails app entry, API handlers
-├── main.go                         # Window config & startup
-├── go.mod                          # Go dependencies
-├── wails.json                      # Wails project config
+├── .github/workflows/release.yml       # Windows/macOS build and GitHub Release workflow
+├── app.go                              # Wails IPC facade and API handlers
+├── main.go                             # Desktop window setup and embedded frontend assets
+├── go.mod / go.sum                     # Go module dependencies
+├── wails.json                          # Wails frontend/build configuration
 │
 ├── backend/
-│   ├── bootstrap/                  # App bootstrap & DB init
-│   ├── constants/                  # App, skill, MCP, tool constants
-│   ├── errors/                     # Error codes & types
-│   ├── models/                     # GORM models (Skill, MCP, Tool, Activity...)
-│   ├── repository/                 # Data access layer (SQLite)
-│   └── service/                    # Business logic
-│       ├── skill_service.go
-│       ├── mcp_service.go
-│       ├── git_service.go
-│       ├── marketplace_service.go
-│       ├── tool_service.go
-│       ├── sync_service.go
-│       ├── settings_service.go
-│       ├── activity_service.go
-│       └── import_export_service.go
+│   ├── bootstrap/                      # Data dir, database, migrations, service wiring
+│   ├── constants/                      # App metadata, default paths, supported tool constants
+│   ├── errors/                         # Error codes and localized messages
+│   ├── models/                         # GORM entities
+│   ├── repository/                     # Repository factory and persistence layer
+│   └── service/                        # Business services
+│       ├── skill_service.go            # Install, delete, enable, update, version diff
+│       ├── mcp_service.go              # MCP CRUD, discovery, tool enablement
+│       ├── git_service.go              # Clone, pull, branch list, status and diff helpers
+│       ├── marketplace_service.go      # Marketplace and GitHub lookup
+│       ├── tool_service.go             # Tool detection and enable/disable state
+│       ├── sync_service.go             # Skill/MCP sync into tool config targets
+│       ├── settings_service.go         # App preferences and defaults
+│       ├── activity_service.go         # Activity timeline records
+│       └── import_export_service.go    # ZIP import/export
 │
-└── frontend/
-    ├── src/
-    │   ├── components/
-    │   │   ├── ui/                 # Reusable UI components
-    │   │   │   ├── Form.tsx        # Input / Select / SearchInput / Textarea
-    │   │   │   ├── Loading.tsx     # Skeleton / Spinner / Loading modes
-    │   │   │   ├── Table.tsx       # Data table with loading states
-    │   │   │   ├── Upload.tsx      # File upload with drag-and-drop
-    │   │   │   ├── SkillIcon.tsx   # Icon with fallback chain
-    │   │   │   ├── ViewToggle.tsx  # Gallery / List switcher
-    │   │   │   ├── SortDropdown.tsx
-    │   │   │   ├── StatusBadge.tsx
-    │   │   │   ├── ConfirmDialog.tsx
-    │   │   │   ├── ToastContainer.tsx
-    │   │   │   └── motion/         # Framer Motion wrappers
-    │   │   ├── skills/             # Skill-specific components
-    │   │   ├── dashboard/          # Dashboard widgets
-    │   │   └── layout/             # App shell & sidebar
-    │   ├── pages/                  # Route pages
-    │   ├── stores/                 # Zustand state management
-    │   ├── services/               # Wails bridge API
-    │   ├── i18n/                   # Internationalization
-    │   ├── types/                  # TypeScript type definitions
-    │   ├── constants/              # Tool icons & supported tools
-    │   ├── utils/                  # Utility functions
-    │   └── styles/                 # Global CSS & design tokens
-    └── wailsjs/                    # Auto-generated Wails bindings
+├── frontend/
+│   ├── package.json / package-lock.json
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Shell/                  # AppLayout, CommandPalette, sidebar scan widget
+│   │   │   ├── Skills/                 # Skill workbench, matrix table, detail, diff, marketplace
+│   │   │   ├── Mcp/                    # MCP status and related UI
+│   │   │   ├── Theme/                  # ThemePicker and theme preset tokens
+│   │   │   ├── Control/ Input/ Table/  # Shared controls and form/table primitives
+│   │   │   ├── Loading/ Dialog/ Toast/ # Feedback and overlay primitives
+│   │   │   └── Motion/ Card/ Badge/    # Visual building blocks
+│   │   ├── pages/                      # Dashboard, Skills, MCP, Tools, Install, Settings
+│   │   ├── stores/                     # Zustand stores for domain and UI state
+│   │   ├── services/wailsBridge.ts     # Runtime bridge and dev-mode mocks
+│   │   ├── i18n/locales/               # en/zh translations
+│   │   ├── constants/                  # App version, tool icons, supported tools
+│   │   ├── styles/globals.css          # Design tokens and global theme CSS
+│   │   └── types/                      # Shared TypeScript contracts
+│   └── wailsjs/                        # Generated Wails bindings
+│
+└── build/                              # Icons, manifests, and generated build output
 ```
 
 ---
@@ -173,6 +192,19 @@ wails build
 ```
 
 Output binary is in `build/bin/`.
+
+### Release Workflow
+
+The repository includes `.github/workflows/release.yml` for Windows and macOS packaging.
+
+- Push a tag such as `v0.1.0` to build and publish a GitHub Release.
+- Run the workflow manually without a version to publish a Release named after the current short commit id.
+- Run the workflow manually with `version` set to a tag such as `v0.1.0` to publish a Release from the selected commit.
+
+Generated assets:
+
+- `aether-dock-windows-amd64.zip`
+- `aether-dock-darwin-universal.zip`
 
 ---
 
