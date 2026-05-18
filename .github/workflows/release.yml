@@ -58,6 +58,11 @@ jobs:
         shell: bash
         run: npm ci
 
+      - name: Build frontend assets for Go embed
+        working-directory: frontend
+        shell: bash
+        run: npm run build
+
       - name: Resolve Wails version
         id: wails
         shell: bash
