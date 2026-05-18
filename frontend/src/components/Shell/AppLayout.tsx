@@ -20,6 +20,7 @@ import { ToastContainer } from '@/components/Toast'
 import CommandPalette from './CommandPalette'
 import SidebarScanWidget from './SidebarScanWidget'
 import { useThemeStore } from '@/stores/themeStore'
+import { wailsApi } from '@/services/wailsBridge'
 
 interface NavItem {
   to: string
@@ -32,10 +33,20 @@ export default function AppLayout() {
   const { t } = useTranslation()
   const location = useLocation()
   const initTheme = useThemeStore((s) => s.init)
+  const applyThemeSettings = useThemeStore((s) => s.applySettings)
 
   useEffect(() => {
+    let cancelled = false
     initTheme()
-  }, [initTheme])
+    void wailsApi.getSettings().then((resp) => {
+      if (!cancelled && resp.success && resp.data) {
+        applyThemeSettings(resp.data)
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [applyThemeSettings, initTheme])
 
   const mainNav: NavItem[] = [
     { to: '/', icon: LayoutDashboard, label: t('nav.dashboard'), end: true },

@@ -189,7 +189,15 @@ function mockCall<T>(key: string): ApiResponse<T> {
     'listTools': mockTools,
     'detectTools': mockTools,
     'listSources': mockSources,
-    'getSettings': { 'app.language': 'auto', 'app.theme': 'light', 'install.autoSync': 'true', 'app.checkUpdates': 'true' },
+    'getSettings': {
+      'app.language': 'auto',
+      'app.theme': 'light',
+      'app.themePreset': 'default',
+      'app.themeRadius': '0.5',
+      'app.themeFontSize': '13',
+      'install.autoSync': 'true',
+      'app.checkUpdates': 'true',
+    },
     'listActivities': [
       { id: 'a1', type: 'install', targetName: 'react-patterns', targetType: 'skill', toolName: '', detail: 'Installed from GitHub', createdAt: '2025-04-10T13:00:00Z' },
       { id: 'a2', type: 'sync', targetName: 'go-clean-arch', targetType: 'skill', toolName: 'cursor', detail: 'Synced to Cursor', createdAt: '2025-04-09T10:00:00Z' },

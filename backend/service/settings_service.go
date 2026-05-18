@@ -31,7 +31,10 @@ func (s *SettingsService) Delete(key string) error {
 func (s *SettingsService) InitDefaults() error {
 	defaults := map[string]string{
 		"app.language":             "auto",
-		"app.theme":                "dark",
+		"app.theme":                "light",
+		"app.themePreset":          "default",
+		"app.themeRadius":          "0.5",
+		"app.themeFontSize":        "13",
 		"app.dataDir":              "",
 		"app.defaultEditor":        "",
 		"app.checkUpdates":         "true",
@@ -56,7 +59,10 @@ func (s *SettingsService) InitDefaults() error {
 func (s *SettingsService) ResetAll() error {
 	defaults := map[string]string{
 		"app.language":             "auto",
-		"app.theme":                "dark",
+		"app.theme":                "light",
+		"app.themePreset":          "default",
+		"app.themeRadius":          "0.5",
+		"app.themeFontSize":        "13",
 		"app.dataDir":              "",
 		"app.defaultEditor":        "",
 		"app.checkUpdates":         "true",

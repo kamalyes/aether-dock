@@ -21,7 +21,7 @@ export function SkillWorkbenchPreview({ skill, onOpenDetail }: SkillWorkbenchPre
 
   if (!skill) {
     return (
-      <div className="grid gap-3" style={{ gridTemplateColumns: 'minmax(0, 1fr) 420px 420px' }}>
+      <div className="grid gap-3" style={{ gridTemplateColumns: 'minmax(360px, 0.9fr) minmax(420px, 1.1fr)' }}>
         <section className="glass-card p-5">
           <p style={{ color: 'var(--c-text-muted)', fontSize: 12, fontWeight: 650 }}>
             {t('skills.previewEmptyTitle')}
@@ -39,7 +39,7 @@ export function SkillWorkbenchPreview({ skill, onOpenDetail }: SkillWorkbenchPre
   const mdPreview = buildSkillMarkdownPreview(skill)
 
   return (
-    <div className="grid gap-3" style={{ gridTemplateColumns: 'minmax(0, 1fr) 420px 420px' }}>
+    <div className="grid gap-3" style={{ gridTemplateColumns: 'minmax(360px, 0.9fr) minmax(420px, 1.1fr)' }}>
       <section className="glass-card overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid var(--c-border)' }}>
           <div className="flex min-w-0 items-center gap-2">
@@ -112,7 +112,12 @@ export function SkillWorkbenchPreview({ skill, onOpenDetail }: SkillWorkbenchPre
               ok={!hasIssue}
               warning={hasIssue}
             />
-            <button className="inline-flex items-center gap-1 text-[11px] font-semibold" style={{ color: 'var(--c-accent)' }} type="button">
+            <button
+              className="inline-flex items-center gap-1 text-[11px] font-semibold"
+              onClick={() => onOpenDetail?.(skill)}
+              style={{ color: 'var(--c-accent)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+              type="button"
+            >
               {t('skills.viewDetails')}
               <ChevronRight style={{ width: 12, height: 12 }} />
             </button>

@@ -190,7 +190,7 @@ export function SkillMatrixTable({
                   gridTemplateColumns: columns,
                   minHeight: 52,
                   borderBottom: index < skills.length - 1 ? '1px solid var(--c-border)' : undefined,
-              background: selectedSkillIds.has(skill.id) || selectedSkillId === skill.id ? 'var(--c-accent-soft)' : undefined,
+                  background: selectedSkillIds.has(skill.id) || selectedSkillId === skill.id ? 'var(--c-accent-soft)' : undefined,
                 }}
               >
                 <div className="flex items-center justify-center">
@@ -375,7 +375,7 @@ function ColumnVisibilityControl<K extends string>({
         type="button"
       >
         <Columns3 style={{ width: 13, height: 13 }} />
-        Columns
+        {t('skills.columns')}
       </button>
       {open && (
         <>

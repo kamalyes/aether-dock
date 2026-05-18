@@ -136,7 +136,7 @@ func (s *GitService) GetDiff(repoPath string) (string, error) {
 
 	diff := ""
 	for file, s := range status {
-		diff += fmt.Sprintf("%s %s\n", s.Staging, file)
+		diff += fmt.Sprintf("%s %s\n", string(s.Staging), file)
 	}
 	return diff, nil
 }

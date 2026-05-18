@@ -9,6 +9,7 @@ import {
   Download,
   Settings,
   LayoutDashboard,
+  MonitorSmartphone,
   Moon,
   Sun,
   RefreshCw,
@@ -18,7 +19,8 @@ import {
 } from 'lucide-react'
 import { useSkillStore } from '@/stores/skillStore'
 import { useMcpStore } from '@/stores/mcpStore'
-import { useThemeStore } from '@/stores/themeStore'
+import { THEME_SETTING_KEYS, useThemeStore, type ThemeMode } from '@/stores/themeStore'
+import { wailsApi } from '@/services/wailsBridge'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface CommandItem {
@@ -42,7 +44,13 @@ export default function CommandPalette() {
 
   const { skills, fetchSkills } = useSkillStore()
   const { servers, fetchServers } = useMcpStore()
-  const { mode: themeMode, setMode: setThemeMode } = useThemeStore()
+  const setThemeMode = useThemeStore((s) => s.setMode)
+
+  const switchThemeMode = (mode: ThemeMode) => {
+    setThemeMode(mode)
+    void wailsApi.setSetting(THEME_SETTING_KEYS.mode, mode)
+    setOpen(false)
+  }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -79,8 +87,9 @@ export default function CommandPalette() {
     { id: 'action-install-git', label: t('cmd.installGit'), icon: FolderOpen, category: 'action', action: () => { navigate('/install?tab=git'); setOpen(false) } },
     { id: 'action-install-local', label: t('cmd.installLocal'), icon: FolderOpen, category: 'action', action: () => { navigate('/install?tab=local'); setOpen(false) } },
     { id: 'action-add-mcp', label: t('cmd.addMcp'), icon: Server, category: 'action', action: () => { navigate('/install?tab=mcp'); setOpen(false) } },
-    { id: 'theme-light', label: t('cmd.themeLight'), icon: Sun, category: 'theme', action: () => { setThemeMode('light'); setOpen(false) } },
-    { id: 'theme-dark', label: t('cmd.themeDark'), icon: Moon, category: 'theme', action: () => { setThemeMode('dark'); setOpen(false) } },
+    { id: 'theme-light', label: t('cmd.themeLight'), icon: Sun, category: 'theme', action: () => switchThemeMode('light') },
+    { id: 'theme-dark', label: t('cmd.themeDark'), icon: Moon, category: 'theme', action: () => switchThemeMode('dark') },
+    { id: 'theme-system', label: t('cmd.themeSystem'), icon: MonitorSmartphone, category: 'theme', action: () => switchThemeMode('system') },
     ...skills.map((skill) => ({
       id: `skill-${skill.id}`,
       label: skill.name,

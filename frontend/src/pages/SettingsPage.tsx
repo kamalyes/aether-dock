@@ -10,24 +10,22 @@ import {
   FolderOpen,
   Globe,
   Monitor,
-  MonitorSmartphone,
-  Moon,
   Pencil,
   RefreshCw,
   RotateCcw,
   ScanSearch,
   Shield,
   SlidersHorizontal,
-  Sun,
 } from 'lucide-react'
 import type { ToolConfig } from '@/types'
 import { wailsApi } from '@/services/wailsBridge'
-import { useThemeStore, type ThemeMode } from '@/stores/themeStore'
+import { THEME_SETTING_KEYS, useThemeStore } from '@/stores/themeStore'
 import { useToolStore } from '@/stores/toolStore'
 import { APP_VERSION } from '@/constants/app'
 import { Switch } from '@/components/Control'
 import { Skeleton, SkeletonCard } from '@/components/Loading'
 import { CORE_SKILL_TOOLS, getToolIconFor, normalizeToolKey, shortPath, type CoreSkillTool } from '@/components/Skills'
+import { ThemePicker } from '@/components/Theme'
 
 type SettingField =
   | {
@@ -47,7 +45,7 @@ type SettingsTab = 'general' | 'scan' | 'validation' | 'apps'
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation()
-  const { mode: themeMode, setMode: setThemeMode } = useThemeStore()
+  const applyThemeSettings = useThemeStore((s) => s.applySettings)
   const { tools, fetchTools } = useToolStore()
   const [settings, setSettings] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
@@ -72,15 +70,12 @@ export default function SettingsPage() {
     if (lang && lang !== 'auto') {
       i18n.changeLanguage(lang)
     }
-    const savedTheme = nextSettings['app.theme'] as ThemeMode | undefined
-    if (savedTheme && savedTheme !== themeMode) {
-      setThemeMode(savedTheme)
-    }
+    applyThemeSettings(nextSettings)
   }
 
   const updateSetting = async (key: string, value: string) => {
-    if (key === 'app.theme') {
-      setThemeMode(value as ThemeMode)
+    if (isThemeSettingKey(key)) {
+      applyThemeSettings({ [key]: value })
     }
     if (key === 'app.language') {
       if (value === 'auto') {
@@ -89,6 +84,11 @@ export default function SettingsPage() {
         i18n.changeLanguage(value)
       }
     }
+    setSettings((prev) => ({ ...prev, [key]: value }))
+    void wailsApi.setSetting(key, value)
+  }
+
+  const persistThemeSetting = (key: string, value: string) => {
     setSettings((prev) => ({ ...prev, [key]: value }))
     void wailsApi.setSetting(key, value)
   }
@@ -272,21 +272,8 @@ export default function SettingsPage() {
                 ))}
 
                 <SettingsSection icon={<Monitor style={{ width: 14, height: 14 }} />} title={t('settings.theme')}>
-                  <div className="grid grid-cols-3 gap-3">
-                    {([
-                      { value: 'light' as ThemeMode, icon: Sun, label: t('settings.light'), preview: { bg: '#f0f2f7', card: '#fff', accent: '#2363eb' } },
-                      { value: 'dark' as ThemeMode, icon: Moon, label: t('settings.dark'), preview: { bg: '#0f1117', card: '#1a1d2e', accent: '#34d399' } },
-                      { value: 'system' as ThemeMode, icon: MonitorSmartphone, label: t('settings.system'), preview: { bg: 'linear-gradient(135deg, #f0f2f7 50%, #0f1117 50%)', card: 'linear-gradient(135deg, #fff 50%, #1a1d2e 50%)', accent: 'linear-gradient(135deg, #2363eb 50%, #34d399 50%)' } },
-                    ]).map((opt) => (
-                      <ThemeButton
-                        key={opt.value}
-                        active={themeMode === opt.value}
-                        icon={<opt.icon style={{ width: 12, height: 12 }} />}
-                        label={opt.label}
-                        preview={opt.preview}
-                        onClick={() => updateSetting('app.theme', opt.value)}
-                      />
-                    ))}
+                  <div className="glass-card p-4" style={{ borderRadius: 'var(--radius-md)' }}>
+                    <ThemePicker onSettingChange={persistThemeSetting} />
                   </div>
                 </SettingsSection>
               </>
@@ -597,47 +584,6 @@ function SettingFieldRow({ item, value, isLast, onChange }: { item: SettingField
   )
 }
 
-function ThemeButton({
-  active,
-  icon,
-  label,
-  preview,
-  onClick,
-}: {
-  active: boolean
-  icon: ReactNode
-  label: string
-  preview: { bg: string; card: string; accent: string }
-  onClick: () => void
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex flex-col items-center gap-2 p-3 rounded-xl transition-all"
-      style={{
-        background: active ? 'var(--c-accent-soft)' : 'var(--c-bg-input)',
-        border: active ? '1.5px solid var(--c-accent)' : '1.5px solid var(--c-border)',
-      }}
-      type="button"
-    >
-      <div className="w-full rounded-lg overflow-hidden" style={{ height: 54, background: preview.bg, padding: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <div className="rounded" style={{ height: 8, width: '60%', background: preview.accent, borderRadius: 3 }} />
-        <div style={{ display: 'flex', gap: 3, flex: 1 }}>
-          <div className="rounded" style={{ width: '42%', background: preview.card, borderRadius: 3 }} />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <div className="rounded" style={{ height: 4, width: '70%', background: 'rgba(128,128,128,0.2)', borderRadius: 2 }} />
-            <div className="rounded" style={{ height: 4, width: '50%', background: 'rgba(128,128,128,0.15)', borderRadius: 2 }} />
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center gap-1.5" style={{ color: active ? 'var(--c-accent)' : 'var(--c-text-muted)' }}>
-        {icon}
-        <span style={{ fontSize: 11, fontWeight: active ? 700 : 600 }}>{label}</span>
-      </div>
-    </button>
-  )
-}
-
 function CoreAppBadge({ tool, config }: { tool: CoreSkillTool; config?: ToolConfig }) {
   const icon = getToolIconFor(tool)
   return (
@@ -678,6 +624,10 @@ function deriveLogPath(config?: ToolConfig): string {
   if (!base) return ''
   const parent = base.replace(/[\\/][^\\/]*$/u, '')
   return parent ? `${parent}/logs` : ''
+}
+
+function isThemeSettingKey(key: string): boolean {
+  return Object.values(THEME_SETTING_KEYS).includes(key as (typeof THEME_SETTING_KEYS)[keyof typeof THEME_SETTING_KEYS])
 }
 
 const selectStyle = {
