@@ -79,9 +79,9 @@ export function ResetSettings():Promise<string>;
 
 export function SaveFile(arg1:string):Promise<string>;
 
-export function SearchMarketplace(arg1:string):Promise<string>;
+export function SearchMarketplace(arg1:string,arg2:number,arg3:number):Promise<string>;
 
-export function SearchMcpMarketplace(arg1:string):Promise<string>;
+export function SearchMcpMarketplace(arg1:string,arg2:number,arg3:number):Promise<string>;
 
 export function SetSetting(arg1:string,arg2:string):Promise<string>;
 

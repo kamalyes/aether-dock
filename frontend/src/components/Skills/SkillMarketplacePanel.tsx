@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { wailsApi } from '@/services/wailsBridge'
 import { MetricTile } from '@/components/Card'
+import { Pagination } from '@/components/Control'
 import { SearchInput } from '@/components/Input'
 import { SkeletonCard } from '@/components/Loading'
 
@@ -28,17 +29,22 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
   const [skills, setSkills] = useState<MarketplaceItem[]>([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const pageSize = 12
 
-  const load = useCallback(async (value: string) => {
+  const load = useCallback(async (value: string, nextPage: number) => {
     setLoading(true)
     setError(null)
     try {
-      const skillResp = await wailsApi.searchMarketplace(value)
+      const skillResp = await wailsApi.searchMarketplace(value, nextPage, pageSize)
       if (skillResp.success) {
-        const data = skillResp.data as { skills?: MarketplaceItem[] } | MarketplaceItem[] | undefined
-        setSkills(Array.isArray(data) ? data : data?.skills ?? [])
+        const data = skillResp.data as { skills?: MarketplaceItem[]; total?: number } | MarketplaceItem[] | undefined
+        const nextSkills = Array.isArray(data) ? data : data?.skills ?? []
+        setSkills(nextSkills)
+        setTotal(Array.isArray(data) ? nextSkills.length : data?.total ?? nextSkills.length)
       } else {
         setError(skillResp.error || t('install.searchFailed'))
       }
@@ -51,10 +57,15 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      void load(query)
+      void load(query, page)
     }, 300)
     return () => window.clearTimeout(timer)
-  }, [load, query])
+  }, [load, page, query])
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value)
+    setPage(1)
+  }
 
   const categories = useMemo(() => {
     const values = new Set(skills.map((item) => item.category).filter(Boolean))
@@ -93,12 +104,12 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
           <SearchInput
             className="flex-1"
             value={query}
-            onChange={setQuery}
+            onChange={handleQueryChange}
             placeholder={t('install.searchMarket')}
           />
           <button
             className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-medium"
-            onClick={() => load(query)}
+            onClick={() => load(query, page)}
             style={{ color: 'var(--c-text-muted)', background: 'var(--c-bg-input)', border: '1px solid var(--c-border)' }}
             type="button"
           >
@@ -151,13 +162,17 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
             ))}
           </div>
         )}
+
+        {!loading && !error && total > pageSize ? (
+          <Pagination page={page} pageSize={pageSize} total={total} onChange={setPage} />
+        ) : null}
       </section>
 
       <aside className="space-y-4 min-w-0">
         <section className="glass-card p-4">
           <h3 style={{ fontSize: 13, color: 'var(--c-text)', fontWeight: 700 }}>{t('skills.marketStats')}</h3>
           <div className="grid gap-2 mt-3">
-            <MetricTile label={t('skills.marketSkills')} value={skills.length} />
+            <MetricTile label={t('skills.marketSkills')} value={total || skills.length} />
             <MetricTile label={t('install.installed')} value={skills.filter((item) => installedSkillNames.has(item.name.toLowerCase())).length} />
             <MetricTile label={t('skills.marketSources')} value={new Set(skills.map((item) => item.author)).size} />
           </div>

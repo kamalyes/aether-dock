@@ -158,12 +158,12 @@ export function SaveFile(arg1) {
   return window['go']['main']['App']['SaveFile'](arg1);
 }
 
-export function SearchMarketplace(arg1) {
-  return window['go']['main']['App']['SearchMarketplace'](arg1);
+export function SearchMarketplace(arg1, arg2, arg3) {
+  return window['go']['main']['App']['SearchMarketplace'](arg1, arg2, arg3);
 }
 
-export function SearchMcpMarketplace(arg1) {
-  return window['go']['main']['App']['SearchMcpMarketplace'](arg1);
+export function SearchMcpMarketplace(arg1, arg2, arg3) {
+  return window['go']['main']['App']['SearchMcpMarketplace'](arg1, arg2, arg3);
 }
 
 export function SetSetting(arg1, arg2) {

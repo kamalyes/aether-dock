@@ -51,58 +51,59 @@ type githubRepo struct {
 	} `json:"owner"`
 }
 
-func (s *MarketplaceService) SearchSkills(query string) (*MarketplaceResult, error) {
+func (s *MarketplaceService) SearchSkills(query string, page, pageSize int) (*MarketplaceResult, error) {
 	if query == "" {
-		return s.getTrendingSkills()
+		return s.getTrendingSkills(page, pageSize)
 	}
 
-	skills, err := s.searchGitHub(query, "skill")
+	result, err := s.searchGitHub(query, "skill", page, pageSize)
 	if err != nil {
 		return &MarketplaceResult{Skills: []MarketplaceSkill{}, Total: 0}, nil
 	}
-	return &MarketplaceResult{Skills: skills, Total: len(skills)}, nil
+	return result, nil
 }
 
-func (s *MarketplaceService) SearchMcpServers(query string) (*MarketplaceResult, error) {
+func (s *MarketplaceService) SearchMcpServers(query string, page, pageSize int) (*MarketplaceResult, error) {
 	if query == "" {
-		return s.getTrendingMcp()
+		return s.getTrendingMcp(page, pageSize)
 	}
 
-	skills, err := s.searchGitHub(query, "mcp+server")
+	result, err := s.searchGitHub(query, "mcp+server", page, pageSize)
 	if err != nil {
 		return &MarketplaceResult{Skills: []MarketplaceSkill{}, Total: 0}, nil
 	}
-	return &MarketplaceResult{Skills: skills, Total: len(skills)}, nil
+	return result, nil
 }
 
 func (s *MarketplaceService) ListCategories() ([]string, error) {
 	return []string{"All", "Skills", "MCP Servers", "Popular", "Recent"}, nil
 }
 
-func (s *MarketplaceService) getTrendingSkills() (*MarketplaceResult, error) {
-	skills, err := s.searchGitHub("ai+skill+SKILL.md", "")
+func (s *MarketplaceService) getTrendingSkills(page, pageSize int) (*MarketplaceResult, error) {
+	result, err := s.searchGitHub("ai+skill+SKILL.md", "", page, pageSize)
 	if err != nil {
 		return &MarketplaceResult{Skills: []MarketplaceSkill{}, Total: 0}, nil
 	}
-	return &MarketplaceResult{Skills: skills, Total: len(skills)}, nil
+	return result, nil
 }
 
-func (s *MarketplaceService) getTrendingMcp() (*MarketplaceResult, error) {
-	skills, err := s.searchGitHub("mcp+server+modelcontextprotocol", "")
+func (s *MarketplaceService) getTrendingMcp(page, pageSize int) (*MarketplaceResult, error) {
+	result, err := s.searchGitHub("mcp+server+modelcontextprotocol", "", page, pageSize)
 	if err != nil {
 		return &MarketplaceResult{Skills: []MarketplaceSkill{}, Total: 0}, nil
 	}
-	return &MarketplaceResult{Skills: skills, Total: len(skills)}, nil
+	return result, nil
 }
 
-func (s *MarketplaceService) searchGitHub(query string, extra string) ([]MarketplaceSkill, error) {
+func (s *MarketplaceService) searchGitHub(query string, extra string, page, pageSize int) (*MarketplaceResult, error) {
+	page, pageSize = normalizeMarketplacePagination(page, pageSize)
 	searchQuery := query
 	if extra != "" {
 		searchQuery = query + "+" + extra
 	}
 
-	apiURL := fmt.Sprintf("https://api.github.com/search/repositories?q=%s&sort=stars&order=desc&per_page=20",
-		url.QueryEscape(searchQuery))
+	apiURL := fmt.Sprintf("https://api.github.com/search/repositories?q=%s&sort=stars&order=desc&page=%d&per_page=%d",
+		url.QueryEscape(searchQuery), page, pageSize)
 
 	req, err := http.NewRequest("GET", apiURL, nil)
 	if err != nil {
@@ -123,7 +124,8 @@ func (s *MarketplaceService) searchGitHub(query string, extra string) ([]Marketp
 	}
 
 	var result struct {
-		Items []githubRepo `json:"items"`
+		TotalCount int          `json:"total_count"`
+		Items      []githubRepo `json:"items"`
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
@@ -137,7 +139,7 @@ func (s *MarketplaceService) searchGitHub(query string, extra string) ([]Marketp
 			skillType = "mcp"
 		}
 		skills = append(skills, MarketplaceSkill{
-			ID:          fmt.Sprintf("gh-%d", i),
+			ID:          fmt.Sprintf("gh-%d", (page-1)*pageSize+i+1),
 			Name:        repo.FullName,
 			Description: repo.Description,
 			Author:      repo.Owner.Login,
@@ -148,7 +150,24 @@ func (s *MarketplaceService) searchGitHub(query string, extra string) ([]Marketp
 		})
 	}
 
-	return skills, nil
+	total := result.TotalCount
+	if total > 1000 {
+		total = 1000
+	}
+	return &MarketplaceResult{Skills: skills, Total: total}, nil
+}
+
+func normalizeMarketplacePagination(page, pageSize int) (int, int) {
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 20
+	}
+	if pageSize > 50 {
+		pageSize = 50
+	}
+	return page, pageSize
 }
 
 type githubBranch struct {

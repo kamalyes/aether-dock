@@ -331,19 +331,19 @@ func (a *App) ResetSettings() string {
 	return jsonResponse(nil, err)
 }
 
-func (a *App) SearchMarketplace(query string) string {
+func (a *App) SearchMarketplace(query string, page, pageSize int) string {
 	if !a.ready {
 		return a.notReady()
 	}
-	result, err := a.bs.Market.SearchSkills(query)
+	result, err := a.bs.Market.SearchSkills(query, page, pageSize)
 	return jsonResponse(result, err)
 }
 
-func (a *App) SearchMcpMarketplace(query string) string {
+func (a *App) SearchMcpMarketplace(query string, page, pageSize int) string {
 	if !a.ready {
 		return a.notReady()
 	}
-	result, err := a.bs.Market.SearchMcpServers(query)
+	result, err := a.bs.Market.SearchMcpServers(query, page, pageSize)
 	return jsonResponse(result, err)
 }
 

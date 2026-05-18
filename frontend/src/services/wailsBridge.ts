@@ -50,8 +50,8 @@ type WailsApp = {
   GetSettings(): Promise<string>
   SetSetting(key: string, value: string): Promise<string>
   ResetSettings(): Promise<string>
-  SearchMarketplace(query: string): Promise<string>
-  SearchMcpMarketplace(query: string): Promise<string>
+  SearchMarketplace(query: string, page: number, pageSize: number): Promise<string>
+  SearchMcpMarketplace(query: string, page: number, pageSize: number): Promise<string>
   ImportSkillsZip(jsonReq: string): Promise<string>
   ExportSkillsZip(jsonReq: string): Promise<string>
   OpenInExplorer(path: string): Promise<string>
@@ -198,6 +198,26 @@ function mockCall<T>(key: string): ApiResponse<T> {
       'install.autoSync': 'true',
       'app.checkUpdates': 'true',
     },
+    'searchMarketplace': { skills: mockSkills.map((skill, index) => ({
+      id: `market-skill-${index + 1}`,
+      name: skill.name,
+      description: skill.description,
+      author: skill.sourceName || 'Marketplace',
+      url: skill.gitUrl,
+      stars: 1200 - index * 120,
+      type: 'skill',
+      category: 'skill',
+    })), total: mockSkills.length },
+    'searchMcpMarketplace': { skills: mockMcpServers.map((server, index) => ({
+      id: `market-mcp-${index + 1}`,
+      name: server.name,
+      description: server.description,
+      author: 'Marketplace',
+      url: server.sourceUrl,
+      stars: 900 - index * 90,
+      type: 'mcp',
+      category: 'mcp',
+    })), total: mockMcpServers.length },
     'listActivities': [
       { id: 'a1', type: 'install', targetName: 'react-patterns', targetType: 'skill', toolName: '', detail: 'Installed from GitHub', createdAt: '2025-04-10T13:00:00Z' },
       { id: 'a2', type: 'sync', targetName: 'go-clean-arch', targetType: 'skill', toolName: 'cursor', detail: 'Synced to Cursor', createdAt: '2025-04-09T10:00:00Z' },
@@ -342,9 +362,11 @@ export const wailsApi = {
 
   resetSettings: () => callApi<void>(() => getApp()!.ResetSettings()),
 
-  searchMarketplace: (query: string) => callApi<any>(() => getApp()!.SearchMarketplace(query)),
+  searchMarketplace: (query: string, page = 1, pageSize = 20) =>
+    callApi<any>(() => getApp()!.SearchMarketplace(query, page, pageSize), 'searchMarketplace'),
 
-  searchMcpMarketplace: (query: string) => callApi<any>(() => getApp()!.SearchMcpMarketplace(query)),
+  searchMcpMarketplace: (query: string, page = 1, pageSize = 20) =>
+    callApi<any>(() => getApp()!.SearchMcpMarketplace(query, page, pageSize), 'searchMcpMarketplace'),
 
   importSkillsZip: (req: { zipPath: string; targetRoot: string }) =>
     callApi<{ targetRoot: string; importedSkillPaths: string[] }>(() =>
