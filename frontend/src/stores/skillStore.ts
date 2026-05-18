@@ -10,6 +10,10 @@ interface InstallLogEntry {
   message: string
 }
 
+function normalizeGitUrlForCompare(url: string): string {
+  return url.trim().toLowerCase().replace(/\.git$/u, '').replace(/\/+$/u, '')
+}
+
 interface SkillState {
   skills: Skill[]
   total: number
@@ -146,8 +150,9 @@ export const useSkillStore = create<SkillState>((set, get) => ({
   clearInstallLog: () => set({ installLog: [], installStatus: 'idle' }),
 
   installFromGit: async (url, branch, name, sourceName) => {
+    const normalizedUrl = normalizeGitUrlForCompare(url)
     const existing = get().skills.find(
-      (s) => s.gitUrl === url && s.gitBranch === branch
+      (s) => normalizeGitUrlForCompare(s.gitUrl) === normalizedUrl && s.gitBranch === branch
     )
     if (existing) {
       toast.warning(i18next.t('skills.alreadyInstalled', 'Skill "{{name}}" is already installed from this URL and branch', { name: existing.name }))

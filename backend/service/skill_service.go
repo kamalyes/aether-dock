@@ -80,6 +80,14 @@ func (s *SkillService) InstallFromGit(req InstallFromGitRequest) (*models.Skill,
 
 	installPath := filepath.Join(dataDir, constants.DefaultSkillsDir, req.Name)
 
+	if err := os.RemoveAll(installPath); err != nil {
+		return nil, fmt.Errorf("failed to prepare install path: %w", err)
+	}
+	if err := s.git.Clone(req.URL, req.Branch, installPath); err != nil {
+		os.RemoveAll(installPath)
+		return nil, fmt.Errorf("git clone failed: %w", err)
+	}
+
 	source := &models.SkillSource{
 		Name:   req.SourceName,
 		Type:   constants.SkillSourceGit,
@@ -90,7 +98,13 @@ func (s *SkillService) InstallFromGit(req InstallFromGitRequest) (*models.Skill,
 		source.Name = req.Name + "-source"
 	}
 	if err := s.repo.Source.Create(source); err != nil {
+		os.RemoveAll(installPath)
 		return nil, fmt.Errorf("failed to create source: %w", err)
+	}
+
+	gitCommit := ""
+	if status, err := s.git.GetStatus(installPath); err == nil {
+		gitCommit = status.Commit
 	}
 
 	skill := &models.Skill{
@@ -99,20 +113,19 @@ func (s *SkillService) InstallFromGit(req InstallFromGitRequest) (*models.Skill,
 		InstallPath:  installPath,
 		GitURL:       req.URL,
 		GitBranch:    req.Branch,
-		Status:       constants.SkillStatusInstalling,
+		GitCommit:    gitCommit,
+		Status:       constants.SkillStatusInstalled,
 		EnabledTools: models.StringList{},
+		Tags:         models.StringList{},
+		Metadata:     models.JSONMap{},
 	}
 
 	if err := s.repo.Skill.Create(skill); err != nil {
+		s.repo.Source.Delete(source.ID)
+		os.RemoveAll(installPath)
 		return nil, fmt.Errorf("failed to create skill record: %w", err)
 	}
 
-	if err := s.git.Clone(req.URL, req.Branch, installPath); err != nil {
-		s.repo.Skill.UpdateStatus(skill.ID, constants.SkillStatusError)
-		return skill, fmt.Errorf("git clone failed: %w", err)
-	}
-
-	s.repo.Skill.UpdateStatus(skill.ID, constants.SkillStatusInstalled)
 	s.activity.Record("install", skill.Name, "skill", "", "Installed from Git: "+req.URL)
 	return skill, nil
 }
@@ -144,6 +157,14 @@ func (s *SkillService) InstallFromLocal(req InstallFromLocalRequest) (*models.Sk
 
 	installPath := filepath.Join(dataDir, constants.DefaultSkillsDir, req.Name)
 
+	if err := os.RemoveAll(installPath); err != nil {
+		return nil, fmt.Errorf("failed to prepare install path: %w", err)
+	}
+	if err := copyDir(req.LocalPath, installPath); err != nil {
+		os.RemoveAll(installPath)
+		return nil, fmt.Errorf("failed to copy local skill: %w", err)
+	}
+
 	source := &models.SkillSource{
 		Name:      req.SourceName,
 		Type:      constants.SkillSourceLocal,
@@ -153,6 +174,7 @@ func (s *SkillService) InstallFromLocal(req InstallFromLocalRequest) (*models.Sk
 		source.Name = req.Name + "-source"
 	}
 	if err := s.repo.Source.Create(source); err != nil {
+		os.RemoveAll(installPath)
 		return nil, fmt.Errorf("failed to create source: %w", err)
 	}
 
@@ -162,15 +184,14 @@ func (s *SkillService) InstallFromLocal(req InstallFromLocalRequest) (*models.Sk
 		InstallPath:  installPath,
 		Status:       constants.SkillStatusInstalled,
 		EnabledTools: models.StringList{},
+		Tags:         models.StringList{},
+		Metadata:     models.JSONMap{},
 	}
 
 	if err := s.repo.Skill.Create(skill); err != nil {
+		s.repo.Source.Delete(source.ID)
+		os.RemoveAll(installPath)
 		return nil, fmt.Errorf("failed to create skill record: %w", err)
-	}
-
-	if err := copyDir(req.LocalPath, installPath); err != nil {
-		s.repo.Skill.UpdateStatus(skill.ID, constants.SkillStatusError)
-		return skill, fmt.Errorf("failed to copy local skill: %w", err)
 	}
 
 	s.activity.Record("install", skill.Name, "skill", "", "Installed from local: "+req.LocalPath)
@@ -326,15 +347,15 @@ type SkillUpdateCheckResult struct {
 }
 
 type SkillVersionDiffResult struct {
-	SkillID        string          `json:"skillId"`
-	CurrentCommit  string          `json:"currentCommit"`
-	LatestCommit   string          `json:"latestCommit"`
-	CurrentVersion string          `json:"currentVersion"`
-	LatestVersion  string          `json:"latestVersion"`
-	BehindCount    int             `json:"behindCount"`
-	AheadCount     int             `json:"aheadCount"`
-	HasUpdate      bool            `json:"hasUpdate"`
-	Commits        []SkillCommit   `json:"commits"`
+	SkillID        string        `json:"skillId"`
+	CurrentCommit  string        `json:"currentCommit"`
+	LatestCommit   string        `json:"latestCommit"`
+	CurrentVersion string        `json:"currentVersion"`
+	LatestVersion  string        `json:"latestVersion"`
+	BehindCount    int           `json:"behindCount"`
+	AheadCount     int           `json:"aheadCount"`
+	HasUpdate      bool          `json:"hasUpdate"`
+	Commits        []SkillCommit `json:"commits"`
 }
 
 type SkillCommit struct {

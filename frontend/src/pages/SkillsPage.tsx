@@ -61,7 +61,7 @@ export default function SkillsPage() {
   const [toolFilter, setToolFilter] = useState<string>('all')
   const [previewSkill, setPreviewSkill] = useState<Skill | null>(null)
   const [detailSkill, setDetailSkill] = useState<Skill | null>(null)
-  const [marketInstallingId, setMarketInstallingId] = useState<string | null>(null)
+  const [marketInstallingIds, setMarketInstallingIds] = useState<Set<string>>(() => new Set())
   const [initialLoading, setInitialLoading] = useState(true)
   const { dialogState, confirm, cancel } = useConfirmDialog()
 
@@ -127,7 +127,16 @@ export default function SkillsPage() {
   }, [searchQuery, skills, sourceFilter, statusFilter, toolFilter])
 
   const installedSkillNames = useMemo(
-    () => new Set(skills.map((skill) => skill.name.toLowerCase())),
+    () => {
+      const keys = new Set<string>()
+      for (const skill of skills) {
+        keys.add(skill.name.toLowerCase())
+        if (skill.gitUrl) {
+          keys.add(skill.gitUrl.toLowerCase())
+        }
+      }
+      return keys
+    },
     [skills],
   )
 
@@ -193,12 +202,20 @@ export default function SkillsPage() {
 
   const handleInstallMarketSkill = async (item: { id: string; name: string; url: string; author?: string }) => {
     if (!item.url) return
-    setMarketInstallingId(item.id)
-    const ok = await installFromGit(item.url, 'main', '', item.author || 'Marketplace')
-    setMarketInstallingId(null)
-    if (ok) {
-      toast.success(t('skills.marketInstallSuccess', { name: item.name }))
-      await refreshAll()
+    if (marketInstallingIds.has(item.id)) return
+    setMarketInstallingIds((prev) => new Set(prev).add(item.id))
+    try {
+      const ok = await installFromGit(item.url, 'main', '', item.author || 'Marketplace')
+      if (ok) {
+        toast.success(t('skills.marketInstallSuccess', { name: item.name }))
+        await refreshAll()
+      }
+    } finally {
+      setMarketInstallingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(item.id)
+        return next
+      })
     }
   }
 
@@ -312,7 +329,7 @@ export default function SkillsPage() {
           {activeView === 'market' ? (
             <SkillMarketplacePanel
               installedSkillNames={installedSkillNames}
-              installingId={marketInstallingId}
+              installingIds={marketInstallingIds}
               onInstallSkill={handleInstallMarketSkill}
             />
           ) : null}

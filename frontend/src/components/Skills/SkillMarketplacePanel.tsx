@@ -20,11 +20,11 @@ interface MarketplaceItem {
 
 interface SkillMarketplacePanelProps {
   installedSkillNames: Set<string>
-  installingId: string | null
+  installingIds: Set<string>
   onInstallSkill: (item: MarketplaceItem) => void
 }
 
-export function SkillMarketplacePanel({ installedSkillNames, installingId, onInstallSkill }: SkillMarketplacePanelProps) {
+export function SkillMarketplacePanel({ installedSkillNames, installingIds, onInstallSkill }: SkillMarketplacePanelProps) {
   const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
@@ -95,6 +95,14 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
               <p style={{ fontSize: 12, color: 'var(--c-text-muted)', marginTop: 5, maxWidth: 560 }}>
                 {t('skills.marketDesc')}
               </p>
+              {installingIds.size > 0 ? (
+                <span
+                  className="inline-flex items-center rounded-full px-2 py-1 text-[10px] font-semibold"
+                  style={{ color: 'var(--c-accent)', background: 'var(--c-accent-soft)', marginTop: 10 }}
+                >
+                  {t('skills.installing')} {installingIds.size}
+                </span>
+              ) : null}
             </div>
             <Store style={{ width: 58, height: 58, color: 'var(--c-accent)', opacity: 0.24 }} />
           </div>
@@ -155,8 +163,8 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
               <MarketSkillCard
                 key={item.id}
                 item={item}
-                installed={installedSkillNames.has(item.name.toLowerCase())}
-                installing={installingId === item.id}
+                installed={isMarketplaceItemInstalled(item, installedSkillNames)}
+                installing={installingIds.has(item.id)}
                 onInstall={() => onInstallSkill(item)}
               />
             ))}
@@ -196,6 +204,15 @@ export function SkillMarketplacePanel({ installedSkillNames, installingId, onIns
       </aside>
     </div>
   )
+}
+
+function isMarketplaceItemInstalled(item: MarketplaceItem, installedSkillNames: Set<string>): boolean {
+  const keys = [
+    item.name,
+    item.url,
+    item.name.split('/').pop(),
+  ]
+  return keys.some((key) => key ? installedSkillNames.has(key.toLowerCase()) : false)
 }
 
 function MarketSkillCard({
